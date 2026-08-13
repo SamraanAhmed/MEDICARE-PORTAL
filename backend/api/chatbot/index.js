@@ -1,12 +1,12 @@
 const express = require('express');
 //const { jwt, authenticate, checkAuthentication } = require('../middleware/jwt');
-const { createMessage } = require('/database/queries');
-const { gemini } = require('/google');
+const { createMessage } = require('../../database/queries');
+const { gemini } = require('../../google');
 
 const router = express.Router();
 
 
-router.post('/ask', authenticate, async (req, res) => {
+router.post('/ask', async (req, res) => {
     try {
         const { content } = req.body;
         const results = await gemini.generateContent(content);
