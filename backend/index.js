@@ -4,6 +4,7 @@ const cors = require("cors");
 const dns = require('dns');
 const cookieParser = require('cookie-parser');
 const { connectDB } = require("./database/mongodb");
+const { }
 
 dotenv.config();
 dns.setServers(['1.1.1.1', '8.8.8.8']);
