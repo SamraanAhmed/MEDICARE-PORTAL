@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
 
 const user = mongoose.model('users', userSchema);
 
-const leadSchema = new mongoose.Schema({
+const DoctorSchema = new mongoose.Schema({
     avatar: {
         type: String,
         default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0k6mJECkDvvxLWpl2C6oVOgbs49inNcoZtvJRFileqS3TAkNr3qOH87dG&s=10"
@@ -47,11 +47,6 @@ const leadSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    role: {
-        type: String,
-        enum: ['doctor', 'admin'],
-        required: true
-    },
     pillar: {
         type: String,
         enum: ['cardiology', 'dermatology', 'orthopedics', 'diagnostics', 'telehealth', 'general'],
@@ -61,16 +56,25 @@ const leadSchema = new mongoose.Schema({
         type: String,
         enum: ['male', 'female'],
         default: 'male'
+    },
+    available: {
+        type: Boolean,
+        default: true
     }
 }, { timestamps: true});
 
-const lead = mongoose.model('leads', leadSchema);
+const doctor = mongoose.model('doctors', doctorSchema);
 
 const serviceSchema = new mongoose.Schema({
     service: {
         type: String,
         required: true,
         unique: true
+    },
+    pillar: {
+        type: String,
+        enum: ['cardiology', 'dermatology', 'orthopedics', 'diagnostics', 'telehealth', 'general'],
+        required: true
     },
     available: {
         type: Boolean,
@@ -119,14 +123,14 @@ const appointmentSchema = new mongoose.Schema({
       enum: ['pending', 'cancelled', 'completed', 'no-show'],
       default: 'pending',
     },
+    appointment_date: {
+        type: Date,
+        required: true
+    },
     notes: {
       type: String,
       trim: true,
       maxLength: 500,
-    },
-    appointment_date: {
-        type: Date,
-        required: true
     }
 }, { timestamps: true });
 
@@ -143,6 +147,6 @@ const connectDB = async () => {
 }
 
 module.exports = {
-    user, lead, service, message, appointment,
+    user, doctor, service, message, appointment,
     connectDB
 };
