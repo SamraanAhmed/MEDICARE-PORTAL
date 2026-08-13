@@ -104,6 +104,32 @@ const updateDoctorAvailability = async (doctorData) => {
     }
 }
 
+// Delete functions
+const deleteUser = async (user_id) => {
+    try {
+        const result = await user.findOneAndDelete({_id: user_id});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const deleteDoctor = async (doctor_id) => {
+    try {
+        const result = await doctor.findOneAndDelete({_id: doctor_id});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const deleteMessages = async (user_id) => {
+    try {
+        const result = await message.deleteMany({user_id: user_id});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
 // checker functions
 const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
     const startOfDay = new Date(appointment_date);
