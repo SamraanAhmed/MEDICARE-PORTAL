@@ -41,8 +41,13 @@ const createDoctor = async (doctorData) => {
 const createAppointment = async (appointmentData) => {
     const { patient_id, date, service, pillar, note } = appointmentData;
     try {
-        const getDoctor = await user.find({ pillar: pillar, role: 'doctor', available: true }).sort({ createdAt: 1 }).limit(1);
-        const result = await appointment.create({ patient_id: patient_id, doctor_id: getDoctor[0]._id, appointment_date: date, service_id: service, notes: note });
+        const getDoctors = await user.find({ pillar: pillar, role: 'doctor' });
+        const availabilityChecks = await Promise.all(getDoctors.map((doctor) => checkDoctorDailyAvailability(doctor._id, date)));
+        const availableDoctors = getDoctors.filter((_, i) => availabilityChecks[i]);
+        if (availableDoctors.length === 0) {
+            throw new Error('No available doctors for this pillar on the selected date');
+        }
+        const result = await appointment.create({ patient_id: patient_id, doctor_id: availableDoctors[0]._id, appointment_date: date, service_id: service, notes: note });
     } catch (error) {
         throw error;
     }
@@ -117,6 +122,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
         return true;
     }
 }
+
 
 
 module.exports = {
