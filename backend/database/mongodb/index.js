@@ -10,11 +10,6 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    role: {
-        type: String,
-        enum: ['patient', 'doctor', 'admin'],
-        required: true
-    },
     email: {
         type: String,
         required: true,
@@ -26,11 +21,50 @@ const userSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        required: true
+        enum: ['male', 'female'],
+        default: 'male'
     }
 }, { timestamps: true});
 
 const user = mongoose.model('users', userSchema);
+
+const leadSchema = new mongoose.Schema({
+    avatar: {
+        type: String,
+        default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0k6mJECkDvvxLWpl2C6oVOgbs49inNcoZtvJRFileqS3TAkNr3qOH87dG&s=10"
+    },
+    name: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    role: {
+        type: String,
+        enum: ['doctor', 'admin'],
+        required: true
+    },
+    pillar: {
+        type: String,
+        enum: ['cardiology', 'dermatology', 'orthopedics', 'diagnostics', 'telehealth', 'general'],
+        required: true
+    },
+    gender: {
+        type: String,
+        enum: ['male', 'female'],
+        default: 'male'
+    }
+}, { timestamps: true});
+
+const lead = mongoose.model('leads', leadSchema);
 
 const serviceSchema = new mongoose.Schema({
     service: {
@@ -47,11 +81,6 @@ const serviceSchema = new mongoose.Schema({
 const service = mongoose.model('available-services', serviceSchema);
 
 const messageSchema = new mongoose.Schema({
-    conversation_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'conversation',
-        required: true
-    },
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
@@ -114,6 +143,6 @@ const connectDB = async () => {
 }
 
 module.exports = {
-    user, service, message, appointment,
+    user, lead, service, message, appointment,
     connectDB
 };
