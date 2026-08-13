@@ -124,6 +124,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 }
 
 
+
 module.exports = {
     getdoctor,
     createUser, createDoctor, createAppointment, createMessage, createService,
