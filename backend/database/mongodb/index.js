@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
+        enum: ['patient', 'doctor', 'admin'],
         required: true
     },
     email: {
@@ -30,6 +31,20 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true});
 
 const user = mongoose.model('users', userSchema);
+
+const serviceSchema = new mongoose.Schema({
+    service: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    available: {
+        type: Boolean,
+        default: false
+    }
+}, { timestamps: true });
+
+const service = mongoose.model('available-services', serviceSchema);
 
 const messageSchema = new mongoose.Schema({
     conversation_id: {
@@ -50,9 +65,43 @@ const messageSchema = new mongoose.Schema({
         type: String,
         required: true
     }
-}, { timestamps: true })
+}, { timestamps: true });
 
 const message = mongoose.model('messages', messageSchema);
+
+const appointmentSchema = new mongoose.Schema({
+    patient_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
+        required: true
+    },
+    doctor_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
+        required: true
+    },
+    service_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'available-services',
+        required: true
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'cancelled', 'completed', 'no-show'],
+      default: 'pending',
+    },
+    notes: {
+      type: String,
+      trim: true,
+      maxLength: 500,
+    },
+    appointment_date: {
+        type: Date,
+        required: true
+    }
+}, { timestamps: true });
+
+const appointment = mongoose.model('appointments', appointmentSchema);
 
 const connectDB = async () => {
     try {
@@ -65,6 +114,6 @@ const connectDB = async () => {
 }
 
 module.exports = {
-    user, message,
+    user, service, message, appointment,
     connectDB
 };
