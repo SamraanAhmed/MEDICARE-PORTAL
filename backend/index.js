@@ -4,6 +4,7 @@ const cors = require("cors");
 const dns = require('dns');
 const cookieParser = require('cookie-parser');
 const { connectDB } = require("./database/mongodb");
+const chatbotRouter = require('./api/chatbot');
 
 dotenv.config();
 dns.setServers(['1.1.1.1', '8.8.8.8']);
@@ -14,6 +15,7 @@ app.use(cors({
     origin: process.env.FRONTEND_URL,
 }));
 app.use(express.json());
+app.use('/api/chatbot', chatbotRouter);
 
 app.get("/check/health", (req, res) => {
   res.status(200).json({
