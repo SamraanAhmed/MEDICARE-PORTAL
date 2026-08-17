@@ -1,10 +1,67 @@
-const { user, doctor, service, message, appointment } = require('/database/mongodb');
+const { user, doctor, service, message, appointment } = require('../mongodb');
 const bycrpt = require('bcrypt');
 const dotenv = require('dotenv');
 
 dotenv.config();
 
 
+
+
+
+// user accounts
+const createUser = async (name, email, password, gender) => {
+    try {
+        const hash = await bycrpt.hash(password, 10);
+        const results = await user.create({
+            name: name,
+            email: email,
+            password: hash,
+            gender: gender
+        });
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+const loginUser = async (email, password) => {
+    try {
+        const results = await user.findOne({ email: email }).select('avatar _id name email password');
+        if(!results) throw new Error('Incorrect Email');
+        if(bycrpt.compare(password, results.password)) return results;
+        else throw new Error('Incorrect Password');
+        
+    } catch (error) {
+        throw error;
+    }
+};
+
+
+//doctor accounts
+const createDoctor = async (name, email, password, gender, pillar) => {
+    try {
+        const hash = await bycrpt.hash(password, 10);
+        const results = await doctor.create({
+            name: name,
+            email: email,
+            password: hash,
+            gender: gender,
+            pillar: pillar
+        });
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+const loginDoctor = async (email, password) => {
+    try {
+        const results = await doctor.findOne({ email: email }).select('avatar _id name email password');
+        if(!results) throw new Error('Incorrect Email');
+        if(bycrpt.compare(password, results.password)) return results;
+        else throw new Error('Incorrect Password');
+    } catch (error) {
+        throw error;
+    }
+};
 
 
 // getter functions
@@ -16,6 +73,15 @@ const getdoctor = async (id) => {
         throw error;
     }
 }
+const getAllAppointmentOfDoctor = async (doctor_id) => {
+    try {
+        const result = await appointment.find({ doctor_id: doctor_id, status: 'pending'});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 // setter functions
 const createUser = async (userData) => {
@@ -103,6 +169,22 @@ const updateDoctorAvailability = async (doctorData) => {
         throw error;
     }
 }
+const markAppointmentAsCompleted = async (appointment_id, proof, role) => {
+    try {
+        if (role === 'doctor') {
+            if (proof) {
+                const result = appointment.findByIdAndUpdate(appointment_id, { proof: proof, status: 'completed'}, { new: true });
+                return result;
+            } else {
+                throw new Error('No proof Provided');
+            }
+        } else {
+            throw new Error('only doctor can edit');
+        }
+    } catch (error) {
+        throw error;
+    }
+}
 
 // Delete functions
 const deleteUser = async (user_id) => {
@@ -152,6 +234,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 
 
 module.exports = {
+    loginDoctor, loginUser, createDoctor, createUser,
     getdoctor,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,

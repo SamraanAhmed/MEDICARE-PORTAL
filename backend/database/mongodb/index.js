@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
 
 const user = mongoose.model('users', userSchema);
 
-const DoctorSchema = new mongoose.Schema({
+const doctorSchema = new mongoose.Schema({
     avatar: {
         type: String,
         default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0k6mJECkDvvxLWpl2C6oVOgbs49inNcoZtvJRFileqS3TAkNr3qOH87dG&s=10"
@@ -131,6 +131,9 @@ const appointmentSchema = new mongoose.Schema({
       type: String,
       trim: true,
       maxLength: 500,
+    },
+    proof: {
+        type: Blob
     }
 }, { timestamps: true });
 
