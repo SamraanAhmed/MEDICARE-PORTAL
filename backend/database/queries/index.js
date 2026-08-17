@@ -37,24 +37,24 @@ const loginUser = async (email, password) => {
 
 
 //doctor accounts
-const createDoctor = async (name, email, password, gender) => {
+const createDoctor = async (name, email, password, gender, pillar) => {
     try {
         const hash = await bycrpt.hash(password, 10);
-        const results = await user.create({
+        const results = await doctor.create({
             name: name,
             email: email,
             password: hash,
-            gender: gender
+            gender: gender,
+            pillar: pillar
         });
         return results;
     } catch (error) {
         throw error;
     }
 };
-
-const login = async (email, password) => {
+const loginDoctor = async (email, password) => {
     try {
-        const results = await user.findOne({ email: email }).select('avatar _id name email password');
+        const results = await doctor.findOne({ email: email }).select('avatar _id name email password');
         if(!results) throw new Error('Incorrect Email');
         if(bycrpt.compare(password, results.password)) return results;
         else throw new Error('Incorrect Password');
@@ -74,6 +74,15 @@ const getdoctor = async (id) => {
         throw error;
     }
 }
+const getAllAppointmentOfDoctor = async (doctor_id) => {
+    try {
+        const result = await appointment.find({ doctor_id: doctor_id, status: 'pending'});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 // setter functions
 const createUser = async (userData) => {
@@ -210,6 +219,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 
 
 module.exports = {
+    loginDoctor, loginUser, createDoctor, createUser,
     getdoctor,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
