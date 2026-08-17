@@ -131,6 +131,9 @@ const appointmentSchema = new mongoose.Schema({
       type: String,
       trim: true,
       maxLength: 500,
+    },
+    proof: {
+        type: Blob
     }
 }, { timestamps: true });
 

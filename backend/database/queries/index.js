@@ -58,7 +58,6 @@ const loginDoctor = async (email, password) => {
         if(!results) throw new Error('Incorrect Email');
         if(bycrpt.compare(password, results.password)) return results;
         else throw new Error('Incorrect Password');
-        
     } catch (error) {
         throw error;
     }
@@ -166,6 +165,22 @@ const updateDoctorAvailability = async (doctorData) => {
     try {
         const result = await doctor.findByIdAndUpdate(doctor_id, { available: available }, { new: true });
         return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const markAppointmentAsCompleted = async (appointment_id, proof, role) => {
+    try {
+        if (role === 'doctor') {
+            if (proof) {
+                const result = appointment.findByIdAndUpdate(appointment_id, { proof: proof, status: 'completed'}, { new: true });
+                return result;
+            } else {
+                throw new Error('No proof Provided');
+            }
+        } else {
+            throw new Error('only doctor can edit');
+        }
     } catch (error) {
         throw error;
     }
