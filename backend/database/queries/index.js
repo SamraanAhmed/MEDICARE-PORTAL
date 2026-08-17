@@ -1,10 +1,68 @@
-const { user, doctor, service, message, appointment } = require('/database/mongodb');
+const { user, doctor, service, message, appointment } = require('../mongodb');
 const bycrpt = require('bcrypt');
 const dotenv = require('dotenv');
 
 dotenv.config();
 
 
+
+
+
+// user accounts
+const createUser = async (name, email, password, gender) => {
+    try {
+        const hash = await bycrpt.hash(password, 10);
+        const results = await user.create({
+            name: name,
+            email: email,
+            password: hash,
+            gender: gender
+        });
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+const loginUser = async (email, password) => {
+    try {
+        const results = await user.findOne({ email: email }).select('avatar _id name email password');
+        if(!results) throw new Error('Incorrect Email');
+        if(bycrpt.compare(password, results.password)) return results;
+        else throw new Error('Incorrect Password');
+        
+    } catch (error) {
+        throw error;
+    }
+};
+
+
+//doctor accounts
+const createDoctor = async (name, email, password, gender) => {
+    try {
+        const hash = await bycrpt.hash(password, 10);
+        const results = await user.create({
+            name: name,
+            email: email,
+            password: hash,
+            gender: gender
+        });
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const login = async (email, password) => {
+    try {
+        const results = await user.findOne({ email: email }).select('avatar _id name email password');
+        if(!results) throw new Error('Incorrect Email');
+        if(bycrpt.compare(password, results.password)) return results;
+        else throw new Error('Incorrect Password');
+        
+    } catch (error) {
+        throw error;
+    }
+};
 
 
 // getter functions
