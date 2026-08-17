@@ -25,11 +25,10 @@ const createUser = async (name, email, password, gender) => {
 };
 const loginUser = async (email, password) => {
     try {
-        const results = await user.findOne({ email: email }).select('avatar _id name email password');
+        const results = await user.findOne({ email: email }).select('_id password');
         if(!results) throw new Error('Incorrect Email');
         if(bycrpt.compare(password, results.password)) return results;
         else throw new Error('Incorrect Password');
-        
     } catch (error) {
         throw error;
     }
@@ -54,7 +53,7 @@ const createDoctor = async (name, email, password, gender, pillar) => {
 };
 const loginDoctor = async (email, password) => {
     try {
-        const results = await doctor.findOne({ email: email }).select('avatar _id name email password');
+        const results = await doctor.findOne({ email: email }).select('_id password');
         if(!results) throw new Error('Incorrect Email');
         if(bycrpt.compare(password, results.password)) return results;
         else throw new Error('Incorrect Password');
