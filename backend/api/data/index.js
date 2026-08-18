@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService,
+    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
     checkDoctorDailyAvailability
@@ -177,18 +177,20 @@ router.get('/logout', authenticate, async (req, res) => {
         throw error;
     }
 });
-router.post('create/appointment', authenticate, async (req, res) => {
-    if (req.user.role !== 'user') throw new Error('Only users can add appointments');
+router.post('/create/appointment', authenticate, async (req, res) => {
     try {
+        if (req.user.role !== 'user') {
+            return res.status(403).json({ message: 'Forbidden: You are not an user' });
+        }
         const result = await createAppointment({
             patient: req.user._id,
             date: req.body.date,
-            service: req.body.service,
+            service_id: req.body.service_id,
             note: req.body.note
         });
         res.status(200).json(result);
     } catch (error) {
-        res.status(409).json({
+        res.status(500).json({
             message: error.message
         });
     }
@@ -196,13 +198,15 @@ router.post('create/appointment', authenticate, async (req, res) => {
 
 
 // doctor only routes
-router.get('appointment/all/doctor', authenticate, async (req, res) => {
-    if (req.user.role !== 'doctor') throw new Error('Doctor can only view their appointments');
+router.get('/appointment/all/doctor', authenticate, async (req, res) => {
     try {
+        if (req.user.role !== 'doctor') {
+            return res.status(403).json({ message: 'Forbidden: You are not an Doctor' });
+        }
         const result = await getAllAppointmentOfDoctor(req.user._id);
         res.status(200).json(result);
     } catch (error) {
-        res.status(409).json({
+        res.status(500).json({
             message: error.message
         });
     }
@@ -210,15 +214,30 @@ router.get('appointment/all/doctor', authenticate, async (req, res) => {
 
 
 // admin only routes
-router.post('create/service', authenticate, async (req, res) => {
-    if (req.user.role !== 'admin') throw new Error('Only admins can add services');
+router.post('/create/service', authenticate, async (req, res) => {
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
         const result = await createService({
             service_name: req.body.service_name,
             pillar: req.body.pillar
         });
     } catch (error) {
-        res.status(409).json({
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.get('/get/user/all', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await getAllUser();
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
             message: error.message
         });
     }
