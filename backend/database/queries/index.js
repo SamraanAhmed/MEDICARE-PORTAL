@@ -167,7 +167,7 @@ const createAppointment = async (appointmentData) => {
     const { patient_id, date, service_id, note } = appointmentData;
     try {
         const services = await getPillarByService(service_id);
-        const getDoctors = await doctor.find({ pillar: services.pillar, role: 'doctor' });
+        const getDoctors = await doctor.find({ pillar: services.pillar });
         const availabilityChecks = await Promise.all(getDoctors.map((doctor) => checkDoctorDailyAvailability(doctor._id, date)));
         const availableDoctors = getDoctors.filter((_, i) => availabilityChecks[i]);
         if (availableDoctors.length === 0) {
@@ -192,9 +192,9 @@ const createMessage = async (messageData) => {
     }
 }
 const createService = async (serviceData) => {
-    const { service_name, pillar } = serviceData;
+    const { service_name, pillar, charges } = serviceData;
     try {
-        const result = await service.create({ service_name: service_name, pillar: pillar });
+        const result = await service.create({ service_name: service_name, pillar: pillar, charges: charges });
         return result;
     } catch (error) {
         throw error;
@@ -252,6 +252,7 @@ const markAppointmentAsCompleted = async (appointment_id, proof) => {
 const payBill = async (payment_id, transcation_id) => {
     try {
         const result = await payment.findByIdAndUpdate(payment_id, { paid: true, transcation: transcation_id }, { new: true });
+        return result;
     } catch (error) {
         throw error;
     }
@@ -299,7 +300,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
     const endOfDay = new Date(appointment_date);
     endOfDay.setHours(23, 59, 59, 999);
     const count = await appointment.countDocuments({
-        doctor_id,
+        doctor: doctor_id,
         appointment_date: { $gte: startOfDay, $lte: endOfDay },
         status: { $ne: 'cancelled' }
     });
