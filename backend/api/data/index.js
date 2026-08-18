@@ -3,9 +3,11 @@ const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment,
-    createAppointment, createMessage, createService,
+    createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
-    checkDoctorDailyAvailability
+    checkDoctorDailyAvailability,
+    markAppointmentAsCompleted,
+    deleteAdmin, deleteDoctor, deleteMessages, deleteUser
 } = require('../../database/queries');
 const { 
     authenticate, checkAuthentication, jwt
@@ -161,11 +163,12 @@ router.post('/login/admin', async (req, res) => {
 });
 router.get('/logout', authenticate, async (req, res) => {
     try {
+        const isProduction = (process.env.STATUS === 'production');
         res.clearCookie("token", {
             httpOnly: true,
-            secure: false,
+            secure: isProduction,
             path: '/',
-            sameSite: "lax"
+            sameSite: ((isProduction)? "none" : "lax")
         });
         res.status(200).json({
             message: 'successfull logout'
@@ -242,5 +245,78 @@ router.get('/get/user/all', authenticate, async (req, res) => {
         });
     }
 });
+router.get('/get/doctor/all', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await getAllDoctor();
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.get('/get/appointment/all', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await getAllAppointment();
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/delete/user', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await deleteUser(req.body.user_id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/delete/doctor', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await deleteDoctor(req.body.doctor_id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/delete/admin', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await deleteAdmin(req.body.admin_id);
+        const isProduction = (process.env.STATUS === 'production');
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: isProduction,
+            path: '/',
+            sameSite: ((isProduction)? "none" : "lax")
+        });
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+
 
 module.exports = router;
