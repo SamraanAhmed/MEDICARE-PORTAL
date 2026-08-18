@@ -2,19 +2,12 @@ const express = require('express');
 const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-<<<<<<< HEAD
-    getdoctor, getPillarByService, getUserProfile,
-    createAppointment, createMessage, createService,
-    updateService, updateAppointment, updateDoctorAvailability,
-    checkDoctorDailyAvailability
-=======
     getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability, payBill,
     checkDoctorDailyAvailability,
     markAppointmentAsCompleted,
     deleteAdmin, deleteDoctor, deleteMessages, deleteUser
->>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
 } = require('../../database/queries');
 const { 
     authenticate, checkAuthentication, jwt
@@ -204,12 +197,7 @@ router.get('/logout', authenticate, async (req, res) => {
         });
     }
 });
-<<<<<<< HEAD
-router.post('/create/appointment', authenticate, async (req, res) => {
-    if (req.user.role !== 'user') throw new Error('Only users can add appointments');
-=======
 router.post('/appointment/payment', authenticate, async (req, res) => {
->>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
     try {
         const result = await getPayment(req.body.appointment_id);
         res.status(200).json(result);
@@ -286,10 +274,6 @@ router.post('/appointment/pay', authenticate, async (req, res) => {
 
 // doctor only routes
 router.get('/appointment/all/doctor', authenticate, async (req, res) => {
-<<<<<<< HEAD
-    if (req.user.role !== 'doctor') throw new Error('Doctor can only view their appointments');
-=======
->>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
     try {
         if (req.user.role !== 'doctor') {
             return res.status(403).json({ message: 'Forbidden: You are not an Doctor' });
@@ -319,10 +303,6 @@ router.post('/appointment/mark/complete', authenticate, async (req, res) => {
 
 // admin only routes
 router.post('/create/service', authenticate, async (req, res) => {
-<<<<<<< HEAD
-    if (req.user.role !== 'admin') throw new Error('Only admins can add services');
-=======
->>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
     try {
         if (req.user.role !== 'admin') {
             return res.status(403).json({ message: 'Forbidden: You are not an admin' });
