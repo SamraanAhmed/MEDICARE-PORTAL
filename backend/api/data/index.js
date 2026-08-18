@@ -2,9 +2,9 @@ const express = require('express');
 const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor,
+    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment,
     createUser, createDoctor, createAppointment, createMessage, createService,
-    updateService, updateAppointment, updateDoctorAvailability,
+    updateService, updateAppointment, updateDoctorAvailability, payBill,
     checkDoctorDailyAvailability,
     markAppointmentAsCompleted,
     deleteAdmin, deleteDoctor, deleteMessages, deleteUser
@@ -12,6 +12,7 @@ const {
 const { 
     authenticate, checkAuthentication, jwt
 } = require('../../authentication');
+const { appointment } = require('../../database/mongodb');
 
 dotenv.config();
 
@@ -177,7 +178,16 @@ router.get('/logout', authenticate, async (req, res) => {
         res.status(409).json({
             message: error.message
         });
-        throw error;
+    }
+});
+router.post('/appointment/payment', authenticate, async (req, res) => {
+    try {
+        const result = await getPayment(req.body.appointment_id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(409).json({
+            message: error.message
+        });
     }
 });
 
@@ -222,6 +232,22 @@ router.post('/appointment/mark/cancel', authenticate, async (req, res) => {
         const result = await updateAppointment({
             appointment_id: req.body.appointment_id,
             status: 'cancelled'
+        });
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/appointment/pay', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'user') {
+            return res.status(403).json({ message: 'Forbidden: You are not an user' });
+        }
+        const result = await payBill({
+            payment_id: req.body.payment_id,
+            transcation_id: req.body.transcation_id
         });
         res.status(200).json(result);
     } catch (error) {
