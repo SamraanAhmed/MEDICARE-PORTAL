@@ -1,0 +1,239 @@
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Create Axios instance
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true, // Crucial for HTTP-only cookies
+});
+
+// Response interceptor for clean errors
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.code === 'ERR_NETWORK' || !error.response) {
+      return Promise.reject(new Error('The backend server is offline or unreachable. Please start the backend by running "node index.js" in the backend directory.'));
+    }
+    const message = error.response?.data?.message || 'Something went wrong';
+    return Promise.reject(new Error(message));
+  }
+);
+
+// Initial Static Data for Local Storage Fallbacks
+const DEFAULT_SERVICES = [
+  { _id: '64d1f2b5a1b2c3d4e5f60001', service_name: 'Cardiology Consultation', pillar: 'cardiology', available: true },
+  { _id: '64d1f2b5a1b2c3d4e5f60002', service_name: 'Dermatological Screening', pillar: 'dermatology', available: true },
+  { _id: '64d1f2b5a1b2c3d4e5f60003', service_name: 'Joint & Bone Therapy', pillar: 'orthopedics', available: true },
+  { _id: '64d1f2b5a1b2c3d4e5f60004', service_name: 'Full Body Diagnostic Lab', pillar: 'diagnostics', available: true },
+  { _id: '64d1f2b5a1b2c3d4e5f60005', service_name: '24/7 Virtual Consultation', pillar: 'telehealth', available: true },
+  { _id: '64d1f2b5a1b2c3d4e5f60006', service_name: 'General Wellness Checkup', pillar: 'general', available: true },
+];
+
+const DEFAULT_DOCTORS = [
+  { _id: '64d1f2b5a1b2c3d4e5f60011', name: 'Dr. Sarah Jenkins', email: 'sarah.j@medicare.com', pillar: 'cardiology', gender: 'female', avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=250' },
+  { _id: '64d1f2b5a1b2c3d4e5f60012', name: 'Dr. Robert Chen', email: 'robert.c@medicare.com', pillar: 'dermatology', gender: 'male', avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=250' },
+  { _id: '64d1f2b5a1b2c3d4e5f60013', name: 'Dr. Elena Rostova', email: 'elena.r@medicare.com', pillar: 'orthopedics', gender: 'female', avatar: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=250' },
+  { _id: '64d1f2b5a1b2c3d4e5f60014', name: 'Dr. Marcus Vance', email: 'marcus.v@medicare.com', pillar: 'diagnostics', gender: 'male', avatar: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=250' },
+  { _id: '64d1f2b5a1b2c3d4e5f60015', name: 'Dr. Aisha Rahman', email: 'aisha.r@medicare.com', pillar: 'telehealth', gender: 'female', avatar: 'https://images.unsplash.com/photo-1614608682850-e0d6ed316d47?auto=format&fit=crop&q=80&w=250' },
+  { _id: '64d1f2b5a1b2c3d4e5f60016', name: 'Dr. Alan Mercer', email: 'alan.m@medicare.com', pillar: 'general', gender: 'male', avatar: 'https://images.unsplash.com/photo-1582750433449-64c676996edb?auto=format&fit=crop&q=80&w=250' },
+];
+
+// Helper to initialize local storage
+const initLocalStorage = () => {
+  if (!localStorage.getItem('medicare_services')) {
+    localStorage.setItem('medicare_services', JSON.stringify(DEFAULT_SERVICES));
+  }
+  if (!localStorage.getItem('medicare_doctors')) {
+    localStorage.setItem('medicare_doctors', JSON.stringify(DEFAULT_DOCTORS));
+  }
+  if (!localStorage.getItem('medicare_appointments')) {
+    localStorage.setItem('medicare_appointments', JSON.stringify([]));
+  }
+  if (!localStorage.getItem('medicare_messages')) {
+    localStorage.setItem('medicare_messages', JSON.stringify([]));
+  }
+};
+initLocalStorage();
+
+export const api = {
+  // --- AUTH ENDPOINTS ---
+  registerUser: async (name, email, password, gender) => {
+    const response = await apiClient.post('/database/register/user', { name, email, password, gender });
+    return response.data;
+  },
+
+  registerDoctor: async (name, email, password, gender, pillar) => {
+    const response = await apiClient.post('/database/register/doctor', { name, email, password, gender, pillar });
+    
+    // Add registered doctor to local listing so they are selectable in appointment flow
+    const localDocs = JSON.parse(localStorage.getItem('medicare_doctors') || '[]');
+    const newDoc = {
+      _id: response.data._id,
+      name: response.data.name || name,
+      email: response.data.email || email,
+      pillar: response.data.pillar || pillar,
+      gender: response.data.gender || gender,
+      avatar: response.data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=115E59&color=fff`,
+    };
+    localDocs.push(newDoc);
+    localStorage.setItem('medicare_doctors', JSON.stringify(localDocs));
+
+    return response.data;
+  },
+
+  registerAdmin: async (name, email, password) => {
+    const response = await apiClient.post('/database/register/admin', { name, email, password });
+    return response.data;
+  },
+
+  loginUser: async (email, password) => {
+    const response = await apiClient.post('/database/login/user', { email, password });
+    return response.data;
+  },
+
+  loginDoctor: async (email, password) => {
+    const response = await apiClient.post('/database/login/doctor', { email, password });
+    return response.data;
+  },
+
+  loginAdmin: async (email, password) => {
+    const response = await apiClient.post('/database/login/admin', { email, password });
+    return response.data;
+  },
+
+  logout: async () => {
+    const response = await apiClient.get('/database/logout');
+    return response.data;
+  },
+
+  getCurrentUser: async () => {
+    const response = await apiClient.get('/database/me');
+    return response.data;
+  },
+
+  // --- SERVICE ENDPOINTS (ADMIN) ---
+  createService: async (service_name, pillar) => {
+    // Call backend endpoint to persist in DB
+    const response = await apiClient.post('/database/create/service', { service_name, pillar });
+    
+    // Cache service locally so patients can book it immediately
+    const services = JSON.parse(localStorage.getItem('medicare_services') || '[]');
+    const newService = {
+      _id: response.data?._id || `s_${Date.now()}`,
+      service_name,
+      pillar,
+      available: true
+    };
+    services.push(newService);
+    localStorage.setItem('medicare_services', JSON.stringify(services));
+
+    return response.data || newService;
+  },
+
+  getAvailableServices: () => {
+    return JSON.parse(localStorage.getItem('medicare_services') || '[]');
+  },
+
+  toggleServiceAvailability: (service_id, available) => {
+    const services = JSON.parse(localStorage.getItem('medicare_services') || '[]');
+    const updated = services.map(s => s._id === service_id ? { ...s, available } : s);
+    localStorage.setItem('medicare_services', JSON.stringify(updated));
+    return updated;
+  },
+
+  // --- APPOINTMENT ENDPOINTS ---
+  createAppointment: async (service_id, date, note) => {
+    // 1. Call real backend database endpoint
+    const response = await apiClient.post('/database/create/appointment', { service: service_id, date, note });
+    
+    // 2. Resolve doctor and service details to save rich history in local storage
+    const services = JSON.parse(localStorage.getItem('medicare_services') || '[]');
+    const doctors = JSON.parse(localStorage.getItem('medicare_doctors') || '[]');
+    
+    const activeService = services.find(s => s._id === service_id);
+    const assignedDoctor = doctors.find(d => d.pillar === activeService?.pillar) || doctors[0];
+
+    const localAppointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+    const newAppointment = {
+      _id: response.data?._id || `appt_${Date.now()}`,
+      patient: response.data?.patient || 'current_user',
+      doctor: assignedDoctor,
+      service: activeService,
+      status: 'pending',
+      appointment_date: date,
+      notes: note,
+    };
+    localAppointments.push(newAppointment);
+    localStorage.setItem('medicare_appointments', JSON.stringify(localAppointments));
+
+    return response.data || newAppointment;
+  },
+
+  getPatientAppointments: (patientId) => {
+    const localAppointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+    return localAppointments;
+  },
+
+  getDoctorAppointments: async () => {
+    try {
+      const response = await apiClient.get('/database/appointment/all/doctor');
+      return response.data;
+    } catch (e) {
+      // Fallback: search appointments in local storage belonging to the doctor
+      const appointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+      return appointments;
+    }
+  },
+
+  completeAppointment: async (appointment_id, proof) => {
+    const appointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+    const updated = appointments.map(app => 
+      app._id === appointment_id ? { ...app, status: 'completed', proof } : app
+    );
+    localStorage.setItem('medicare_appointments', JSON.stringify(updated));
+    return updated;
+  },
+
+  cancelAppointment: (appointment_id) => {
+    const appointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+    const updated = appointments.map(app => 
+      app._id === appointment_id ? { ...app, status: 'cancelled' } : app
+    );
+    localStorage.setItem('medicare_appointments', JSON.stringify(updated));
+    return updated;
+  },
+
+  // --- TELEHEALTH & AI CHAT BOT ---
+  askChatbot: async (message) => {
+    const response = await apiClient.post('/chatbot/ask', { message });
+    
+    // Save to local chat history
+    const history = JSON.parse(localStorage.getItem('medicare_messages') || '[]');
+    history.push({ sender: 'user', content: message, created_at: new Date() });
+    history.push({ sender: 'bot', content: response.data.message, created_at: new Date() });
+    localStorage.setItem('medicare_messages', JSON.stringify(history));
+
+    return response.data.message;
+  },
+
+  getChatHistory: () => {
+    return JSON.parse(localStorage.getItem('medicare_messages') || '[]');
+  },
+
+  sendDirectMessage: (sender, content) => {
+    const history = JSON.parse(localStorage.getItem('medicare_messages') || '[]');
+    const newMsg = { sender, content, created_at: new Date() };
+    history.push(newMsg);
+    localStorage.setItem('medicare_messages', JSON.stringify(history));
+    return newMsg;
+  },
+
+  getDoctors: () => {
+    return JSON.parse(localStorage.getItem('medicare_doctors') || '[]');
+  }
+};
+export default api;

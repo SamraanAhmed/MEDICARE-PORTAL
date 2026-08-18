@@ -1,25 +1,51 @@
-import React from 'react'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Layout from './components/Layout';
+
+// Pages import
+import Home from './pages/Home';
+import Contact from './pages/Contact';
+import Auth from './pages/Auth';
+import BookAppointment from './pages/BookAppointment';
+import Chat from './pages/Chat';
+import PatientDashboard from './pages/PatientDashboard';
+import DoctorDashboard from './pages/DoctorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 
 const App = () => {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
-      {/* Navbar */}
-      <nav className="bg-white border-b border-slate-200 py-4 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 flex justify-center items-center">
-          <span className="text-xl font-semibold text-slate-900">medicare</span>
-        </div>
-      </nav>
+    <AuthProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            {/* Landing page */}
+            <Route path="/" element={<Home />} />
+            
+            {/* Lead generation and Contact */}
+            <Route path="/contact" element={<Contact />} />
+            
+            {/* Login & Register Tabbed Interface */}
+            <Route path="/auth" element={<Auth />} />
+            
+            {/* Appointment Booking Flow */}
+            <Route path="/book" element={<BookAppointment />} />
+            
+            {/* AI Assistant Messaging Desk */}
+            <Route path="/chat" element={<Chat />} />
+            
+            {/* Dashboards */}
+            <Route path="/dashboard/patient" element={<PatientDashboard />} />
+            <Route path="/dashboard/doctor" element={<DoctorDashboard />} />
+            <Route path="/dashboard/admin" element={<AdminDashboard />} />
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col items-center justify-center p-6">
-        <button 
-          className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-xs cursor-pointer"
-        >
-          Test Button
-        </button>
-      </main>
-    </div>
-  )
-}
+            {/* Catch-all fallback redirect */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </AuthProvider>
+  );
+};
 
-export default App
+export default App;

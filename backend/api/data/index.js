@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService,
+    getdoctor, getPillarByService, getUserProfile,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
     checkDoctorDailyAvailability
@@ -21,6 +21,17 @@ router.get('/', (req, res) => {
         message: 'endpoint Healthy'
     });
 });
+router.get('/me', authenticate, async (req, res) => {
+    try {
+        const results = await getUserProfile(req.user._id, req.user.role);
+        if (!results) {
+            return res.status(404).json({ message: 'User profile not found' });
+        }
+        res.status(200).json({ ...results.toObject(), role: req.user.role });
+    } catch (error) {
+        res.status(409).json({ message: error.message });
+    }
+});
 router.post('/register/user', async (req, res) => {
     try {
         const { name, email, password, gender } = req.body;
@@ -38,7 +49,9 @@ router.post('/register/user', async (req, res) => {
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
         });
-        res.status(200).json(results);
+        const userObj = results.toObject();
+        delete userObj.password;
+        res.status(200).json(userObj);
     } catch (error) {
         res.status(409).json({
             message: error.message
@@ -63,7 +76,9 @@ router.post('/register/doctor', async (req, res) => {
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
         });
-        res.status(200).json(results);
+        const docObj = results.toObject();
+        delete docObj.password;
+        res.status(200).json(docObj);
     } catch (error) {
         res.status(409).json({
             message: error.message
@@ -76,7 +91,9 @@ router.post('/register/admin', authenticate, async (req, res) => {
     try {
         const { name, email, password } = req.body;
         const results = await createAdmin(name, email, password);
-        res.status(200).json(results);
+        const adminObj = results.toObject();
+        delete adminObj.password;
+        res.status(200).json(adminObj);
     } catch (error) {
         res.status(409).json({
             message: error.message
@@ -177,7 +194,7 @@ router.get('/logout', authenticate, async (req, res) => {
         throw error;
     }
 });
-router.post('create/appointment', authenticate, async (req, res) => {
+router.post('/create/appointment', authenticate, async (req, res) => {
     if (req.user.role !== 'user') throw new Error('Only users can add appointments');
     try {
         const result = await createAppointment({
@@ -196,7 +213,7 @@ router.post('create/appointment', authenticate, async (req, res) => {
 
 
 // doctor only routes
-router.get('appointment/all/doctor', authenticate, async (req, res) => {
+router.get('/appointment/all/doctor', authenticate, async (req, res) => {
     if (req.user.role !== 'doctor') throw new Error('Doctor can only view their appointments');
     try {
         const result = await getAllAppointmentOfDoctor(req.user._id);
@@ -210,7 +227,7 @@ router.get('appointment/all/doctor', authenticate, async (req, res) => {
 
 
 // admin only routes
-router.post('create/service', authenticate, async (req, res) => {
+router.post('/create/service', authenticate, async (req, res) => {
     if (req.user.role !== 'admin') throw new Error('Only admins can add services');
     try {
         const result = await createService({

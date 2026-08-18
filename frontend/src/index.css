@@ -1,1 +1,48 @@
 @import "tailwindcss";
+
+@theme {
+  --color-teal-dark: #115E59;
+  --color-teal-850: #115E59; /* Maps to primary Teal theme color */
+  --color-teal-900: #0F4C47; /* Slightly darker shade of teal for hover states */
+  --color-emerald-accent: #10B981;
+  --color-bg-medicare: #FAFFFD;
+  
+  --font-heading: 'Exo 2', sans-serif;
+  --font-body: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg-medicare);
+  color: #1e293b;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Custom scrollbars for a premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Micro-animations and utility classes */
+.hover-scale {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-scale:hover {
+  transform: translateY(-2px) scale(1.01);
+}

@@ -25,10 +25,14 @@ app.get("/check/health", (req, res) => {
   });
 });
 
-connectDB().then(() => {
-  app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${process.env.PORT} and database is also connected`);
+connectDB()
+  .then(() => {
+    console.log("Database connected successfully");
+  })
+  .catch((error) => {
+    console.warn("WARNING: MongoDB failed to connect. Mongoose operations will timeout. Error:", error.message);
   });
-}).catch((error) => {
-  console.error("Error connecting to MongoDB:", error);
+
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`Server is running on port ${process.env.PORT || 5000}`);
 });
