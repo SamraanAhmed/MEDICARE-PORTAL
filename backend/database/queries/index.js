@@ -100,7 +100,7 @@ const getdoctor = async (id) => {
 }
 const getAllAppointmentOfDoctor = async (doctor_id) => {
     try {
-        const result = await appointment.find({ doctor_id: doctor_id, status: 'pending'}).populate('patient_id', 'name');
+        const result = await appointment.find({ doctor: doctor_id, status: 'pending'}).populate('patient', 'name');
         return result;
     } catch (error) {
         throw error;
@@ -109,6 +109,30 @@ const getAllAppointmentOfDoctor = async (doctor_id) => {
 const getPillarByService = async (service_id) => {
     try {
         const result = service.findOne({_id: service_id});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getAllUser = async () => {
+    try {
+        const result = await user.find({});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getAllDoctor = async () => {
+    try {
+        const result = await doctor.find({});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getAllAppointment = async () => {
+    try {
+        const result = await appointment.find({}).populate('patient doctor service');
         return result;
     } catch (error) {
         throw error;
