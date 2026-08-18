@@ -1,7 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const {
-    loginDoctor, loginUser, createDoctor, createUser,
+    loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,

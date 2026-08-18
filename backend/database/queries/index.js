@@ -63,6 +63,32 @@ const loginDoctor = async (email, password) => {
 };
 
 
+// Admin accounts
+const loginAdmin = async (email, password) => {
+    try {
+        const results = await admin.findOne({ email: email }).select('_id password');
+        if(!results) throw new Error('Incorrect Email');
+        if(bycrpt.compare(password, results.password)) return results;
+        else throw new Error('Incorrect Password');
+    } catch (error) {
+        throw error;
+    }
+};
+const createAdmin = async (name, email, password) => {
+    try {
+        const hash = await bycrpt.hash(password, 10);
+        const results = await doctor.create({
+            name: name,
+            email: email,
+            password: hash,
+        });
+        return results;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
 // getter functions
 const getdoctor = async (id) => {
     try {
@@ -242,7 +268,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 
 
 module.exports = {
-    loginDoctor, loginUser, createDoctor, createUser,
+    loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
