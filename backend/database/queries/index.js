@@ -174,6 +174,15 @@ const getDoctorFromAppointment = async (appointment_id) => {
         throw error;
     }
 }
+const getUserFromAppointment = async (appointment_id) => {
+    try {
+        const appoint = await appointment.findById(appointment_id).select('patient').populate('patient');
+        const result = appoint.patient;
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 // setter functions
@@ -333,7 +342,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 module.exports = {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser,
-    getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment,
+    getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment, getUserFromAppointment,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability, payBill,
     checkDoctorDailyAvailability,

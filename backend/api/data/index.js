@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment,
+    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getUserFromAppointment,
     getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability, payBill,
@@ -220,11 +220,16 @@ router.post('/appointment/mark/cancel', authenticate, async (req, res) => {
         if (req.user.role !== 'user') {
             return res.status(403).json({ message: 'Forbidden: You are not an user' });
         }
-        const result = await updateAppointment({
-            appointment_id: req.body.appointment_id,
-            status: 'cancelled'
-        });
-        res.status(200).json(result);
+        const appointmentPatient = await getUserFromAppointment(req.body.appointment_id);
+        if (appointmentPatient._id === req.user._id) {
+            const result = await updateAppointment({
+                appointment_id: req.body.appointment_id,
+                status: 'cancelled'
+            });
+            res.status(200).json(result);
+        } else {
+            throw new Error('You cannt mark this appointment');
+        }
     } catch (error) {
         res.status(500).json({
             message: error.message
