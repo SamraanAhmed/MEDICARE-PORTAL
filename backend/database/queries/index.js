@@ -109,6 +109,14 @@ const getAllAppointmentOfDoctor = async (doctor_id) => {
         throw error;
     }
 }
+const getAllAppointmentOfUser = async (user_id) => {
+    try {
+        const result = await appointment.find({ patient: user_id }).populate('doctor', '_id name pillar');
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
 const getPillarByService = async (service_id) => {
     try {
         const result = await service.findOne({_id: service_id});
@@ -213,15 +221,11 @@ const updateDoctorAvailability = async (doctorData) => {
 }
 const markAppointmentAsCompleted = async (appointment_id, proof, role) => {
     try {
-        if (role === 'doctor') {
-            if (proof) {
-                const result = appointment.findByIdAndUpdate(appointment_id, { proof: proof, status: 'completed'}, { new: true });
-                return result;
-            } else {
-                throw new Error('No proof Provided');
-            }
+        if (proof) {
+            const result = appointment.findByIdAndUpdate(appointment_id, { proof: proof, status: 'completed'}, { new: true });
+            return result;
         } else {
-            throw new Error('only doctor can edit');
+            throw new Error('No proof Provided');
         }
     } catch (error) {
         throw error;
@@ -286,7 +290,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 
 module.exports = {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment,
+    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
     checkDoctorDailyAvailability,
