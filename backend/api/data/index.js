@@ -212,7 +212,7 @@ router.post('/create/appointment', authenticate, async (req, res) => {
             return res.status(403).json({ message: 'Forbidden: You are not an user' });
         }
         const result = await createAppointment({
-            patient: req.user._id,
+            patient_id: req.user._id,
             date: req.body.date,
             service_id: req.body.service_id,
             note: req.body.note
@@ -245,10 +245,7 @@ router.post('/appointment/pay', authenticate, async (req, res) => {
         if (req.user.role !== 'user') {
             return res.status(403).json({ message: 'Forbidden: You are not an user' });
         }
-        const result = await payBill({
-            payment_id: req.body.payment_id,
-            transcation_id: req.body.transcation_id
-        });
+        const result = await payBill(req.body.payment_id, req.body.transcation_id);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({
@@ -295,8 +292,10 @@ router.post('/create/service', authenticate, async (req, res) => {
         }
         const result = await createService({
             service_name: req.body.service_name,
-            pillar: req.body.pillar
+            pillar: req.body.pillar,
+            charges: req.body.charges
         });
+        res.status(200).json(result);
     } catch (error) {
         res.status(500).json({
             message: error.message

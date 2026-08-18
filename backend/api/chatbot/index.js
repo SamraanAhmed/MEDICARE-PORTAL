@@ -7,8 +7,8 @@ const router = express.Router();
 
 
 router.post('/ask', authenticate, async (req, res) => {
-    if (req.user.role !== 'user') throw new Error('Only users can use this AI feature');
     try {
+        if (req.user.role !== 'user') throw new Error('Only users can use this AI feature');
         const { message } = req.body;
         const sendMessage = await createMessage({
             user: req.user._id,
