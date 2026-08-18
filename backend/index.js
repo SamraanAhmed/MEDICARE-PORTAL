@@ -12,6 +12,8 @@ dns.setServers(['1.1.1.1', '8.8.8.8']);
 const app = express();
 app.use(cookieParser());
 
+const name = 'hazza';
+
 app.use(cors({
     origin: process.env.FRONTEND_URL,
 }));
