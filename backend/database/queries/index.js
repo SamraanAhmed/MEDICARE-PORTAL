@@ -27,7 +27,8 @@ const loginUser = async (email, password) => {
     try {
         const results = await user.findOne({ email: email }).select('_id password');
         if(!results) throw new Error('Incorrect Email');
-        if(bycrpt.compare(password, results.password)) return results;
+        const match = await bycrpt.compare(password, results.password);
+        if(match) return results;
         else throw new Error('Incorrect Password');
     } catch (error) {
         throw error;
@@ -55,7 +56,8 @@ const loginDoctor = async (email, password) => {
     try {
         const results = await doctor.findOne({ email: email }).select('_id password');
         if(!results) throw new Error('Incorrect Email');
-        if(bycrpt.compare(password, results.password)) return results;
+        const match = await bycrpt.compare(password, results.password);
+        if(match) return results;
         else throw new Error('Incorrect Password');
     } catch (error) {
         throw error;
@@ -68,7 +70,8 @@ const loginAdmin = async (email, password) => {
     try {
         const results = await admin.findOne({ email: email }).select('_id password');
         if(!results) throw new Error('Incorrect Email');
-        if(bycrpt.compare(password, results.password)) return results;
+        const match = await bycrpt.compare(password, results.password);
+        if(match) return results;
         else throw new Error('Incorrect Password');
     } catch (error) {
         throw error;
@@ -77,7 +80,7 @@ const loginAdmin = async (email, password) => {
 const createAdmin = async (name, email, password) => {
     try {
         const hash = await bycrpt.hash(password, 10);
-        const results = await doctor.create({
+        const results = await admin.create({
             name: name,
             email: email,
             password: hash,
@@ -100,7 +103,7 @@ const getdoctor = async (id) => {
 }
 const getAllAppointmentOfDoctor = async (doctor_id) => {
     try {
-        const result = await appointment.find({ doctor_id: doctor_id, status: 'pending'}).populate('patient_id', 'name');
+        const result = await appointment.find({ doctor: doctor_id, status: 'pending'}).populate('patient', 'name');
         return result;
     } catch (error) {
         throw error;
@@ -108,7 +111,31 @@ const getAllAppointmentOfDoctor = async (doctor_id) => {
 }
 const getPillarByService = async (service_id) => {
     try {
-        const result = service.findOne({_id: service_id});
+        const result = await service.findOne({_id: service_id});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getAllUser = async () => {
+    try {
+        const result = await user.find({});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getAllDoctor = async () => {
+    try {
+        const result = await doctor.find({});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getAllAppointment = async () => {
+    try {
+        const result = await appointment.find({}).populate('patient doctor service');
         return result;
     } catch (error) {
         throw error;
@@ -120,14 +147,15 @@ const getPillarByService = async (service_id) => {
 const createAppointment = async (appointmentData) => {
     const { patient, date, service_id, note } = appointmentData;
     try {
-        const service = await getPillarByService(service_id);
-        const getDoctors = await user.find({ pillar: service.pillar, role: 'doctor' });
+        const services = await getPillarByService(service_id);
+        const getDoctors = await doctor.find({ pillar: services.pillar, role: 'doctor' });
         const availabilityChecks = await Promise.all(getDoctors.map((doctor) => checkDoctorDailyAvailability(doctor._id, date)));
         const availableDoctors = getDoctors.filter((_, i) => availabilityChecks[i]);
         if (availableDoctors.length === 0) {
             throw new Error('No available doctors for this pillar on the selected date');
         }
         const result = await appointment.create({ patient: patient, doctor: availableDoctors[0]._id, appointment_date: date, service: service_id, notes: note });
+        return result;
     } catch (error) {
         throw error;
     }
@@ -175,9 +203,9 @@ const updateAppointment = async (appointmentData) => {
     }
 }
 const updateDoctorAvailability = async (doctorData) => {
-    const { doctor, available } = doctorData;
+    const { doctor_id, available } = doctorData;
     try {
-        const result = await doctor.findByIdAndUpdate(doctor, { available: available }, { new: true });
+        const result = await doctor.findByIdAndUpdate(doctor_id, { available: available }, { new: true });
         return result;
     } catch (error) {
         throw error;
@@ -249,7 +277,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 
 module.exports = {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService,
+    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
     checkDoctorDailyAvailability
