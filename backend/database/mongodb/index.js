@@ -154,6 +154,7 @@ const appointmentSchema = new mongoose.Schema({
     },
     payment: {
         type: mongoose.Schema.Types.ObjectId,
+        unique: true,
         require: true
     },
     notes: {

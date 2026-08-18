@@ -151,6 +151,15 @@ const getAllAppointment = async () => {
         throw error;
     }
 }
+const getPayment = async (appointment_id) => {
+    try {
+        const appoint = await appointment.findById(appointment_id).select('payment').populate('payment');
+        const result = appoint.payment;
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 // setter functions
@@ -206,7 +215,7 @@ const updateAppointment = async (appointmentData) => {
     const { appointment_id, status } = appointmentData;
     try {
         const result = await appointment.findByIdAndUpdate(appointment_id, { status: status }, { new: true });
-        if (status !== 'pending') {
+        if ((status !== 'pending') && (status !== 'completed')) {
             const doctor = result.doctor;
             await updateDoctorAvailability({doctor: doctor, available: true});
         }
@@ -306,9 +315,9 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 
 module.exports = {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor,
+    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment,
     createUser, createDoctor, createAppointment, createMessage, createService,
-    updateService, updateAppointment, updateDoctorAvailability,
+    updateService, updateAppointment, updateDoctorAvailability, payBill,
     checkDoctorDailyAvailability,
     markAppointmentAsCompleted,
     deleteAdmin, deleteDoctor, deleteMessages, deleteUser
