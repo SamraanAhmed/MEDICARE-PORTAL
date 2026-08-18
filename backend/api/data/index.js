@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment,
-    createUser, createDoctor, createAppointment, createMessage, createService,
+    createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability, payBill,
     checkDoctorDailyAvailability,
     markAppointmentAsCompleted,
@@ -24,17 +24,6 @@ router.get('/', (req, res) => {
         message: 'endpoint Healthy'
     });
 });
-router.get('/me', authenticate, async (req, res) => {
-    try {
-        const results = await getUserProfile(req.user._id, req.user.role);
-        if (!results) {
-            return res.status(404).json({ message: 'User profile not found' });
-        }
-        res.status(200).json({ ...results.toObject(), role: req.user.role });
-    } catch (error) {
-        res.status(409).json({ message: error.message });
-    }
-});
 router.post('/register/user', async (req, res) => {
     try {
         const { name, email, password, gender } = req.body;
@@ -52,9 +41,8 @@ router.post('/register/user', async (req, res) => {
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
         });
-        const userObj = results.toObject();
-        delete userObj.password;
-        res.status(200).json(userObj);
+        delete results.password;
+        res.status(200).json(results);
     } catch (error) {
         res.status(409).json({
             message: error.message
@@ -62,26 +50,12 @@ router.post('/register/user', async (req, res) => {
         throw error;
     }
 });
-router.post('/register/doctor', async (req, res) => {
+router.post('/register/doctor', authenticate, async (req, res) => {
     try {
+        if (req.user.role !== 'admin') throw new Error('Only Admin can create Doctors');
         const { name, email, password, gender, pillar } = req.body;
         const results = await createDoctor(name, email, password, gender, pillar);
-        const token = jwt.sign({
-                _id: results._id, role: 'doctor'
-            }, process.env.SECRET_KEY, {
-                expiresIn: "7d"
-        });
-        const isProduction = (process.env.STATUS === 'production');
-        res.cookie("token", token, {
-                httpOnly: true,
-                secure: isProduction,
-                sameSite: ((isProduction)? "none" : "lax"),
-                path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
-        });
-        const docObj = results.toObject();
-        delete docObj.password;
-        res.status(200).json(docObj);
+        res.status(200).json(results);
     } catch (error) {
         res.status(409).json({
             message: error.message
@@ -94,9 +68,8 @@ router.post('/register/admin', authenticate, async (req, res) => {
     try {
         const { name, email, password } = req.body;
         const results = await createAdmin(name, email, password);
-        const adminObj = results.toObject();
-        delete adminObj.password;
-        res.status(200).json(adminObj);
+        delete results.password;
+        res.status(200).json(results);
     } catch (error) {
         res.status(409).json({
             message: error.message

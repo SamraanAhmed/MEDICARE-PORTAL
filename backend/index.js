@@ -19,7 +19,7 @@ app.use(express.json());
 app.use('/api/database', databaseRouter);
 app.use('/api/chatbot', chatbotRouter);
 
-app.get("/check/health", (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).json({
     message: "Server is running"
   });

@@ -157,7 +157,6 @@ const getPayment = async (appointment_id) => {
         throw error;
     }
 }
-
 const getAllAppointmentOfDoctor = async (doctor_id) => {
     try {
         const result = await appointment.find({ doctor: doctor_id, status: 'pending'}).populate('patient', 'name');
@@ -167,14 +166,6 @@ const getAllAppointmentOfDoctor = async (doctor_id) => {
     }
 }
 
-const getPillarByService = async (service_id) => {
-    try {
-        const result = await service.findOne({_id: service_id});
-        return result;
-    } catch (error) {
-        throw error;
-    }
-}
 
 // setter functions
 const createAppointment = async (appointmentData) => {
@@ -205,17 +196,6 @@ const createMessage = async (messageData) => {
         throw error;
     }
 }
-
-const createMessage = async (messageData) => {
-    const { user: userId, content, sender } = messageData;
-    try {
-        const result = await message.create({ user: userId, content: content, sender: sender });
-        return result;
-    } catch (error) {
-        throw error;
-    }
-}
-
 const createService = async (serviceData) => {
     const { service_name, pillar, charges } = serviceData;
     try {
@@ -344,7 +324,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 module.exports = {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment,
-    createUser, createDoctor, createAppointment, createMessage, createService,
+    createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability, payBill,
     checkDoctorDailyAvailability,
     markAppointmentAsCompleted,
