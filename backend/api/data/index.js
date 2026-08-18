@@ -1,7 +1,7 @@
 const express = require('express');
 const {
     loginDoctor, loginUser, createDoctor, createUser,
-    getdoctor,
+    getdoctor, getPillarByService,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
     checkDoctorDailyAvailability
@@ -127,6 +127,45 @@ router.get('/logout', authenticate, async (req, res) => {
         throw error;
     }
 });
-
+router.get('appointment/all/doctor', authenticate, async (req, res) => {
+    try {
+        if (req.user.role === 'doctor') {
+            const result = await getAllAppointmentOfDoctor(req.user._id);
+            res.status(200).json(result);
+        } else {
+            throw new Error('Doctor can only view appointments')
+        }
+    } catch (error) {
+        res.status(409).json({
+            message: error.message
+        });
+    }
+});
+router.post('create/appointment', authenticate, async (req, res) => {
+    try {
+        const result = await createAppointment({
+            patient: req.user._id,
+            date: req.body.date,
+            service: req.body.service,
+            note: req.body.note
+        });
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(409).json({
+            message: error.message
+        });
+    }
+});
+router.post('create/service', authenticate, async (req, res) => {
+    try {
+        const result = await createService({
+            service_name: req.body.service_name,
+        })
+    } catch (error) {
+        res.status(409).json({
+            message: error.message
+        });
+    }
+});
 
 module.exports = router;

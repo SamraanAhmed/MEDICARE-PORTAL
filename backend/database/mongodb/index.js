@@ -1,5 +1,28 @@
 const mongoose = require('mongoose');
 
+
+const adminSchema = new mongoose.Schema({
+    avatar: {
+        type: String,
+        default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0k6mJECkDvvxLWpl2C6oVOgbs49inNcoZtvJRFileqS3TAkNr3qOH87dG&s=10"
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    }
+}, { timestamps: true});
+
+const admin = mongoose.model('admins', adminSchema);
+
 const userSchema = new mongoose.Schema({
     avatar: {
         type: String,
@@ -7,8 +30,7 @@ const userSchema = new mongoose.Schema({
     },
     name: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     email: {
         type: String,
@@ -21,8 +43,8 @@ const userSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        enum: ['male', 'female'],
-        default: 'male'
+        enum: ['male', 'female', 'not-specified'],
+        default: 'not-specified'
     }
 }, { timestamps: true});
 
@@ -35,8 +57,7 @@ const doctorSchema = new mongoose.Schema({
     },
     name: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     email: {
         type: String,
@@ -54,8 +75,8 @@ const doctorSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        enum: ['male', 'female'],
-        default: 'male'
+        enum: ['male', 'female', 'not-specified'],
+        default: 'not-specified'
     },
     available: {
         type: Boolean,
@@ -66,7 +87,7 @@ const doctorSchema = new mongoose.Schema({
 const doctor = mongoose.model('doctors', doctorSchema);
 
 const serviceSchema = new mongoose.Schema({
-    service: {
+    service_name: {
         type: String,
         required: true,
         unique: true
@@ -78,14 +99,14 @@ const serviceSchema = new mongoose.Schema({
     },
     available: {
         type: Boolean,
-        default: false
+        default: true
     }
 }, { timestamps: true });
 
 const service = mongoose.model('available-services', serviceSchema);
 
 const messageSchema = new mongoose.Schema({
-    user_id: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
         required: true
@@ -103,17 +124,17 @@ const messageSchema = new mongoose.Schema({
 const message = mongoose.model('messages', messageSchema);
 
 const appointmentSchema = new mongoose.Schema({
-    patient_id: {
+    patient: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
         required: true
     },
-    doctor_id: {
+    doctor: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'doctors',
         required: true
     },
-    service_id: {
+    service: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'available-services',
         required: true
@@ -133,7 +154,7 @@ const appointmentSchema = new mongoose.Schema({
       maxLength: 500,
     },
     proof: {
-        type: Blob
+        type: String
     }
 }, { timestamps: true });
 
@@ -150,6 +171,6 @@ const connectDB = async () => {
 }
 
 module.exports = {
-    user, doctor, service, message, appointment,
+    admin, user, doctor, service, message, appointment,
     connectDB
 };

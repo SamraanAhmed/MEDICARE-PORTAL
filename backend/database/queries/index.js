@@ -74,7 +74,15 @@ const getdoctor = async (id) => {
 }
 const getAllAppointmentOfDoctor = async (doctor_id) => {
     try {
-        const result = await appointment.find({ doctor_id: doctor_id, status: 'pending'});
+        const result = await appointment.find({ doctor_id: doctor_id, status: 'pending'}).populate('patient_id', 'name');
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getPillarByService = async (service_id) => {
+    try {
+        const result = service.findOne({_id: service_id});
         return result;
     } catch (error) {
         throw error;
@@ -104,32 +112,33 @@ const createDoctor = async (doctorData) => {
     }
 }
 const createAppointment = async (appointmentData) => {
-    const { patient_id, date, service, pillar, note } = appointmentData;
+    const { patient, date, service_id, note } = appointmentData;
     try {
-        const getDoctors = await user.find({ pillar: pillar, role: 'doctor' });
+        const service = await getPillarByService(service_id);
+        const getDoctors = await user.find({ pillar: service.pillar, role: 'doctor' });
         const availabilityChecks = await Promise.all(getDoctors.map((doctor) => checkDoctorDailyAvailability(doctor._id, date)));
         const availableDoctors = getDoctors.filter((_, i) => availabilityChecks[i]);
         if (availableDoctors.length === 0) {
             throw new Error('No available doctors for this pillar on the selected date');
         }
-        const result = await appointment.create({ patient_id: patient_id, doctor_id: availableDoctors[0]._id, appointment_date: date, service_id: service, notes: note });
+        const result = await appointment.create({ patient: patient, doctor: availableDoctors[0]._id, appointment_date: date, service: service_id, notes: note });
     } catch (error) {
         throw error;
     }
 }
 const createMessage = async (messageData) => {
-    const { user_id, content, sender } = messageData;
+    const { user, content, sender } = messageData;
     try {
-        const result = await message.create({ user_id: user_id, content: content, sender: sender });
+        const result = await message.create({ user: user, content: content, sender: sender });
         return result;
     } catch (error) {
         throw error;
     }
 }
 const createService = async (serviceData) => {
-    const { service, pillar } = serviceData;
+    const { service_name, pillar } = serviceData;
     try {
-        const result = await service.create({ service: service, pillar: pillar });
+        const result = await service.create({ service_name: service_name, pillar: pillar });
         return result;
     } catch (error) {
         throw error;
@@ -151,8 +160,8 @@ const updateAppointment = async (appointmentData) => {
     try {
         const result = await appointment.findByIdAndUpdate(appointment_id, { status: status }, { new: true });
         if (status !== 'pending') {
-            const doctor_id = result.doctor_id;
-            await updateDoctorAvailability({doctor_id: doctor_id, available: true});
+            const doctor = result.doctor;
+            await updateDoctorAvailability({doctor: doctor, available: true});
         }
         return result;
     } catch (error) {
@@ -160,9 +169,9 @@ const updateAppointment = async (appointmentData) => {
     }
 }
 const updateDoctorAvailability = async (doctorData) => {
-    const { doctor_id, available } = doctorData;
+    const { doctor, available } = doctorData;
     try {
-        const result = await doctor.findByIdAndUpdate(doctor_id, { available: available }, { new: true });
+        const result = await doctor.findByIdAndUpdate(doctor, { available: available }, { new: true });
         return result;
     } catch (error) {
         throw error;
@@ -234,7 +243,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 
 module.exports = {
     loginDoctor, loginUser, createDoctor, createUser,
-    getdoctor,
+    getdoctor, getPillarByService,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
     checkDoctorDailyAvailability
