@@ -16,7 +16,7 @@ app.use(cors({
     origin: process.env.FRONTEND_URL,
 }));
 app.use(express.json());
-app.use('api/database', databaseRouter);
+app.use('/api/database', databaseRouter);
 app.use('/api/chatbot', chatbotRouter);
 
 app.get("/check/health", (req, res) => {

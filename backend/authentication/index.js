@@ -29,5 +29,5 @@ async function checkAuthentication(req, res, next) {
 
 
 module.exports = {
-    authenticate, checkAuthentication
+    authenticate, checkAuthentication, jwt
 }

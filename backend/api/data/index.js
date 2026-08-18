@@ -8,7 +8,7 @@ const {
     checkDoctorDailyAvailability
 } = require('../../database/queries');
 const { 
-    authenticate, checkAuthentication
+    authenticate, checkAuthentication, jwt
 } = require('../../authentication');
 
 dotenv.config();
@@ -16,6 +16,11 @@ dotenv.config();
 const router = express.Router();
 
 
+router.get('/', (req, res) => {
+    res.status(200).json({
+        message: 'endpoint Healthy'
+    });
+});
 router.post('/register/user', async (req, res) => {
     try {
         const { name, email, password, gender } = req.body;

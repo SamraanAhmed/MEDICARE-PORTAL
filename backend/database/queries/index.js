@@ -1,4 +1,4 @@
-const { user, doctor, service, message, appointment } = require('../mongodb');
+const { admin, user, doctor, service, message, appointment } = require('../mongodb');
 const bycrpt = require('bcrypt');
 const dotenv = require('dotenv');
 
