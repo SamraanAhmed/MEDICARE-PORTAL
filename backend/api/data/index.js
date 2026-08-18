@@ -2,14 +2,24 @@ const express = require('express');
 const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
+<<<<<<< HEAD
     getdoctor, getPillarByService, getUserProfile,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
     checkDoctorDailyAvailability
+=======
+    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment,
+    createUser, createDoctor, createAppointment, createMessage, createService,
+    updateService, updateAppointment, updateDoctorAvailability, payBill,
+    checkDoctorDailyAvailability,
+    markAppointmentAsCompleted,
+    deleteAdmin, deleteDoctor, deleteMessages, deleteUser
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
 } = require('../../database/queries');
 const { 
     authenticate, checkAuthentication, jwt
 } = require('../../authentication');
+const { appointment } = require('../../database/mongodb');
 
 dotenv.config();
 
@@ -178,11 +188,12 @@ router.post('/login/admin', async (req, res) => {
 });
 router.get('/logout', authenticate, async (req, res) => {
     try {
+        const isProduction = (process.env.STATUS === 'production');
         res.clearCookie("token", {
             httpOnly: true,
-            secure: false,
+            secure: isProduction,
             path: '/',
-            sameSite: "lax"
+            sameSite: ((isProduction)? "none" : "lax")
         });
         res.status(200).json({
             message: 'successfull logout'
@@ -191,21 +202,82 @@ router.get('/logout', authenticate, async (req, res) => {
         res.status(409).json({
             message: error.message
         });
-        throw error;
+    }
+});
+<<<<<<< HEAD
+router.post('/create/appointment', authenticate, async (req, res) => {
+    if (req.user.role !== 'user') throw new Error('Only users can add appointments');
+=======
+router.post('/appointment/payment', authenticate, async (req, res) => {
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
+    try {
+        const result = await getPayment(req.body.appointment_id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(409).json({
+            message: error.message
+        });
+    }
+});
+
+
+// user only routes
+router.get('/appointment/all/user', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'user') {
+            return res.status(403).json({ message: 'Forbidden: You are not an User' });
+        }
+        const result = await getAllAppointmentOfUser(req.user._id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
     }
 });
 router.post('/create/appointment', authenticate, async (req, res) => {
-    if (req.user.role !== 'user') throw new Error('Only users can add appointments');
     try {
+        if (req.user.role !== 'user') {
+            return res.status(403).json({ message: 'Forbidden: You are not an user' });
+        }
         const result = await createAppointment({
-            patient: req.user._id,
+            patient_id: req.user._id,
             date: req.body.date,
-            service: req.body.service,
+            service_id: req.body.service_id,
             note: req.body.note
         });
         res.status(200).json(result);
     } catch (error) {
-        res.status(409).json({
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/appointment/mark/cancel', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'user') {
+            return res.status(403).json({ message: 'Forbidden: You are not an user' });
+        }
+        const result = await updateAppointment({
+            appointment_id: req.body.appointment_id,
+            status: 'cancelled'
+        });
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/appointment/pay', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'user') {
+            return res.status(403).json({ message: 'Forbidden: You are not an user' });
+        }
+        const result = await payBill(req.body.payment_id, req.body.transcation_id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
             message: error.message
         });
     }
@@ -214,12 +286,31 @@ router.post('/create/appointment', authenticate, async (req, res) => {
 
 // doctor only routes
 router.get('/appointment/all/doctor', authenticate, async (req, res) => {
+<<<<<<< HEAD
     if (req.user.role !== 'doctor') throw new Error('Doctor can only view their appointments');
+=======
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
     try {
+        if (req.user.role !== 'doctor') {
+            return res.status(403).json({ message: 'Forbidden: You are not an Doctor' });
+        }
         const result = await getAllAppointmentOfDoctor(req.user._id);
         res.status(200).json(result);
     } catch (error) {
-        res.status(409).json({
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/appointment/mark/complete', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'doctor') {
+            return res.status(403).json({ message: 'Forbidden: You are not an Doctor' });
+        }
+        const result = await markAppointmentAsCompleted(req.body.appointment_id, req.body.proof);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
             message: error.message
         });
     }
@@ -228,17 +319,111 @@ router.get('/appointment/all/doctor', authenticate, async (req, res) => {
 
 // admin only routes
 router.post('/create/service', authenticate, async (req, res) => {
+<<<<<<< HEAD
     if (req.user.role !== 'admin') throw new Error('Only admins can add services');
+=======
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
         const result = await createService({
             service_name: req.body.service_name,
-            pillar: req.body.pillar
+            pillar: req.body.pillar,
+            charges: req.body.charges
         });
+        res.status(200).json(result);
     } catch (error) {
-        res.status(409).json({
+        res.status(500).json({
             message: error.message
         });
     }
 });
+router.get('/get/user/all', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await getAllUser();
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.get('/get/doctor/all', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await getAllDoctor();
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.get('/get/appointment/all', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await getAllAppointment();
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/delete/user', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await deleteUser(req.body.user_id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/delete/doctor', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await deleteDoctor(req.body.doctor_id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/delete/admin', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await deleteAdmin(req.body.admin_id);
+        const isProduction = (process.env.STATUS === 'production');
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: isProduction,
+            path: '/',
+            sameSite: ((isProduction)? "none" : "lax")
+        });
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+
 
 module.exports = router;

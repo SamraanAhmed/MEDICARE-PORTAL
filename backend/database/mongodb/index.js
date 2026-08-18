@@ -100,6 +100,10 @@ const serviceSchema = new mongoose.Schema({
     available: {
         type: Boolean,
         default: true
+    },
+    charges: {
+        type: Number,
+        required: true
     }
 }, { timestamps: true });
 
@@ -148,6 +152,12 @@ const appointmentSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    payment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'payments',
+        unique: true,
+        require: true
+    },
     notes: {
       type: String,
       trim: true,
@@ -160,6 +170,25 @@ const appointmentSchema = new mongoose.Schema({
 
 const appointment = mongoose.model('appointments', appointmentSchema);
 
+const paymentSchema = new mongoose.Schema({
+    charges: {
+        type: Number,
+        required: true
+    },
+    paid: {
+        type: Boolean,
+        default: false
+    },
+    transcation: {
+        type: String
+    },
+    paid_at: {
+        type: Date
+    }
+}, { timestamps: true });
+
+const payment = mongoose.model('payments', paymentSchema);
+
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URL, {
@@ -171,6 +200,6 @@ const connectDB = async () => {
 }
 
 module.exports = {
-    admin, user, doctor, service, message, appointment,
+    admin, user, doctor, service, message, appointment, payment,
     connectDB
 };

@@ -1,4 +1,4 @@
-const { admin, user, doctor, service, message, appointment } = require('../mongodb');
+const { admin, user, doctor, service, message, appointment, payment } = require('../mongodb');
 const bycrpt = require('bcrypt');
 const dotenv = require('dotenv');
 
@@ -24,11 +24,16 @@ const loginUser = async (email, password) => {
     try {
         const results = await user.findOne({ email: email });
         if(!results) throw new Error('Incorrect Email');
+<<<<<<< HEAD
         if(await bycrpt.compare(password, results.password)) {
             const userObj = results.toObject();
             delete userObj.password;
             return userObj;
         }
+=======
+        const match = await bycrpt.compare(password, results.password);
+        if(match) return results;
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
         else throw new Error('Incorrect Password');
     } catch (error) {
         throw error;
@@ -56,11 +61,16 @@ const loginDoctor = async (email, password) => {
     try {
         const results = await doctor.findOne({ email: email });
         if(!results) throw new Error('Incorrect Email');
+<<<<<<< HEAD
         if(await bycrpt.compare(password, results.password)) {
             const doctorObj = results.toObject();
             delete doctorObj.password;
             return doctorObj;
         }
+=======
+        const match = await bycrpt.compare(password, results.password);
+        if(match) return results;
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
         else throw new Error('Incorrect Password');
     } catch (error) {
         throw error;
@@ -72,11 +82,16 @@ const loginAdmin = async (email, password) => {
     try {
         const results = await admin.findOne({ email: email });
         if(!results) throw new Error('Incorrect Email');
+<<<<<<< HEAD
         if(await bycrpt.compare(password, results.password)) {
             const adminObj = results.toObject();
             delete adminObj.password;
             return adminObj;
         }
+=======
+        const match = await bycrpt.compare(password, results.password);
+        if(match) return results;
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
         else throw new Error('Incorrect Password');
     } catch (error) {
         throw error;
@@ -109,6 +124,7 @@ const getdoctor = async (id) => {
 
 const getUserProfile = async (id, role) => {
     try {
+<<<<<<< HEAD
         let result;
         if (role === 'user') {
             result = await user.findOne({ _id: id }).select('-password');
@@ -117,6 +133,60 @@ const getUserProfile = async (id, role) => {
         } else if (role === 'admin') {
             result = await admin.findOne({ _id: id }).select('-password');
         }
+=======
+        const result = await appointment.find({ doctor: doctor_id, status: 'pending'})
+            .populate({ path: 'patient', select: 'name' })
+            .populate({ path: 'payment', select: 'paid' });
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getAllAppointmentOfUser = async (user_id) => {
+    try {
+        const result = await appointment.find({ patient: user_id }).populate('doctor', '_id name pillar');
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getPillarByService = async (service_id) => {
+    try {
+        const result = await service.findOne({_id: service_id});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getAllUser = async () => {
+    try {
+        const result = await user.find({});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getAllDoctor = async () => {
+    try {
+        const result = await doctor.find({});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getAllAppointment = async () => {
+    try {
+        const result = await appointment.find({}).populate('patient doctor service payment');
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getPayment = async (appointment_id) => {
+    try {
+        const appoint = await appointment.findById(appointment_id).select('payment').populate('payment');
+        const result = appoint.payment;
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
         return result;
     } catch (error) {
         throw error;
@@ -143,6 +213,7 @@ const getPillarByService = async (service_id) => {
 
 // setter functions
 const createAppointment = async (appointmentData) => {
+<<<<<<< HEAD
     const { patient, date, service: service_id, note } = appointmentData;
     try {
         const serviceData = await getPillarByService(service_id);
@@ -151,10 +222,18 @@ const createAppointment = async (appointmentData) => {
         }
         const getDoctors = await doctor.find({ pillar: serviceData.pillar });
         const availabilityChecks = await Promise.all(getDoctors.map((doc) => checkDoctorDailyAvailability(doc._id, date)));
+=======
+    const { patient_id, date, service_id, note } = appointmentData;
+    try {
+        const services = await getPillarByService(service_id);
+        const getDoctors = await doctor.find({ pillar: services.pillar });
+        const availabilityChecks = await Promise.all(getDoctors.map((doctor) => checkDoctorDailyAvailability(doctor._id, date)));
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
         const availableDoctors = getDoctors.filter((_, i) => availabilityChecks[i]);
         if (availableDoctors.length === 0) {
             throw new Error('No available doctors for this pillar on the selected date');
         }
+<<<<<<< HEAD
         const result = await appointment.create({ 
             patient: patient, 
             doctor: availableDoctors[0]._id, 
@@ -162,6 +241,21 @@ const createAppointment = async (appointmentData) => {
             service: service_id, 
             notes: note 
         });
+=======
+        const paymentResult = await payment.create({ 
+            charges: services.charges
+        });
+        const result = await appointment.create({ patient: patient_id, doctor: availableDoctors[0]._id, appointment_date: date, service: service_id, notes: note, payment: paymentResult._id });
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const createMessage = async (messageData) => {
+    const { user, content, sender } = messageData;
+    try {
+        const result = await message.create({ user: user, content: content, sender: sender });
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
         return result;
     } catch (error) {
         throw error;
@@ -179,9 +273,9 @@ const createMessage = async (messageData) => {
 }
 
 const createService = async (serviceData) => {
-    const { service_name, pillar } = serviceData;
+    const { service_name, pillar, charges } = serviceData;
     try {
-        const result = await service.create({ service_name: service_name, pillar: pillar });
+        const result = await service.create({ service_name: service_name, pillar: pillar, charges: charges });
         return result;
     } catch (error) {
         throw error;
@@ -203,9 +297,15 @@ const updateAppointment = async (appointmentData) => {
     const { appointment_id, status } = appointmentData;
     try {
         const result = await appointment.findByIdAndUpdate(appointment_id, { status: status }, { new: true });
+<<<<<<< HEAD
         if (status !== 'pending' && result) {
             const doctorId = result.doctor;
             await updateDoctorAvailability({doctor: doctorId, available: true});
+=======
+        if ((status !== 'pending') && (status !== 'completed')) {
+            const doctor = result.doctor;
+            await updateDoctorAvailability({doctor: doctor, available: true});
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
         }
         return result;
     } catch (error) {
@@ -214,14 +314,21 @@ const updateAppointment = async (appointmentData) => {
 }
 
 const updateDoctorAvailability = async (doctorData) => {
+<<<<<<< HEAD
     const { doctor: doctorId, available } = doctorData;
     try {
         const result = await doctor.findByIdAndUpdate(doctorId, { available: available }, { new: true });
+=======
+    const { doctor_id, available } = doctorData;
+    try {
+        const result = await doctor.findByIdAndUpdate(doctor_id, { available: available }, { new: true });
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
         return result;
     } catch (error) {
         throw error;
     }
 }
+<<<<<<< HEAD
 
 const markAppointmentAsCompleted = async (appointment_id, proof, role) => {
     try {
@@ -232,9 +339,28 @@ const markAppointmentAsCompleted = async (appointment_id, proof, role) => {
             } else {
                 throw new Error('No proof Provided');
             }
+=======
+const markAppointmentAsCompleted = async (appointment_id, proof) => {
+    try {
+        const appointments = await appointment.findById(appointment_id)
+            .populate({ path: 'payment', select: 'paid' });
+        if (proof && appointments.payment.paid) {
+            const result = await appointment.findByIdAndUpdate(appointment_id, { proof: proof, status: 'completed'}, { new: true });
+            return result;
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
         } else {
-            throw new Error('only doctor can edit');
+            if(!appointments) throw new Error('No appointment Founded');
+            else if(!appointments.payment) throw new Error('No payment Founded');
+            else if (!proof) throw new Error('No Proof Founded');
         }
+    } catch (error) {
+        throw error;
+    }
+}
+const payBill = async (payment_id, transcation_id) => {
+    try {
+        const result = await payment.findByIdAndUpdate(payment_id, { paid: true, transcation: transcation_id }, { new: true });
+        return result;
     } catch (error) {
         throw error;
     }
@@ -243,6 +369,7 @@ const markAppointmentAsCompleted = async (appointment_id, proof, role) => {
 // Delete functions
 const deleteUser = async (user_id) => {
     try {
+        await deleteMessages(user_id);
         const result = await user.findOneAndDelete({_id: user_id});
         return result;
     } catch (error) {
@@ -262,6 +389,14 @@ const deleteDoctor = async (doctor_id) => {
 const deleteMessages = async (user_id) => {
     try {
         const result = await message.deleteMany({user: user_id});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const deleteAdmin = async (admin_id) => {
+    try {
+        const result = await admin.findOneAndDelete({_id: admin_id});
         return result;
     } catch (error) {
         throw error;
@@ -289,9 +424,18 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 
 module.exports = {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
+<<<<<<< HEAD
     getdoctor, getPillarByService, getUserProfile,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
     checkDoctorDailyAvailability, getAllAppointmentOfDoctor, markAppointmentAsCompleted,
     deleteUser, deleteDoctor, deleteMessages
+=======
+    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment,
+    createUser, createDoctor, createAppointment, createMessage, createService,
+    updateService, updateAppointment, updateDoctorAvailability, payBill,
+    checkDoctorDailyAvailability,
+    markAppointmentAsCompleted,
+    deleteAdmin, deleteDoctor, deleteMessages, deleteUser
+>>>>>>> 0cb5d75ff21d5ab71d5386d126c325c21f8a0d4e
 }
