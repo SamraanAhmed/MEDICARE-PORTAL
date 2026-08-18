@@ -1,4 +1,4 @@
-const { admin, user, doctor, service, message, appointment } = require('../mongodb');
+const { admin, user, doctor, service, message, appointment, payment } = require('../mongodb');
 const bycrpt = require('bcrypt');
 const dotenv = require('dotenv');
 
@@ -103,7 +103,9 @@ const getdoctor = async (id) => {
 }
 const getAllAppointmentOfDoctor = async (doctor_id) => {
     try {
-        const result = await appointment.find({ doctor: doctor_id, status: 'pending'}).populate('patient', 'name');
+        const result = await appointment.find({ doctor: doctor_id, status: 'pending'})
+            .populate({ path: 'patient', select: 'name' })
+            .populate({ path: 'payment', select: 'paid' });
         return result;
     } catch (error) {
         throw error;
@@ -143,7 +145,7 @@ const getAllDoctor = async () => {
 }
 const getAllAppointment = async () => {
     try {
-        const result = await appointment.find({}).populate('patient doctor service');
+        const result = await appointment.find({}).populate('patient doctor service payment');
         return result;
     } catch (error) {
         throw error;
@@ -153,7 +155,7 @@ const getAllAppointment = async () => {
 
 // setter functions
 const createAppointment = async (appointmentData) => {
-    const { patient, date, service_id, note } = appointmentData;
+    const { patient_id, date, service_id, note } = appointmentData;
     try {
         const services = await getPillarByService(service_id);
         const getDoctors = await doctor.find({ pillar: services.pillar, role: 'doctor' });
@@ -162,7 +164,10 @@ const createAppointment = async (appointmentData) => {
         if (availableDoctors.length === 0) {
             throw new Error('No available doctors for this pillar on the selected date');
         }
-        const result = await appointment.create({ patient: patient, doctor: availableDoctors[0]._id, appointment_date: date, service: service_id, notes: note });
+        const paymentResult = await payment.create({ 
+            charges: services.charges
+        });
+        const result = await appointment.create({ patient: patient_id, doctor: availableDoctors[0]._id, appointment_date: date, service: service_id, notes: note, payment: paymentResult._id });
         return result;
     } catch (error) {
         throw error;
@@ -219,14 +224,25 @@ const updateDoctorAvailability = async (doctorData) => {
         throw error;
     }
 }
-const markAppointmentAsCompleted = async (appointment_id, proof, role) => {
+const markAppointmentAsCompleted = async (appointment_id, proof) => {
     try {
-        if (proof) {
-            const result = appointment.findByIdAndUpdate(appointment_id, { proof: proof, status: 'completed'}, { new: true });
+        const appointments = await appointment.findById(appointment_id)
+            .populate({ path: 'payment', select: 'paid' });
+        if (proof && appointments.payment.paid) {
+            const result = await appointment.findByIdAndUpdate(appointment_id, { proof: proof, status: 'completed'}, { new: true });
             return result;
         } else {
-            throw new Error('No proof Provided');
+            if(!appointments) throw new Error('No appointment Founded');
+            else if(!appointments.payment) throw new Error('No payment Founded');
+            else if (!proof) throw new Error('No Proof Founded');
         }
+    } catch (error) {
+        throw error;
+    }
+}
+const payBill = async (payment_id, transcation_id) => {
+    try {
+        const result = await payment.findByIdAndUpdate(payment_id, { paid: true, transcation: transcation_id }, { new: true });
     } catch (error) {
         throw error;
     }
