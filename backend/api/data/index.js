@@ -2,7 +2,8 @@ const express = require('express');
 const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment,
+    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment,
+    getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability, payBill,
     checkDoctorDailyAvailability,
@@ -264,8 +265,14 @@ router.post('/appointment/mark/complete', authenticate, async (req, res) => {
         if (req.user.role !== 'doctor') {
             return res.status(403).json({ message: 'Forbidden: You are not an Doctor' });
         }
-        const result = await markAppointmentAsCompleted(req.body.appointment_id, req.body.proof);
-        res.status(200).json(result);
+        const appointmentDoctor = await getDoctorFromAppointment(req.body.appointment_id);
+        if (appointmentDoctor._id === req.user._id) {
+            const result = await markAppointmentAsCompleted(req.body.appointment_id, req.body.proof);
+            res.status(200).json(result);
+        } else {
+            throw new Error('You cannt mark this appointment');
+        }
+        
     } catch (error) {
         res.status(500).json({
             message: error.message
