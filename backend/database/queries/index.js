@@ -231,6 +231,7 @@ const markAppointmentAsCompleted = async (appointment_id, proof, role) => {
 // Delete functions
 const deleteUser = async (user_id) => {
     try {
+        await deleteMessages(user_id);
         const result = await user.findOneAndDelete({_id: user_id});
         return result;
     } catch (error) {
@@ -248,6 +249,14 @@ const deleteDoctor = async (doctor_id) => {
 const deleteMessages = async (user_id) => {
     try {
         const result = await message.deleteMany({user_id: user_id});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const deleteAdmin = async (admin_id) => {
+    try {
+        const result = await admin.findOneAndDelete({_id: admin_id});
         return result;
     } catch (error) {
         throw error;
@@ -280,5 +289,7 @@ module.exports = {
     getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
-    checkDoctorDailyAvailability
+    checkDoctorDailyAvailability,
+    markAppointmentAsCompleted,
+    deleteAdmin, deleteDoctor, deleteMessages, deleteUser
 }
