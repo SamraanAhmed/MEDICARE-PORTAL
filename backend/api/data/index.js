@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService,
-    createUser, createDoctor, createAppointment, createMessage, createService,
+    createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
     checkDoctorDailyAvailability
 } = require('../../database/queries');

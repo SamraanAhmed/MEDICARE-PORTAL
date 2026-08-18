@@ -117,26 +117,6 @@ const getPillarByService = async (service_id) => {
 
 
 // setter functions
-const createUser = async (userData) => {
-    const { name, email, password, gender } = userData;
-    try {
-        const hash = await bycrpt.hash(password, 10);
-        const result = await user.create({ name: name, email: email, password: hash, gender: gender });
-        return result;
-    } catch (error) {
-        throw error;
-    }
-}
-const createDoctor = async (doctorData) => {
-    const { name, email, password, role, pillar, gender } = doctorData;
-    try {
-        const hash = await bycrpt.hash(password, 10);
-        const result = await doctor.create({ name: name, email: email, password: hash, role: role, pillar: pillar, gender: gender });
-        return result;
-    } catch (error) {
-        throw error;
-    }
-}
 const createAppointment = async (appointmentData) => {
     const { patient, date, service_id, note } = appointmentData;
     try {
