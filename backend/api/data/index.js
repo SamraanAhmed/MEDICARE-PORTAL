@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment,
+    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor,
     createUser, createDoctor, createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability,
     checkDoctorDailyAvailability,
@@ -180,6 +180,22 @@ router.get('/logout', authenticate, async (req, res) => {
         throw error;
     }
 });
+
+
+// user only routes
+router.get('/appointment/all/user', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'user') {
+            return res.status(403).json({ message: 'Forbidden: You are not an User' });
+        }
+        const result = await getAllAppointmentOfUser(req.user._id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
 router.post('/create/appointment', authenticate, async (req, res) => {
     try {
         if (req.user.role !== 'user') {
@@ -198,6 +214,22 @@ router.post('/create/appointment', authenticate, async (req, res) => {
         });
     }
 });
+router.post('/appointment/mark/cancel', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'user') {
+            return res.status(403).json({ message: 'Forbidden: You are not an user' });
+        }
+        const result = await updateAppointment({
+            appointment_id: req.body.appointment_id,
+            status: 'cancelled'
+        });
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
 
 
 // doctor only routes
@@ -207,6 +239,19 @@ router.get('/appointment/all/doctor', authenticate, async (req, res) => {
             return res.status(403).json({ message: 'Forbidden: You are not an Doctor' });
         }
         const result = await getAllAppointmentOfDoctor(req.user._id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/appointment/mark/complete', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'doctor') {
+            return res.status(403).json({ message: 'Forbidden: You are not an Doctor' });
+        }
+        const result = await markAppointmentAsCompleted(req.body.appointment_id, req.body.proof);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({
