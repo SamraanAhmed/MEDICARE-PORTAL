@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getUserFromAppointment,
+    getdoctor, getPillarByService, getAllServices, getUserProfile, getAllUser, getAllDoctor, getAllAppointment, getUserFromAppointment,
     getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability, payBill,
@@ -24,6 +24,17 @@ router.get('/', (req, res) => {
     res.status(200).json({
         message: 'endpoint Healthy'
     });
+});
+router.get('/me', authenticate, async (req, res) => {
+    try {
+        const results = await getUserProfile(req.user._id, req.user.role);
+        if (!results) {
+            return res.status(404).json({ message: 'User profile not found' });
+        }
+        res.status(200).json({ ...results.toObject(), role: req.user.role });
+    } catch (error) {
+        res.status(409).json({ message: error.message });
+    }
 });
 router.post('/register/user', async (req, res) => {
     try {
@@ -296,6 +307,32 @@ router.post('/create/service', authenticate, async (req, res) => {
             service_name: req.body.service_name,
             pillar: req.body.pillar,
             charges: req.body.charges
+        });
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.get('/service/all', async (req, res) => {
+    try {
+        const result = await getAllServices();
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/service/update', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await updateService({
+            service_id: req.body.service_id,
+            available: req.body.available
         });
         res.status(200).json(result);
     } catch (error) {

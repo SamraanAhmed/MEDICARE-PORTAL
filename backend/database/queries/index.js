@@ -1,11 +1,16 @@
+const mongoose = require('mongoose');
 const { admin, user, doctor, service, message, appointment, payment } = require('../mongodb');
 const bycrpt = require('bcrypt');
 const dotenv = require('dotenv');
+const jsonDb = require('../jsonDb');
 
 dotenv.config();
 
+const isConnected = () => mongoose.connection.readyState === 1;
+
 // user accounts
 const createUser = async (name, email, password, gender) => {
+    if (!isConnected()) return jsonDb.createUser(name, email, password, gender);
     try {
         const hash = await bycrpt.hash(password, 10);
         const results = await user.create({
@@ -21,6 +26,7 @@ const createUser = async (name, email, password, gender) => {
 };
 
 const loginUser = async (email, password) => {
+    if (!isConnected()) return jsonDb.loginUser(email, password);
     try {
         const results = await user.findOne({ email: email });
         if(!results) throw new Error('Incorrect Email');
@@ -34,6 +40,7 @@ const loginUser = async (email, password) => {
 
 //doctor accounts
 const createDoctor = async (name, email, password, gender, pillar) => {
+    if (!isConnected()) return jsonDb.createDoctor(name, email, password, gender, pillar);
     try {
         const hash = await bycrpt.hash(password, 10);
         const results = await doctor.create({
@@ -50,6 +57,7 @@ const createDoctor = async (name, email, password, gender, pillar) => {
 };
 
 const loginDoctor = async (email, password) => {
+    if (!isConnected()) return jsonDb.loginDoctor(email, password);
     try {
         const results = await doctor.findOne({ email: email });
         if(!results) throw new Error('Incorrect Email');
@@ -63,6 +71,7 @@ const loginDoctor = async (email, password) => {
 
 // Admin accounts
 const loginAdmin = async (email, password) => {
+    if (!isConnected()) return jsonDb.loginAdmin(email, password);
     try {
         const results = await admin.findOne({ email: email });
         if(!results) throw new Error('Incorrect Email');
@@ -75,6 +84,7 @@ const loginAdmin = async (email, password) => {
 };
 
 const createAdmin = async (name, email, password) => {
+    if (!isConnected()) return jsonDb.createAdmin(name, email, password);
     try {
         const hash = await bycrpt.hash(password, 10);
         const results = await admin.create({
@@ -90,6 +100,7 @@ const createAdmin = async (name, email, password) => {
 
 // getter functions
 const getdoctor = async (id) => {
+    if (!isConnected()) return jsonDb.getdoctor(id);
     try {
         const result = await doctor.findOne({_id: id});
         return result;
@@ -99,16 +110,23 @@ const getdoctor = async (id) => {
 }
 
 const getUserProfile = async (id, role) => {
+    if (!isConnected()) return jsonDb.getUserProfile(id, role);
     try {
-        const result = await appointment.find({ doctor: doctor_id, status: 'pending'})
-            .populate({ path: 'patient', select: 'name' })
-            .populate({ path: 'payment', select: 'paid' });
+        let result;
+        if (role === 'user') {
+            result = await user.findOne({ _id: id }).select('-password');
+        } else if (role === 'doctor') {
+            result = await doctor.findOne({ _id: id }).select('-password');
+        } else if (role === 'admin') {
+            result = await admin.findOne({ _id: id }).select('-password');
+        }
         return result;
     } catch (error) {
         throw error;
     }
 }
 const getAllAppointmentOfUser = async (user_id) => {
+    if (!isConnected()) return jsonDb.getAllAppointmentOfUser(user_id);
     try {
         const result = await appointment.find({ patient: user_id }).populate('doctor', '_id name pillar');
         return result;
@@ -117,6 +135,7 @@ const getAllAppointmentOfUser = async (user_id) => {
     }
 }
 const getPillarByService = async (service_id) => {
+    if (!isConnected()) return jsonDb.getPillarByService(service_id);
     try {
         const result = await service.findOne({_id: service_id});
         return result;
@@ -124,7 +143,17 @@ const getPillarByService = async (service_id) => {
         throw error;
     }
 }
+const getAllServices = async () => {
+    if (!isConnected()) return jsonDb.getAllServices();
+    try {
+        const result = await service.find({});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
 const getAllUser = async () => {
+    if (!isConnected()) return jsonDb.getAllUser();
     try {
         const result = await user.find({});
         return result;
@@ -133,6 +162,7 @@ const getAllUser = async () => {
     }
 }
 const getAllDoctor = async () => {
+    if (!isConnected()) return jsonDb.getAllDoctor();
     try {
         const result = await doctor.find({});
         return result;
@@ -141,6 +171,7 @@ const getAllDoctor = async () => {
     }
 }
 const getAllAppointment = async () => {
+    if (!isConnected()) return jsonDb.getAllAppointment();
     try {
         const result = await appointment.find({}).populate('patient doctor service payment');
         return result;
@@ -149,6 +180,7 @@ const getAllAppointment = async () => {
     }
 }
 const getPayment = async (appointment_id) => {
+    if (!isConnected()) return jsonDb.getPayment(appointment_id);
     try {
         const appoint = await appointment.findById(appointment_id).select('payment').populate('payment');
         const result = appoint.payment;
@@ -158,6 +190,7 @@ const getPayment = async (appointment_id) => {
     }
 }
 const getAllAppointmentOfDoctor = async (doctor_id) => {
+    if (!isConnected()) return jsonDb.getAllAppointmentOfDoctor(doctor_id);
     try {
         const result = await appointment.find({ doctor: doctor_id, status: 'pending'}).populate('patient', 'name');
         return result;
@@ -166,6 +199,7 @@ const getAllAppointmentOfDoctor = async (doctor_id) => {
     }
 }
 const getDoctorFromAppointment = async (appointment_id) => {
+    if (!isConnected()) return jsonDb.getDoctorFromAppointment(appointment_id);
     try {
         const appoint = await appointment.findById(appointment_id).select('doctor').populate('doctor');
         const result = appoint.doctor;
@@ -175,6 +209,7 @@ const getDoctorFromAppointment = async (appointment_id) => {
     }
 }
 const getUserFromAppointment = async (appointment_id) => {
+    if (!isConnected()) return jsonDb.getUserFromAppointment(appointment_id);
     try {
         const appoint = await appointment.findById(appointment_id).select('patient').populate('patient');
         const result = appoint.patient;
@@ -187,6 +222,7 @@ const getUserFromAppointment = async (appointment_id) => {
 
 // setter functions
 const createAppointment = async (appointmentData) => {
+    if (!isConnected()) return jsonDb.createAppointment(appointmentData);
     const { patient_id, date, service_id, note } = appointmentData;
     try {
         const services = await getPillarByService(service_id);
@@ -206,6 +242,7 @@ const createAppointment = async (appointmentData) => {
     }
 }
 const createMessage = async (messageData) => {
+    if (!isConnected()) return jsonDb.createMessage(messageData);
     const { user, content, sender } = messageData;
     try {
         const result = await message.create({ user: user, content: content, sender: sender });
@@ -215,6 +252,7 @@ const createMessage = async (messageData) => {
     }
 }
 const createService = async (serviceData) => {
+    if (!isConnected()) return jsonDb.createService(serviceData);
     const { service_name, pillar, charges } = serviceData;
     try {
         const result = await service.create({ service_name: service_name, pillar: pillar, charges: charges });
@@ -226,6 +264,7 @@ const createService = async (serviceData) => {
 
 // update functions
 const updateService = async (serviceData) => {
+    if (!isConnected()) return jsonDb.updateService(serviceData);
     const { service_id, available } = serviceData;
     try {
         const result = await service.findByIdAndUpdate(service_id, { available: available }, { new: true });
@@ -236,6 +275,7 @@ const updateService = async (serviceData) => {
 }
 
 const updateAppointment = async (appointmentData) => {
+    if (!isConnected()) return jsonDb.updateAppointment(appointmentData);
     const { appointment_id, status } = appointmentData;
     try {
         const result = await appointment.findByIdAndUpdate(appointment_id, { status: status }, { new: true });
@@ -250,6 +290,7 @@ const updateAppointment = async (appointmentData) => {
 }
 
 const updateDoctorAvailability = async (doctorData) => {
+    if (!isConnected()) return jsonDb.updateDoctorAvailability(doctorData);
     const { doctor_id, available } = doctorData;
     try {
         const result = await doctor.findByIdAndUpdate(doctor_id, { available: available }, { new: true });
@@ -259,6 +300,7 @@ const updateDoctorAvailability = async (doctorData) => {
     }
 }
 const markAppointmentAsCompleted = async (appointment_id, proof) => {
+    if (!isConnected()) return jsonDb.markAppointmentAsCompleted(appointment_id, proof);
     try {
         const appointments = await appointment.findById(appointment_id)
             .populate({ path: 'payment', select: 'paid' });
@@ -275,6 +317,7 @@ const markAppointmentAsCompleted = async (appointment_id, proof) => {
     }
 }
 const payBill = async (payment_id, transcation_id) => {
+    if (!isConnected()) return jsonDb.payBill(payment_id, transcation_id);
     try {
         const result = await payment.findByIdAndUpdate(payment_id, { paid: true, transcation: transcation_id }, { new: true });
         return result;
@@ -285,6 +328,7 @@ const payBill = async (payment_id, transcation_id) => {
 
 // Delete functions
 const deleteUser = async (user_id) => {
+    if (!isConnected()) return jsonDb.deleteUser(user_id);
     try {
         await deleteMessages(user_id);
         const result = await user.findOneAndDelete({_id: user_id});
@@ -295,6 +339,7 @@ const deleteUser = async (user_id) => {
 }
 
 const deleteDoctor = async (doctor_id) => {
+    if (!isConnected()) return jsonDb.deleteDoctor(doctor_id);
     try {
         const result = await doctor.findOneAndDelete({_id: doctor_id});
         return result;
@@ -304,6 +349,7 @@ const deleteDoctor = async (doctor_id) => {
 }
 
 const deleteMessages = async (user_id) => {
+    if (!isConnected()) return jsonDb.deleteMessages(user_id);
     try {
         const result = await message.deleteMany({user: user_id});
         return result;
@@ -312,6 +358,7 @@ const deleteMessages = async (user_id) => {
     }
 }
 const deleteAdmin = async (admin_id) => {
+    if (!isConnected()) return jsonDb.deleteAdmin(admin_id);
     try {
         const result = await admin.findOneAndDelete({_id: admin_id});
         return result;
@@ -322,6 +369,7 @@ const deleteAdmin = async (admin_id) => {
 
 // checker functions
 const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
+    if (!isConnected()) return jsonDb.checkDoctorDailyAvailability(doctor_id, appointment_date);
     const startOfDay = new Date(appointment_date);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(appointment_date);
@@ -341,7 +389,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 
 module.exports = {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser,
+    getdoctor, getPillarByService, getAllServices, getUserProfile, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser,
     getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment, getUserFromAppointment,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability, payBill,

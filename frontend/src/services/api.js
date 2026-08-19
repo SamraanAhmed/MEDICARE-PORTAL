@@ -116,9 +116,9 @@ export const api = {
   },
 
   // --- SERVICE ENDPOINTS (ADMIN) ---
-  createService: async (service_name, pillar) => {
+  createService: async (service_name, pillar, charges) => {
     // Call backend endpoint to persist in DB
-    const response = await apiClient.post('/database/create/service', { service_name, pillar });
+    const response = await apiClient.post('/database/create/service', { service_name, pillar, charges: Number(charges || 100) });
     
     // Cache service locally so patients can book it immediately
     const services = JSON.parse(localStorage.getItem('medicare_services') || '[]');
@@ -126,7 +126,8 @@ export const api = {
       _id: response.data?._id || `s_${Date.now()}`,
       service_name,
       pillar,
-      available: true
+      available: true,
+      charges: Number(charges || 100)
     };
     services.push(newService);
     localStorage.setItem('medicare_services', JSON.stringify(services));
@@ -134,21 +135,36 @@ export const api = {
     return response.data || newService;
   },
 
-  getAvailableServices: () => {
-    return JSON.parse(localStorage.getItem('medicare_services') || '[]');
+  getAvailableServices: async () => {
+    try {
+      const response = await apiClient.get('/database/service/all');
+      localStorage.setItem('medicare_services', JSON.stringify(response.data));
+      return response.data;
+    } catch (e) {
+      console.warn("getAvailableServices failed:", e.message);
+      return JSON.parse(localStorage.getItem('medicare_services') || '[]');
+    }
   },
 
-  toggleServiceAvailability: (service_id, available) => {
-    const services = JSON.parse(localStorage.getItem('medicare_services') || '[]');
-    const updated = services.map(s => s._id === service_id ? { ...s, available } : s);
-    localStorage.setItem('medicare_services', JSON.stringify(updated));
-    return updated;
+  toggleServiceAvailability: async (service_id, available) => {
+    try {
+      const response = await apiClient.post('/database/service/update', { service_id, available });
+      const listRes = await apiClient.get('/database/service/all');
+      localStorage.setItem('medicare_services', JSON.stringify(listRes.data));
+      return listRes.data;
+    } catch (e) {
+      console.warn("toggleServiceAvailability failed:", e.message);
+      const services = JSON.parse(localStorage.getItem('medicare_services') || '[]');
+      const updated = services.map(s => s._id === service_id ? { ...s, available } : s);
+      localStorage.setItem('medicare_services', JSON.stringify(updated));
+      return updated;
+    }
   },
 
   // --- APPOINTMENT ENDPOINTS ---
   createAppointment: async (service_id, date, note) => {
     // 1. Call real backend database endpoint
-    const response = await apiClient.post('/database/create/appointment', { service: service_id, date, note });
+    const response = await apiClient.post('/database/create/appointment', { service_id, date, note });
     
     // 2. Resolve doctor and service details to save rich history in local storage
     const services = JSON.parse(localStorage.getItem('medicare_services') || '[]');
@@ -173,9 +189,14 @@ export const api = {
     return response.data || newAppointment;
   },
 
-  getPatientAppointments: (patientId) => {
-    const localAppointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
-    return localAppointments;
+  getPatientAppointments: async (patientId) => {
+    try {
+      const response = await apiClient.get('/database/appointment/all/user');
+      return response.data;
+    } catch (e) {
+      console.warn("getPatientAppointments failed:", e.message);
+      return JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+    }
   },
 
   getDoctorAppointments: async () => {
@@ -190,21 +211,33 @@ export const api = {
   },
 
   completeAppointment: async (appointment_id, proof) => {
-    const appointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
-    const updated = appointments.map(app => 
-      app._id === appointment_id ? { ...app, status: 'completed', proof } : app
-    );
-    localStorage.setItem('medicare_appointments', JSON.stringify(updated));
-    return updated;
+    try {
+      const response = await apiClient.post('/database/appointment/mark/complete', { appointment_id, proof });
+      return response.data;
+    } catch (e) {
+      console.warn("completeAppointment failed:", e.message);
+      const appointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+      const updated = appointments.map(app => 
+        app._id === appointment_id ? { ...app, status: 'completed', proof } : app
+      );
+      localStorage.setItem('medicare_appointments', JSON.stringify(updated));
+      return updated;
+    }
   },
 
-  cancelAppointment: (appointment_id) => {
-    const appointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
-    const updated = appointments.map(app => 
-      app._id === appointment_id ? { ...app, status: 'cancelled' } : app
-    );
-    localStorage.setItem('medicare_appointments', JSON.stringify(updated));
-    return updated;
+  cancelAppointment: async (appointment_id) => {
+    try {
+      const response = await apiClient.post('/database/appointment/mark/cancel', { appointment_id });
+      return response.data;
+    } catch (e) {
+      console.warn("cancelAppointment failed:", e.message);
+      const appointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+      const updated = appointments.map(app => 
+        app._id === appointment_id ? { ...app, status: 'cancelled' } : app
+      );
+      localStorage.setItem('medicare_appointments', JSON.stringify(updated));
+      return updated;
+    }
   },
 
   // --- TELEHEALTH & AI CHAT BOT ---

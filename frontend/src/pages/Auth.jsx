@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, UserPlus, AlertCircle, Eye, EyeOff, User, Stethoscope, Lock } from 'lucide-react';
+import { LogIn, UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 // Zod schemas for forms
 const loginSchema = z.object({
@@ -17,7 +17,6 @@ const registerSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
   gender: z.enum(['male', 'female', 'not-specified'], { errorMap: () => ({ message: 'Please select a gender.' }) }),
-  pillar: z.string().optional(),
 });
 
 const Auth = () => {
@@ -25,7 +24,6 @@ const Auth = () => {
   const { login, register: signUp, error: authError } = useAuth();
   
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
-  const [selectedRole, setSelectedRole] = useState('user'); // 'user', 'doctor', 'admin'
   const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
@@ -34,25 +32,18 @@ const Auth = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const { register: registerSignup, handleSubmit: handleSignupSubmit, formState: { errors: signupErrors, isSubmitting: isRegistering }, watch } = useForm({
+  const { register: registerSignup, handleSubmit: handleSignupSubmit, formState: { errors: signupErrors, isSubmitting: isRegistering } } = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       gender: 'not-specified',
-      pillar: 'general',
     }
   });
-
-  const selectedSignupRole = watch('role');
 
   const onLoginSubmit = async (data) => {
     setSubmitError(null);
     try {
-      await login(data.email, data.password, selectedRole);
-      
-      // Redirect based on role
-      if (selectedRole === 'admin') navigate('/dashboard/admin');
-      else if (selectedRole === 'doctor') navigate('/dashboard/doctor');
-      else navigate('/dashboard/patient');
+      await login(data.email, data.password, 'user');
+      navigate('/dashboard/patient');
     } catch (err) {
       setSubmitError(err.message || 'Login failed. Please check your credentials.');
     }
@@ -66,14 +57,9 @@ const Auth = () => {
         data.email, 
         data.password, 
         data.gender, 
-        selectedRole, 
-        selectedRole === 'doctor' ? data.pillar : undefined
+        'user'
       );
-
-      // Redirect based on role
-      if (selectedRole === 'admin') navigate('/dashboard/admin');
-      else if (selectedRole === 'doctor') navigate('/dashboard/doctor');
-      else navigate('/dashboard/patient');
+      navigate('/dashboard/patient');
     } catch (err) {
       setSubmitError(err.message || 'Registration failed. Email might already be taken.');
     }
@@ -87,8 +73,8 @@ const Auth = () => {
         {/* Brand & Toggle Header */}
         <div className="p-8 pb-4">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-black text-teal-950 font-heading">MediCare Portal</h2>
-            <p className="text-xs text-slate-400">Access your clinical dashboard and secure medical desk</p>
+            <h2 className="text-3xl font-black text-teal-950 font-heading">MediCare Patient Portal</h2>
+            <p className="text-xs text-slate-400">Access your medical files and book appointments</p>
           </div>
 
           {/* Login/Register Tabs */}
@@ -111,35 +97,6 @@ const Auth = () => {
               <UserPlus className="w-4 h-4" />
               Register
             </button>
-          </div>
-
-          {/* Role selector buttons */}
-          <div className="mt-6">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block text-center mb-2">Select User Role</label>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: 'user', label: 'Patient', icon: User },
-                { id: 'doctor', label: 'Doctor', icon: Stethoscope },
-                { id: 'admin', label: 'Admin', icon: Lock },
-              ].map((r) => {
-                const Icon = r.icon;
-                return (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => { setSelectedRole(r.id); setSubmitError(null); }}
-                    className={`py-2 px-3 text-xs font-semibold rounded-xl border flex flex-col items-center gap-1 transition-all cursor-pointer ${
-                      selectedRole === r.id
-                        ? 'border-teal-700 bg-teal-50 text-teal-800 font-bold'
-                        : 'border-slate-200 hover:bg-slate-50 text-slate-600'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {r.label}
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </div>
 
@@ -208,7 +165,7 @@ const Auth = () => {
                 disabled={isLoggingIn}
                 className="w-full mt-4 py-3.5 bg-teal-800 text-white rounded-xl font-bold shadow-md hover:bg-teal-900 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:bg-slate-300 disabled:shadow-none"
               >
-                {isLoggingIn ? 'Logging in...' : `Login as ${selectedRole === 'user' ? 'Patient' : selectedRole === 'doctor' ? 'Doctor' : 'Admin'}`}
+                {isLoggingIn ? 'Logging in...' : 'Login as Patient'}
               </button>
             </form>
           ) : (
@@ -278,50 +235,30 @@ const Auth = () => {
                 )}
               </div>
 
-              {/* Gender (Patient & Doctor only) */}
-              {selectedRole !== 'admin' && (
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Gender</label>
-                  <select
-                    {...registerSignup('gender')}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm transition-all focus:outline-hidden focus:bg-white focus:ring-2 focus:ring-teal-700 cursor-pointer"
-                  >
-                    <option value="not-specified">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </select>
-                  {signupErrors.gender && (
-                    <p className="text-rose-500 text-[10px] flex items-center gap-1 mt-0.5">
-                      <AlertCircle className="w-3.5 h-3.5" /> {signupErrors.gender.message}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Pillar Specialization (Doctor only) */}
-              {selectedRole === 'doctor' && (
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Pillar Speciality</label>
-                  <select
-                    {...registerSignup('pillar')}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm transition-all focus:outline-hidden focus:bg-white focus:ring-2 focus:ring-teal-700 cursor-pointer"
-                  >
-                    <option value="general">General Consulting</option>
-                    <option value="cardiology">Cardiology Division</option>
-                    <option value="dermatology">Dermatology Science</option>
-                    <option value="orthopedics">Orthopedics Joint Care</option>
-                    <option value="diagnostics">Diagnostics Lab</option>
-                    <option value="telehealth">Telehealth Remote Consultation</option>
-                  </select>
-                </div>
-              )}
+              {/* Gender */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Gender</label>
+                <select
+                  {...registerSignup('gender')}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm transition-all focus:outline-hidden focus:bg-white focus:ring-2 focus:ring-teal-700 cursor-pointer"
+                >
+                  <option value="not-specified">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+                {signupErrors.gender && (
+                  <p className="text-rose-500 text-[10px] flex items-center gap-1 mt-0.5">
+                    <AlertCircle className="w-3.5 h-3.5" /> {signupErrors.gender.message}
+                  </p>
+                )}
+              </div>
 
               <button
                 type="submit"
                 disabled={isRegistering}
                 className="w-full mt-4 py-3.5 bg-teal-800 text-white rounded-xl font-bold shadow-md hover:bg-teal-900 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:bg-slate-300 disabled:shadow-none"
               >
-                {isRegistering ? 'Registering...' : `Register as ${selectedRole === 'user' ? 'Patient' : selectedRole === 'doctor' ? 'Doctor' : 'Admin'}`}
+                {isRegistering ? 'Registering...' : 'Register as Patient'}
               </button>
             </form>
           )}

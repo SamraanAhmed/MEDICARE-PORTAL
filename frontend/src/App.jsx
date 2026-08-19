@@ -5,8 +5,10 @@ import Layout from './components/Layout';
 
 // Pages import
 import Home from './pages/Home';
+import Welcome from './pages/Welcome';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
+import StaffAuth from './pages/StaffAuth';
 import BookAppointment from './pages/BookAppointment';
 import Chat from './pages/Chat';
 import PatientDashboard from './pages/PatientDashboard';
@@ -20,13 +22,15 @@ const App = () => {
         <Layout>
           <Routes>
             {/* Landing page */}
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Welcome />} />
+            <Route path="/home" element={<Home />} />
             
             {/* Lead generation and Contact */}
             <Route path="/contact" element={<Contact />} />
             
             {/* Login & Register Tabbed Interface */}
             <Route path="/auth" element={<Auth />} />
+            <Route path="/admin" element={<StaffAuth />} />
             
             {/* Appointment Booking Flow */}
             <Route path="/book" element={<BookAppointment />} />

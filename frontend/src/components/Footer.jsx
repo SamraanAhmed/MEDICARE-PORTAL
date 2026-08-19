@@ -69,11 +69,12 @@ const Footer = () => {
           <div>
             <h4 className="text-white font-bold tracking-wider uppercase text-xs font-heading">Quick Navigation</h4>
             <div className="mt-4 flex flex-col space-y-2 text-sm">
-              <Link to="/" className="hover:text-emerald-400 transition-colors">Home Landing</Link>
+              <Link to="/home" className="hover:text-emerald-400 transition-colors">Home Landing</Link>
               <Link to="/book" className="hover:text-emerald-400 transition-colors">Book Consultation</Link>
               <Link to="/chat" className="hover:text-emerald-400 transition-colors">AI Diagnostics Chat</Link>
               <Link to="/contact" className="hover:text-emerald-400 transition-colors">Contact & Map</Link>
               <Link to="/auth" className="hover:text-emerald-400 transition-colors">Sign In Portal</Link>
+              <Link to="/admin" className="hover:text-emerald-400 transition-colors">Staff / Admin Portal</Link>
             </div>
           </div>
 

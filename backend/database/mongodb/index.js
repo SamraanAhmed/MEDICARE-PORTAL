@@ -189,6 +189,10 @@ const paymentSchema = new mongoose.Schema({
 
 const payment = mongoose.model('payments', paymentSchema);
 
+mongoose.connection.on('error', (err) => {
+    console.warn("Mongoose connection error event:", err.message);
+});
+
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URL, {

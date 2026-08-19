@@ -10,17 +10,31 @@ const PatientDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      const list = api.getPatientAppointments(user._id);
-      setAppointments(list);
-      setLoading(false);
-    }
+    const fetchAppointments = async () => {
+      if (user) {
+        setLoading(true);
+        try {
+          const list = await api.getPatientAppointments(user._id);
+          setAppointments(list);
+        } catch (e) {
+          console.error("Failed to load patient appointments:", e);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchAppointments();
   }, [user]);
 
-  const handleCancelAppointment = (id) => {
+  const handleCancelAppointment = async (id) => {
     if (window.confirm("Are you sure you want to cancel this appointment?")) {
-      const updated = api.cancelAppointment(id);
-      setAppointments(updated);
+      try {
+        await api.cancelAppointment(id);
+        const list = await api.getPatientAppointments(user._id);
+        setAppointments(list);
+      } catch (err) {
+        alert(err.message || "Failed to cancel appointment.");
+      }
     }
   };
 

@@ -19,7 +19,7 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   const navLinks = [
-    { name: 'Home', path: '/' },
+    { name: 'Home', path: '/home' },
     { name: 'Book Appointment', path: '/book', icon: Calendar },
     { name: 'AI Health Assistant', path: '/chat', icon: MessageSquare },
     { name: 'Contact', path: '/contact', icon: Phone },
@@ -37,7 +37,7 @@ const Navbar = () => {
         <div className="flex justify-between h-20">
           {/* Logo Brand */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center gap-3 group">
+            <Link to="/home" className="flex items-center gap-3 group">
               <img 
                 src="/imgvid/medicarelogo.png" 
                 alt="MediCare Logo" 

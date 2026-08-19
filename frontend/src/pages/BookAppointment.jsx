@@ -29,9 +29,15 @@ const BookAppointment = () => {
   const selectedServiceId = watch('service');
 
   useEffect(() => {
-    // Fetch available services (both default ones and admin-created ones)
-    const list = api.getAvailableServices();
-    setServices(list.filter(s => s.available));
+    const fetchServices = async () => {
+      try {
+        const list = await api.getAvailableServices();
+        setServices(list.filter(s => s.available));
+      } catch (e) {
+        console.error("Failed to load services:", e);
+      }
+    };
+    fetchServices();
   }, []);
 
   const onSubmit = async (data) => {
