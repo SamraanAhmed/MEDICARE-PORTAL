@@ -13,7 +13,7 @@ const {
 const { 
     authenticate, checkAuthentication, jwt
 } = require('../../authentication');
-const { appointment } = require('../../database/mongodb');
+const { appointment, user } = require('../../database/mongodb');
 
 dotenv.config();
 
@@ -31,7 +31,7 @@ router.get('/me', authenticate, async (req, res) => {
         if (!results) {
             return res.status(404).json({ message: 'User profile not found' });
         }
-        res.status(200).json({ ...results.toObject(), role: req.user.role });
+        res.status(200).json({ ...results, role: req.user.role });
     } catch (error) {
         res.status(409).json({ message: error.message });
     }
@@ -252,7 +252,7 @@ router.post('/appointment/pay', authenticate, async (req, res) => {
         if (req.user.role !== 'user') {
             return res.status(403).json({ message: 'Forbidden: You are not an user' });
         }
-        const result = await payBill(req.body.payment_id, req.body.transcation_id);
+        const result = await payBill(req.body.payment_id, req.body.transcation_id, req.user._id);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({
