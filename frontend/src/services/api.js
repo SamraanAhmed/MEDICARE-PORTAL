@@ -267,6 +267,123 @@ export const api = {
 
   getDoctors: () => {
     return JSON.parse(localStorage.getItem('medicare_doctors') || '[]');
+  },
+
+  // --- NEW PAYMENT & BILLING ENDPOINTS ---
+  payAppointment: async (payment_id, transaction_id) => {
+    try {
+      const response = await apiClient.post('/database/appointment/pay', {
+        payment_id,
+        transcation_id: transaction_id // Match backend typo "transcation_id"
+      });
+      return response.data;
+    } catch (e) {
+      console.warn("payAppointment API failed, using fallback:", e.message);
+      // Fallback: update local storage appointments payment
+      const appointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+      const updated = appointments.map(appt => {
+        if (appt.payment && appt.payment._id === payment_id) {
+          return {
+            ...appt,
+            payment: {
+              ...appt.payment,
+              paid: true,
+              transcation: transaction_id,
+              paid_at: new Date()
+            }
+          };
+        }
+        // In some cases appointment.payment might just be a string ID or nested differently
+        if (appt._id === payment_id || (appt.payment && typeof appt.payment === 'object' && appt.payment._id === payment_id)) {
+          return {
+            ...appt,
+            payment: {
+              ...appt.payment,
+              paid: true,
+              transcation: transaction_id,
+              paid_at: new Date()
+            }
+          };
+        }
+        return appt;
+      });
+      localStorage.setItem('medicare_appointments', JSON.stringify(updated));
+      return { payment_id, success: true, fallback: true };
+    }
+  },
+
+  getAppointmentPayment: async (appointment_id) => {
+    try {
+      const response = await apiClient.post('/database/appointment/payment', { appointment_id });
+      return response.data;
+    } catch (e) {
+      console.warn("getAppointmentPayment API failed, using fallback:", e.message);
+      const appointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+      const appt = appointments.find(a => a._id === appointment_id);
+      if (appt && appt.payment) {
+        return appt.payment;
+      }
+      // If payment details not initialized, create mock details based on service charges
+      const charges = appt?.service?.charges || 100;
+      return {
+        _id: `pay_${appointment_id}`,
+        charges: Number(charges),
+        paid: false,
+        transcation: ""
+      };
+    }
+  },
+
+  // --- NEW ADMIN LISTING & DELETION ENDPOINTS ---
+  getAllUsers: async () => {
+    try {
+      const response = await apiClient.get('/database/get/user/all');
+      return response.data;
+    } catch (e) {
+      console.warn("getAllUsers API failed, using fallback:", e.message);
+      return [];
+    }
+  },
+
+  getAllDoctors: async () => {
+    try {
+      const response = await apiClient.get('/database/get/doctor/all');
+      return response.data;
+    } catch (e) {
+      console.warn("getAllDoctors API failed, using fallback:", e.message);
+      return JSON.parse(localStorage.getItem('medicare_doctors') || '[]');
+    }
+  },
+
+  getAllAppointmentsAdmin: async () => {
+    try {
+      const response = await apiClient.get('/database/get/appointment/all');
+      return response.data;
+    } catch (e) {
+      console.warn("getAllAppointmentsAdmin API failed, using fallback:", e.message);
+      return JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
+    }
+  },
+
+  deleteUser: async (user_id) => {
+    const response = await apiClient.post('/database/delete/user', { user_id });
+    return response.data;
+  },
+
+  deleteDoctor: async (doctor_id) => {
+    const response = await apiClient.post('/database/delete/doctor', { doctor_id });
+    
+    // Remove doctor from local storage list as well
+    const doctors = JSON.parse(localStorage.getItem('medicare_doctors') || '[]');
+    const filtered = doctors.filter(d => d._id !== doctor_id);
+    localStorage.setItem('medicare_doctors', JSON.stringify(filtered));
+
+    return response.data;
+  },
+
+  deleteAdmin: async (admin_id) => {
+    const response = await apiClient.post('/database/delete/admin', { admin_id });
+    return response.data;
   }
 };
 export default api;
