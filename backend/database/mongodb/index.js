@@ -207,6 +207,10 @@ const contactFormSchema = new mongoose.Schema({
         type: String,
         required: true,
         maxLength: 500
+    },
+    seen: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 

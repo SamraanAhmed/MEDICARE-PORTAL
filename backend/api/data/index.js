@@ -9,10 +9,11 @@ const {
     createAppointment, createMessage, createService, createContactForm,
 
     updateService, updateAppointment, updateDoctorAvailability, payBill, markAppointmentAsCompleted,
+    markContactFormAsSeen,
 
     checkDoctorDailyAvailability,
     
-    deleteAdmin, deleteDoctor, deleteMessages, deleteUser
+    deleteAdmin, deleteDoctor, deleteMessages, deleteUser, deleteContactForm
 } = require('../../database/queries');
 const { 
     authenticate, checkAuthentication, jwt
@@ -339,6 +340,19 @@ router.get('/get/all/contact/form', authenticate, async (req, res) => {
         });
     }
 });
+router.post('/contact/form/marked/seen', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await markContactFormAsSeen(req.body.form_id);
+        res.status(200).json(result);
+    } catch(error) {
+        res.status(409).json({
+            message: error.message
+        });
+    }
+});
 router.get('/get/contact/form', authenticate, async (req, res) => {
     try {
         if (req.user.role !== 'admin') {
@@ -476,6 +490,19 @@ router.post('/delete/admin', authenticate, async (req, res) => {
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.post('/contact/form/delete', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await deleteContactForm(req.body.form_id);
+        res.status(200).json(result);
+    } catch(error) {
+        res.status(409).json({
             message: error.message
         });
     }

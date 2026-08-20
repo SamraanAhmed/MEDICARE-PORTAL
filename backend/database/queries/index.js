@@ -363,6 +363,15 @@ const payBill = async (payment_id, transcation_id, user_id) => {
         throw error;
     }
 }
+const markContactFormAsSeen = async (form_id) => {
+    try {
+        const result = await contactForm.findByIdAndUpdate(form_id, { seen: true }, { new: true });
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 // Delete functions
 const deleteUser = async (user_id) => {
@@ -404,6 +413,15 @@ const deleteAdmin = async (admin_id) => {
         throw error;
     }
 }
+const deleteContactForm = async (form_id) => {
+    try {
+        const result = await contactForm.findOneAndDelete({_id: form_id});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 // checker functions
 const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
@@ -431,8 +449,8 @@ module.exports = {
     getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment, getUserFromAppointment, getMessages, getAllContactForm,
     getContactForm, 
     createAppointment, createMessage, createService, createContactForm,
-    updateService, updateAppointment, updateDoctorAvailability, payBill,
+    updateService, updateAppointment, updateDoctorAvailability, payBill, markContactFormAsSeen,
     checkDoctorDailyAvailability,
     markAppointmentAsCompleted,
-    deleteAdmin, deleteDoctor, deleteMessages, deleteUser
+    deleteAdmin, deleteDoctor, deleteMessages, deleteUser, deleteContactForm
 }
