@@ -2,39 +2,107 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Calendar, Heart, ShieldCheck, Activity, Trash2, Clock, CheckCircle2, User, UserCheck, Eye } from 'lucide-react';
+import { Calendar, Heart, ShieldCheck, Activity, Trash2, Clock, CheckCircle2, User, UserCheck, Eye, CreditCard, AlertCircle, X } from 'lucide-react';
 
 const PatientDashboard = () => {
   const { user } = useAuth();
   const [appointments, setAppointments] = useState([]);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Payment states
+  const [payingAppointment, setPayingAppointment] = useState(null);
+  const [transactionId, setTransactionId] = useState('');
+  const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+  const [paymentSuccess, setPaymentSuccess] = useState('');
+
+  const fetchDashboardData = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      // 1. Fetch available services to map names locally
+      const servicesList = await api.getAvailableServices();
+      setServices(servicesList);
+
+      // 2. Fetch appointments
+      const list = await api.getPatientAppointments(user._id);
+
+      // 3. Fetch payment info for each appointment in parallel
+      const appointmentsWithPayments = await Promise.all(list.map(async (appt) => {
+        try {
+          const paymentInfo = await api.getAppointmentPayment(appt._id);
+          return { ...appt, paymentInfo };
+        } catch (err) {
+          console.warn(`Failed to fetch payment for appointment ${appt._id}`, err);
+          return { ...appt, paymentInfo: null };
+        }
+      }));
+
+      setAppointments(appointmentsWithPayments);
+    } catch (e) {
+      console.error("Failed to load patient dashboard data:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      if (user) {
-        setLoading(true);
-        try {
-          const list = await api.getPatientAppointments(user._id);
-          setAppointments(list);
-        } catch (e) {
-          console.error("Failed to load patient appointments:", e);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    fetchAppointments();
+    fetchDashboardData();
   }, [user]);
 
   const handleCancelAppointment = async (id) => {
     if (window.confirm("Are you sure you want to cancel this appointment?")) {
       try {
         await api.cancelAppointment(id);
-        const list = await api.getPatientAppointments(user._id);
-        setAppointments(list);
+        await fetchDashboardData();
       } catch (err) {
         alert(err.message || "Failed to cancel appointment.");
       }
+    }
+  };
+
+  const handleOpenPaymentModal = (appt) => {
+    setPayingAppointment(appt);
+    setTransactionId('');
+    setPaymentError('');
+    setPaymentSuccess('');
+  };
+
+  const handleClosePaymentModal = () => {
+    setPayingAppointment(null);
+  };
+
+  const handleProcessPayment = async (e) => {
+    e.preventDefault();
+    if (!transactionId.trim()) {
+      setPaymentError('Please enter a valid Transaction ID.');
+      return;
+    }
+
+    const paymentId = payingAppointment.paymentInfo?._id || payingAppointment.payment;
+    if (!paymentId) {
+      setPaymentError('Payment record not found for this appointment.');
+      return;
+    }
+
+    setIsSubmittingPayment(true);
+    setPaymentError('');
+    setPaymentSuccess('');
+
+    try {
+      await api.payAppointment(paymentId, transactionId.trim());
+      setPaymentSuccess('Payment completed successfully! Transaction logged.');
+      
+      // Refresh after a brief delay
+      setTimeout(async () => {
+        handleClosePaymentModal();
+        await fetchDashboardData();
+      }, 1500);
+    } catch (err) {
+      setPaymentError(err.message || 'Payment processing failed. Try again.');
+    } finally {
+      setIsSubmittingPayment(false);
     }
   };
 
@@ -145,6 +213,9 @@ const PatientDashboard = () => {
                   weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
                 });
                 
+                // Map service details in case they are not populated from API
+                const serviceObj = typeof appt.service === 'object' ? appt.service : (services.find(s => s._id === appt.service) || {});
+                
                 return (
                   <div
                     key={appt._id}
@@ -167,13 +238,29 @@ const PatientDashboard = () => {
 
                     {/* Booking Details */}
                     <div className="md:col-span-5 space-y-1">
-                      <p className="text-xs font-bold text-slate-700 font-body">{appt.service?.service_name || 'Standard Consultation'}</p>
+                      <p className="text-xs font-bold text-slate-700 font-body">{serviceObj?.service_name || 'Standard Consultation'}</p>
                       <div className="flex items-center gap-1.5 text-xs text-slate-500">
                         <Clock className="w-3.5 h-3.5 text-slate-400" />
                         <span>Date: {dateStr}</span>
                       </div>
                       {appt.notes && (
                         <p className="text-[10px] text-slate-400 italic truncate max-w-xs mt-1">"Notes: {appt.notes}"</p>
+                      )}
+                      
+                      {/* Payment info visual badge */}
+                      {appt.paymentInfo && (
+                        <div className="mt-1.5 flex flex-wrap gap-1.5">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                            appt.paymentInfo.paid 
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-100' 
+                              : 'bg-amber-50 text-amber-800 border-amber-100'
+                          }`}>
+                            {appt.paymentInfo.paid 
+                              ? `Paid via Txn: ${appt.paymentInfo.transcation || 'Offline'}` 
+                              : `Unpaid: $${appt.paymentInfo.charges}`
+                            }
+                          </span>
+                        </div>
                       )}
                       
                       {/* Prescriptions / proof display */}
@@ -207,15 +294,27 @@ const PatientDashboard = () => {
                         </span>
                       )}
 
-                      {appt.status === 'pending' && (
-                        <button
-                          onClick={() => handleCancelAppointment(appt._id)}
-                          className="p-1.5 rounded-lg border border-slate-100 hover:border-rose-100 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
-                          title="Cancel Booking"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
+                      <div className="flex gap-2">
+                        {appt.status === 'pending' && appt.paymentInfo && !appt.paymentInfo.paid && (
+                          <button
+                            onClick={() => handleOpenPaymentModal(appt)}
+                            className="px-2.5 py-1 bg-teal-850 hover:bg-teal-900 text-white font-bold rounded-lg text-[10px] flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+                          >
+                            <CreditCard className="w-3.5 h-3.5" />
+                            Pay Now
+                          </button>
+                        )}
+
+                        {appt.status === 'pending' && (
+                          <button
+                            onClick={() => handleCancelAppointment(appt._id)}
+                            className="p-1 rounded-lg border border-slate-100 hover:border-rose-100 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                            title="Cancel Booking"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                   </div>
@@ -247,6 +346,87 @@ const PatientDashboard = () => {
         </div>
 
       </div>
+
+      {/* Payment Modal Overlay */}
+      {payingAppointment && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-2xl max-w-md w-full space-y-6 text-left relative animate-in zoom-in-95 duration-250">
+            <button
+              onClick={handleClosePaymentModal}
+              className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="space-y-1">
+              <h3 className="text-xl font-bold text-slate-800 font-heading">Consultation Payment</h3>
+              <p className="text-xs text-slate-400">Complete payment to enable practitioner review and checkup completion.</p>
+            </div>
+
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
+              <div className="flex justify-between text-xs text-slate-500">
+                <span>Specialist:</span>
+                <span className="font-semibold text-slate-800">{payingAppointment.doctor?.name || 'Assigned Specialist'}</span>
+              </div>
+              <div className="flex justify-between text-xs text-slate-500">
+                <span>Medical Specialty:</span>
+                <span className="font-semibold text-slate-800 capitalize">{payingAppointment.doctor?.pillar || 'Consultation'}</span>
+              </div>
+              <hr className="border-slate-200" />
+              <div className="flex justify-between text-sm font-bold">
+                <span className="text-slate-800">Total Charges:</span>
+                <span className="text-teal-850">${payingAppointment.paymentInfo?.charges || 100}</span>
+              </div>
+            </div>
+
+            {paymentError && (
+              <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4.5 h-4.5 text-rose-500 shrink-0" />
+                <p className="font-semibold">{paymentError}</p>
+              </div>
+            )}
+
+            {paymentSuccess && (
+              <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
+                <p className="font-semibold">{paymentSuccess}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleProcessPayment} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Transaction / Reference ID</label>
+                <input
+                  type="text"
+                  placeholder="e.g. TXN987654321"
+                  value={transactionId}
+                  onChange={(e) => setTransactionId(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm focus:outline-hidden focus:bg-white focus:ring-2 focus:ring-teal-700"
+                  disabled={isSubmittingPayment || paymentSuccess}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleClosePaymentModal}
+                  className="flex-1 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                  disabled={isSubmittingPayment || paymentSuccess}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingPayment || paymentSuccess}
+                  className="flex-1 py-3 bg-teal-850 hover:bg-teal-900 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-md disabled:bg-slate-200"
+                >
+                  {isSubmittingPayment ? 'Processing...' : 'Confirm Payment'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

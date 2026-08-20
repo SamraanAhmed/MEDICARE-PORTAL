@@ -9,6 +9,16 @@
       "role": "user",
       "createdAt": "2026-08-19T05:09:49.994Z",
       "updatedAt": "2026-08-19T05:09:49.994Z"
+    },
+    {
+      "_id": "73ee0858784ae1bab6bec850",
+      "name": "ALI USMAN",
+      "email": "aliusman.lab@gmail.com",
+      "password": "$2b$10$mKpRcK0q1cGvvcEYzCVTaufXuIQAAJWPMO854gvAS0yTJ6MZeX75u",
+      "gender": "male",
+      "role": "user",
+      "createdAt": "2026-08-20T09:49:45.550Z",
+      "updatedAt": "2026-08-20T09:49:45.550Z"
     }
   ],
   "doctors": [
@@ -126,7 +136,39 @@
       "charges": 50
     }
   ],
-  "appointments": [],
-  "payments": [],
-  "messages": []
+  "appointments": [
+    {
+      "_id": "86cbaa59c2511783c8c4ab23",
+      "patient": "73ee0858784ae1bab6bec850",
+      "doctor": "64d1f2b5a1b2c3d4e5f60014",
+      "service": "64d1f2b5a1b2c3d4e5f60004",
+      "status": "pending",
+      "appointment_date": "2026-08-21",
+      "payment": "0b6c457b3f43e958d71ade3c",
+      "notes": "liver swelling",
+      "createdAt": "2026-08-20T09:56:25.330Z",
+      "updatedAt": "2026-08-20T09:56:25.330Z"
+    }
+  ],
+  "payments": [
+    {
+      "_id": "0b6c457b3f43e958d71ade3c",
+      "charges": 200,
+      "paid": true,
+      "createdAt": "2026-08-20T09:56:25.330Z",
+      "updatedAt": "2026-08-20T09:56:53.251Z",
+      "transcation": "txn939r3r",
+      "paid_at": "2026-08-20T09:56:53.251Z"
+    }
+  ],
+  "messages": [
+    {
+      "_id": "7616eb4656314027034afd5d",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "Hi , does medicare offers eye treatment as i am suffering from eye infection?",
+      "sender": "user",
+      "createdAt": "2026-08-20T09:54:08.439Z",
+      "updatedAt": "2026-08-20T09:54:08.439Z"
+    }
+  ]
 }
