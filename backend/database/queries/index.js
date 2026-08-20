@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { admin, user, doctor, service, message, appointment, payment, contactForm } = require('../mongodb');
+const { admin, user, doctor, service, message, appointment, payment, contactForm, notice } = require('../mongodb');
 const bycrpt = require('bcrypt');
 const dotenv = require('dotenv');
 const jsonDb = require('../jsonDb');
@@ -116,7 +116,7 @@ const getUserProfile = async (id, role) => {
         if (role === 'user') {
             result = await user.findOne({ _id: id }).select('-password');
         } else if (role === 'doctor') {
-            result = await doctor.findOne({ _id: id }).select('-password');
+            result = await doctor.findOne({ _id: id, deactivated: false }).select('-password');
         } else if (role === 'admin') {
             result = await admin.findOne({ _id: id }).select('-password');
         }
@@ -242,9 +242,31 @@ const getContactForm = async (form_id) => {
         throw error;
     }
 }
+const getDoctorNotice = async (doctor_id) => {
+    try {
+        const result = await notice.find({ doctor: doctor_id }).select('_id type message');
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 // setter functions
+const createNotice = async (admin_id, doctor_id, type, message) => {
+    try {
+        if (type === 'warning') {
+            const r = await notice.find({ doctor: doctor_id }).select('_id');
+            if (r.length >= 3) {
+                await deactiveDoctor(doctor_id);
+            }
+        }
+        const result = await notice.create({ admin_id, doctor_id, type, message });
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
 const createAppointment = async (appointmentData) => {
     if (!isConnected()) return jsonDb.createAppointment(appointmentData);
     const { patient_id, date, service_id, note } = appointmentData;
@@ -371,6 +393,14 @@ const markContactFormAsSeen = async (form_id) => {
         throw error;
     }
 }
+const deactiveDoctor = async (doctor_id) => {
+    try {
+        const result = await doctor.findByIdAndUpdate(doctor_id, { deactivated: true });
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 // Delete functions
@@ -447,10 +477,10 @@ module.exports = {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService, getAllServices, getUserProfile, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser,
     getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment, getUserFromAppointment, getMessages, getAllContactForm,
-    getContactForm, 
-    createAppointment, createMessage, createService, createContactForm,
-    updateService, updateAppointment, updateDoctorAvailability, payBill, markContactFormAsSeen,
-    checkDoctorDailyAvailability,
+    getContactForm, getDoctorNotice,
+    createAppointment, createMessage, createService, createContactForm, createNotice,
+    updateService, updateAppointment, updateDoctorAvailability, payBill, markContactFormAsSeen, deactiveDoctor,
     markAppointmentAsCompleted,
+    checkDoctorDailyAvailability,
     deleteAdmin, deleteDoctor, deleteMessages, deleteUser, deleteContactForm
 }

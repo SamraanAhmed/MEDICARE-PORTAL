@@ -81,6 +81,10 @@ const doctorSchema = new mongoose.Schema({
     available: {
         type: Boolean,
         default: true
+    },
+    deactivated: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true});
 
