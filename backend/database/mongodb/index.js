@@ -189,6 +189,33 @@ const paymentSchema = new mongoose.Schema({
 
 const payment = mongoose.model('payments', paymentSchema);
 
+const contactFormSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    subject: {
+        type: String,
+        required: true,
+        maxLength: 100
+    },
+    message: {
+        type: String,
+        required: true,
+        maxLength: 500
+    },
+    seen: {
+        type: Boolean,
+        default: false
+    }
+}, { timestamps: true });
+
+const contactForm = mongoose.model('contact-forms', contactFormSchema);
+
 mongoose.connection.on('error', (err) => {
     console.warn("Mongoose connection error event:", err.message);
 });
@@ -204,6 +231,6 @@ const connectDB = async () => {
 }
 
 module.exports = {
-    admin, user, doctor, service, message, appointment, payment,
+    admin, user, doctor, service, message, appointment, payment, contactForm,
     connectDB
 };
