@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { admin, user, doctor, service, message, appointment, payment } = require('../mongodb');
+const { admin, user, doctor, service, message, appointment, payment, contactForm } = require('../mongodb');
 const bycrpt = require('bcrypt');
 const dotenv = require('dotenv');
 const jsonDb = require('../jsonDb');
@@ -226,6 +226,22 @@ const getMessages = async (user_id) => {
         throw error;
     }
 }
+const getAllContactForm = async () => {
+    try {
+        const result = await contactForm.find({}).select('_id name email subject');
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+const getContactForm = async (form_id) => {
+    try {
+        const result = await contactForm.findById(form_id);
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 // setter functions
@@ -269,6 +285,15 @@ const createService = async (serviceData) => {
         throw error;
     }
 }
+const createContactForm = async (name, email, subject, message) => {
+    try {
+        const result = await contactForm.create({name, email, subject, message});
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 // update functions
 const updateService = async (serviceData) => {
@@ -403,8 +428,9 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 module.exports = {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService, getAllServices, getUserProfile, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser,
-    getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment, getUserFromAppointment, getMessages,
-    createAppointment, createMessage, createService,
+    getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment, getUserFromAppointment, getMessages, getAllContactForm,
+    getContactForm, 
+    createAppointment, createMessage, createService, createContactForm,
     updateService, updateAppointment, updateDoctorAvailability, payBill,
     checkDoctorDailyAvailability,
     markAppointmentAsCompleted,

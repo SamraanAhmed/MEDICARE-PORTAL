@@ -2,12 +2,16 @@ const express = require('express');
 const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
-    getdoctor, getPillarByService, getAllServices, getUserProfile, getAllUser, getAllDoctor, getAllAppointment, getUserFromAppointment,
-    getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment, getMessages,
-    createAppointment, createMessage, createService,
-    updateService, updateAppointment, updateDoctorAvailability, payBill,
+    getdoctor, getPillarByService, getAllServices, getUserProfile, getAllUser, getAllDoctor,
+    getAllAppointment, getUserFromAppointment, getAllAppointmentOfUser, getAllAppointmentOfDoctor,
+    getPayment, getDoctorFromAppointment, getMessages, getAllContactForm, getContactForm,
+
+    createAppointment, createMessage, createService, createContactForm,
+
+    updateService, updateAppointment, updateDoctorAvailability, payBill, markAppointmentAsCompleted,
+
     checkDoctorDailyAvailability,
-    markAppointmentAsCompleted,
+    
     deleteAdmin, deleteDoctor, deleteMessages, deleteUser
 } = require('../../database/queries');
 const { 
@@ -192,6 +196,17 @@ router.post('/appointment/payment', authenticate, async (req, res) => {
         });
     }
 });
+router.post('/create/contact/form', async (req, res) => {
+    try {
+        const { name, email, subject, message } = req.body;
+        const result = await createContactForm(name, email, subject, message);
+        res.status(200).json(result);
+    } catch(error) {
+        res.status(409).json({
+            message: error.message
+        });
+    }
+});
 
 
 // user only routes
@@ -311,6 +326,32 @@ router.post('/appointment/mark/complete', authenticate, async (req, res) => {
 
 
 // admin only routes
+router.get('/get/all/contact/form', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await getAllContactForm();
+        res.status(200).json(result);
+    } catch(error) {
+        res.status(409).json({
+            message: error.message
+        });
+    }
+});
+router.get('/get/contact/form', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: You are not an admin' });
+        }
+        const result = await getAllContactForm(req.body.form_id);
+        res.status(200).json(result);
+    } catch(error) {
+        res.status(409).json({
+            message: error.message
+        });
+    }
+});
 router.post('/create/service', authenticate, async (req, res) => {
     try {
         if (req.user.role !== 'admin') {
