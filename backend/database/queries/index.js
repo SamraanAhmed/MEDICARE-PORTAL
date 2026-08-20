@@ -218,6 +218,14 @@ const getUserFromAppointment = async (appointment_id) => {
         throw error;
     }
 }
+const getMessages = async (user_id) => {
+    try {
+        const result = await message.find({user: user_id});
+        return result;
+    } catch(error) {
+        throw error;
+    }
+}
 
 
 // setter functions
@@ -316,11 +324,16 @@ const markAppointmentAsCompleted = async (appointment_id, proof) => {
         throw error;
     }
 }
-const payBill = async (payment_id, transcation_id) => {
+const payBill = async (payment_id, transcation_id, user_id) => {
     if (!isConnected()) return jsonDb.payBill(payment_id, transcation_id);
     try {
-        const result = await payment.findByIdAndUpdate(payment_id, { paid: true, transcation: transcation_id }, { new: true });
-        return result;
+        const user = await appointment.findOne({payment: payment_id}).select('patient');
+        if (user_id === user.patient) {
+            const result = await payment.findByIdAndUpdate(payment_id, { paid: true, transcation: transcation_id }, { new: true });
+            return result;
+        } else {
+            throw new Error('You can not pay this bill');
+        }
     } catch (error) {
         throw error;
     }
@@ -390,7 +403,7 @@ const checkDoctorDailyAvailability = async (doctor_id, appointment_date) => {
 module.exports = {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService, getAllServices, getUserProfile, getAllUser, getAllDoctor, getAllAppointment, getAllAppointmentOfUser,
-    getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment, getUserFromAppointment,
+    getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment, getUserFromAppointment, getMessages,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability, payBill,
     checkDoctorDailyAvailability,

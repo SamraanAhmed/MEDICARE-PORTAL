@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const {
     loginDoctor, loginUser, createDoctor, createUser, loginAdmin, createAdmin,
     getdoctor, getPillarByService, getAllServices, getUserProfile, getAllUser, getAllDoctor, getAllAppointment, getUserFromAppointment,
-    getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment,
+    getAllAppointmentOfUser, getAllAppointmentOfDoctor, getPayment, getDoctorFromAppointment, getMessages,
     createAppointment, createMessage, createService,
     updateService, updateAppointment, updateDoctorAvailability, payBill,
     checkDoctorDailyAvailability,
@@ -13,7 +13,7 @@ const {
 const { 
     authenticate, checkAuthentication, jwt
 } = require('../../authentication');
-const { appointment } = require('../../database/mongodb');
+const { appointment, user } = require('../../database/mongodb');
 
 dotenv.config();
 
@@ -31,7 +31,7 @@ router.get('/me', authenticate, async (req, res) => {
         if (!results) {
             return res.status(404).json({ message: 'User profile not found' });
         }
-        res.status(200).json({ ...results.toObject(), role: req.user.role });
+        res.status(200).json({ ...results, role: req.user.role });
     } catch (error) {
         res.status(409).json({ message: error.message });
     }
@@ -195,6 +195,19 @@ router.post('/appointment/payment', authenticate, async (req, res) => {
 
 
 // user only routes
+router.get('/chat/all', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'user') {
+            return res.status(403).json({ message: 'Forbidden: You are not an User' });
+        }
+        const result = await getMessages(req.user._id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
 router.get('/appointment/all/user', authenticate, async (req, res) => {
     try {
         if (req.user.role !== 'user') {
@@ -239,7 +252,7 @@ router.post('/appointment/mark/cancel', authenticate, async (req, res) => {
             });
             res.status(200).json(result);
         } else {
-            throw new Error('You cannt mark this appointment');
+            throw new Error('You can not mark this appointment');
         }
     } catch (error) {
         res.status(500).json({
@@ -252,7 +265,7 @@ router.post('/appointment/pay', authenticate, async (req, res) => {
         if (req.user.role !== 'user') {
             return res.status(403).json({ message: 'Forbidden: You are not an user' });
         }
-        const result = await payBill(req.body.payment_id, req.body.transcation_id);
+        const result = await payBill(req.body.payment_id, req.body.transcation_id, req.user._id);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({
