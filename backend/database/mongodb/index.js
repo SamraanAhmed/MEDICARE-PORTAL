@@ -216,6 +216,31 @@ const contactFormSchema = new mongoose.Schema({
 
 const contactForm = mongoose.model('contact-forms', contactFormSchema);
 
+const noticeSchema = new mongoose.Schema({
+    admin: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'admins',
+        required: true
+    },
+    doctor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'doctors',
+        required: true
+    },
+    type: {
+        type: String,
+        required: true,
+        enum: ['warning', 'letter']
+    },
+    message: {
+        type: String,
+        required: true,
+        maxLength: 500
+    }
+}, { timestamps: true });
+
+const notice = mongoose.model('notices', noticeSchema);
+
 mongoose.connection.on('error', (err) => {
     console.warn("Mongoose connection error event:", err.message);
 });
@@ -231,6 +256,6 @@ const connectDB = async () => {
 }
 
 module.exports = {
-    admin, user, doctor, service, message, appointment, payment, contactForm,
+    admin, user, doctor, service, message, appointment, payment, contactForm, notice,
     connectDB
 };
