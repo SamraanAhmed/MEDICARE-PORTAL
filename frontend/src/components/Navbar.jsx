@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Menu, X, Calendar, MessageSquare, Phone, User, LayoutDashboard, LogOut, ChevronDown, Activity } from 'lucide-react';
+import navLogo from '../assets/nav logo.png';
+
 
 const Navbar = () => {
   const { user, role, logout } = useAuth();
@@ -37,15 +39,12 @@ const Navbar = () => {
         <div className="flex justify-between h-20">
           {/* Logo Brand */}
           <div className="flex items-center">
-            <Link to="/home" className="flex items-center gap-3 group">
+            <Link to="/home" className="flex items-center group ml-9">
               <img 
-                src="/imgvid/medicarelogo.png" 
-                alt="MediCare Logo" 
-                className="h-14 w-14 rounded-full object-cover border-2 border-emerald-500 bg-white transition-transform group-hover:scale-105 duration-300 shadow-xs shrink-0"
+                src={navLogo} 
+                alt="MediCare" 
+                className="h-[68px] w-auto object-contain transition-transform group-hover:scale-105 duration-300"
               />
-              <span className="text-2xl font-bold tracking-tight text-teal-800 flex items-center gap-1 font-heading">
-                Medi<span className="text-emerald-500">Care</span>
-              </span>
             </Link>
           </div>
 
