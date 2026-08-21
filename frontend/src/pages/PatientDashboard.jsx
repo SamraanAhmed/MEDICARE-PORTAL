@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { Calendar, Heart, ShieldCheck, Activity, Trash2, Clock, CheckCircle2, User, UserCheck, Eye, CreditCard, AlertCircle, X } from 'lucide-react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 
 const PatientDashboard = () => {
   const { user } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const containerRef = useRef(null);
   
   // Payment states
   const [payingAppointment, setPayingAppointment] = useState(null);
@@ -50,6 +53,16 @@ const PatientDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, [user]);
+
+  useGSAP(() => {
+    if (loading) return;
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('.dashboard-header', { opacity: 0, y: -25, duration: 0.8 })
+      .from('.vitals-card', { opacity: 0, y: 20, stagger: 0.1, duration: 0.6 }, '-=0.5')
+      .from('.appt-register', { opacity: 0, x: -30, duration: 0.8 }, '-=0.4')
+      .from('.telehealth-reminders', { opacity: 0, x: 30, duration: 0.8 }, '-=0.8');
+  }, { scope: containerRef, dependencies: [loading] });
 
   const handleCancelAppointment = async (id) => {
     if (window.confirm("Are you sure you want to cancel this appointment?")) {
@@ -123,10 +136,10 @@ const PatientDashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       
       {/* Upper Dashboard Header: User Info */}
-      <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden">
+      <div className="dashboard-header bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden">
         <div className="absolute top-0 right-0 w-44 h-44 bg-teal-50/30 rounded-bl-full -z-10"></div>
         <div className="flex items-center gap-5">
           <img
@@ -172,7 +185,7 @@ const PatientDashboard = () => {
           {healthMetrics.map((metric, i) => (
             <div
               key={i}
-              className="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs hover:shadow-md transition-shadow text-left space-y-3"
+              className="vitals-card bg-white p-5 rounded-2xl border border-slate-100 shadow-xs hover:shadow-md transition-shadow text-left space-y-3"
             >
               <div className="flex justify-between items-center">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{metric.label}</span>
@@ -193,7 +206,7 @@ const PatientDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Appointments List Column */}
-        <div className="lg:col-span-8 space-y-4 text-left">
+        <div className="appt-register lg:col-span-8 space-y-4 text-left">
           <h3 className="text-lg font-bold text-teal-950 font-heading pl-1">Appointment Register</h3>
           
           {loading ? (
@@ -325,7 +338,7 @@ const PatientDashboard = () => {
         </div>
 
         {/* Informative Side Card */}
-        <div className="lg:col-span-4 space-y-6 text-left">
+        <div className="telehealth-reminders lg:col-span-4 space-y-6 text-left">
           <div className="bg-slate-900 text-white rounded-3xl p-6 relative overflow-hidden border border-slate-800 shadow-md">
             <h4 className="text-xs font-bold text-teal-300 uppercase tracking-wider mb-2">Telehealth Reminders</h4>
             <ul className="space-y-4 text-xs text-slate-300 mt-4 leading-relaxed font-body">

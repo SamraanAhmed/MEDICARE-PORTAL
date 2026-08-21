@@ -133,7 +133,8 @@
       "service_name": "General Wellness Checkup",
       "pillar": "general",
       "available": true,
-      "charges": 50
+      "charges": 50,
+      "updatedAt": "2026-08-21T15:24:45.021Z"
     }
   ],
   "appointments": [
@@ -148,6 +149,18 @@
       "notes": "liver swelling",
       "createdAt": "2026-08-20T09:56:25.330Z",
       "updatedAt": "2026-08-20T09:56:25.330Z"
+    },
+    {
+      "_id": "81c72517fbbf0aab6d16b0a3",
+      "patient": "73ee0858784ae1bab6bec850",
+      "doctor": "64d1f2b5a1b2c3d4e5f60011",
+      "service": "64d1f2b5a1b2c3d4e5f60001",
+      "status": "cancelled",
+      "appointment_date": "2026-08-28",
+      "payment": "8a62efd8c4382e24110faf72",
+      "notes": "eyes infectuion",
+      "createdAt": "2026-08-20T17:57:12.844Z",
+      "updatedAt": "2026-08-20T17:57:28.530Z"
     }
   ],
   "payments": [
@@ -159,6 +172,13 @@
       "updatedAt": "2026-08-20T09:56:53.251Z",
       "transcation": "txn939r3r",
       "paid_at": "2026-08-20T09:56:53.251Z"
+    },
+    {
+      "_id": "8a62efd8c4382e24110faf72",
+      "charges": 150,
+      "paid": false,
+      "createdAt": "2026-08-20T17:57:12.844Z",
+      "updatedAt": "2026-08-20T17:57:12.844Z"
     }
   ],
   "messages": [
@@ -169,6 +189,142 @@
       "sender": "user",
       "createdAt": "2026-08-20T09:54:08.439Z",
       "updatedAt": "2026-08-20T09:54:08.439Z"
+    },
+    {
+      "_id": "312fb022cb9ab792fa84a4e5",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "i have an issue in my eyes does you offer any eye speacialist",
+      "sender": "user",
+      "createdAt": "2026-08-20T17:36:48.543Z",
+      "updatedAt": "2026-08-20T17:36:48.543Z"
+    },
+    {
+      "_id": "e0d0907a29abf6fe8409cd7e",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "hi how are you?",
+      "sender": "user",
+      "createdAt": "2026-08-21T11:03:34.239Z",
+      "updatedAt": "2026-08-21T11:03:34.239Z"
+    },
+    {
+      "_id": "d6507cf8fa9c891f53db8f35",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "hi how are you?",
+      "sender": "user",
+      "createdAt": "2026-08-21T11:04:58.034Z",
+      "updatedAt": "2026-08-21T11:04:58.034Z"
+    },
+    {
+      "_id": "5f25e009bd8ffe1281ed9335",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "hwlllo",
+      "sender": "user",
+      "createdAt": "2026-08-21T11:05:15.888Z",
+      "updatedAt": "2026-08-21T11:05:15.888Z"
+    },
+    {
+      "_id": "59f3f38f2e398253f6cf482d",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "hmm",
+      "sender": "user",
+      "createdAt": "2026-08-21T11:05:32.744Z",
+      "updatedAt": "2026-08-21T11:05:32.744Z"
+    },
+    {
+      "_id": "8380876ff74e80759fb92b9e",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "helo",
+      "sender": "user",
+      "createdAt": "2026-08-21T11:05:55.725Z",
+      "updatedAt": "2026-08-21T11:05:55.725Z"
+    },
+    {
+      "_id": "ca7e43cd2737ba0efc9c091d",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "why this chat bot not working?",
+      "sender": "user",
+      "createdAt": "2026-08-21T11:12:17.906Z",
+      "updatedAt": "2026-08-21T11:12:17.907Z"
+    },
+    {
+      "_id": "9795ba65661bd61f1d8d2c23",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "hi how are you",
+      "sender": "user",
+      "createdAt": "2026-08-21T14:51:21.815Z",
+      "updatedAt": "2026-08-21T14:51:21.815Z"
+    },
+    {
+      "_id": "3f624af9c13ba39708ccf381",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "Hello! I'm doing well, thank you for asking. Welcome to MediCare Medical Services! \n\nHow can I assist you today? Whether you need help booking an appointment, finding a doctor, or learning more about our healthcare services, I'm here to help.",
+      "sender": "bot",
+      "createdAt": "2026-08-21T14:51:24.317Z",
+      "updatedAt": "2026-08-21T14:51:24.317Z"
+    },
+    {
+      "_id": "e9874e2d44dd7b59af62f92b",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "i have an infection in my eyes does medicare offer any eye doctors?",
+      "sender": "user",
+      "createdAt": "2026-08-21T14:52:13.038Z",
+      "updatedAt": "2026-08-21T14:52:13.038Z"
+    },
+    {
+      "_id": "bb3510789e97827f9ca85718",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "Yes, **Medicare absolutely covers visits to eye doctors for medical issues, including eye infections.** \n\nWhile Original Medicare (Part A and Part B) generally does not cover *routine* vision care (like eye exams for glasses or contacts), it **does cover medical eye care** to diagnose and treat eye diseases, injuries, and infections.\n\nHere is how your coverage works for an eye infection:\n\n### 1. Doctor Visits (Medicare Part B)\nMedicare Part B covers outpatient medical services. This includes visits to an **optometrist** or **ophthalmologist** (eye specialists) to evaluate and treat your infection. \n* **Cost:** You will typically pay 20% of the Medicare-approved amount after you meet your yearly Part B deductible. \n* If you have a **Medicare Advantage Plan (Part C)**, your visit is also covered, though your copayments may vary depending on your specific plan.\n\n### 2. Prescriptions (Medicare Part D)\nIf the eye doctor prescribes medication to treat the infection (such as antibiotic, antiviral, or anti-inflammatory eye drops), this will be covered under your **Medicare Part D** prescription drug plan or your Medicare Advantage plan's drug coverage. \n\n---\n\n### How to Find an Eye Doctor\nTo find a doctor near you who accepts Medicare:\n1. Go to the official **Medicare.gov** website and use the **\"Find Care Providers\"** tool.\n2. Search for \"Ophthalmology\" or \"Optometry\" in your zip code.\n3. **Important Step:** When you call to schedule your appointment, confirm with the office by asking: *\"Do you accept Medicare assignment?\"* (This ensures they accept Medicare's approved payment amount and won't charge you extra).\n\n### ⚠️ A Quick Note on Safety\nEye infections can escalate quickly. If you are experiencing **severe eye pain, sudden changes in your vision, extreme redness, or discharge**, please do not wait for a standard appointment. Go to an urgent care clinic or an emergency room immediately, as Medicare covers emergency medical eye care as well.",
+      "sender": "bot",
+      "createdAt": "2026-08-21T14:52:19.239Z",
+      "updatedAt": "2026-08-21T14:52:19.239Z"
+    },
+    {
+      "_id": "a20d24cb0cf78d73e47d9813",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "any doctor name?",
+      "sender": "user",
+      "createdAt": "2026-08-21T14:52:51.164Z",
+      "updatedAt": "2026-08-21T14:52:51.164Z"
+    },
+    {
+      "_id": "1df549e59a6d57bb3fe42a58",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "Welcome to MediCare Medical Services! I would be happy to help you find the right doctor for your needs. \n\nTo give you the most accurate recommendation, **are you looking for a doctor in a specific specialty, or do you have a particular symptom you'd like to address?**\n\nTo give you an idea of our team, here are a few of our leading specialists:\n\n*   **General Medicine / Family Practice:** Dr. Sarah Jenkins, MD\n*   **Cardiology (Heart Care):** Dr. Robert Chen, FACC\n*   **Pediatrics (Children's Health):** Dr. Aisha Rahman, MD\n*   **Orthopedics (Bone & Joint):** Dr. Marcus Vance, DO\n*   **Dermatology (Skin Care):** Dr. Elena Rostova, MD\n\n### How would you like to proceed?\n1. **Search by Specialty:** Tell me what kind of doctor you need (e.g., Women's Health, Neurology, General Practitioner).\n2. **Search the Directory:** You can use the **\"Find a Doctor\"** tool at the top of our homepage to filter by name, specialty, language, or location.\n3. **Book an Appointment:** If you'd like, I can help guide you through booking an appointment with one of our available physicians. \n\nPlease let me know how I can help you today!",
+      "sender": "bot",
+      "createdAt": "2026-08-21T14:52:56.021Z",
+      "updatedAt": "2026-08-21T14:52:56.021Z"
+    },
+    {
+      "_id": "aa1c1880bc50115262b7503d",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "suggest me doctor for  liver checkup",
+      "sender": "user",
+      "createdAt": "2026-08-21T14:53:41.182Z",
+      "updatedAt": "2026-08-21T14:53:41.182Z"
+    },
+    {
+      "_id": "32ad903df6e2f64d3bd8a1d0",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "Welcome to MediCare Medical Services! I would be glad to help you find the right specialist for your liver checkup. \n\nDepending on your current health needs, here are the types of doctors you should consult:\n\n### 1. **Hepatologist** (Highly Recommended for Specific Liver Issues)\n* **Who they are:** A hepatologist is a medical doctor who sub-specializes specifically in preventatively diagnosing and treating diseases of the liver, gallbladder, biliary tree, and pancreas.\n* **When to see them:** If you have known liver conditions (like fatty liver, hepatitis, cirrhosis) or if you have received abnormal liver test results.\n\n### 2. **Gastroenterologist (GI Specialist)**\n* **Who they are:** A specialist in the entire digestive system, which includes the stomach, intestines, and the liver. \n* **When to see them:** This is the most common specialist to see for general liver evaluations, acid reflux, abdominal pain, or routine liver screenings.\n\n### 3. **General Physician / Internal Medicine Specialist**\n* **Who they are:** Your primary care doctor.\n* **When to see them:** If you want a **routine preventive checkup** or are not experiencing any severe symptoms. They can order your initial blood work—such as a **Liver Function Test (LFT)** or an abdominal ultrasound—and refer you to a Hepatologist if any abnormalities are found.\n\n---\n\n### How I can help you book an appointment today:\nTo help me recommend the best doctor for you on our MediCare platform, could you please share a few details?\n\n1. **Your Location:** Which city or area are you located in?\n2. **Reason for Checkup:** Is this for a routine annual checkup, or are you experiencing symptoms (like fatigue, abdominal pain, yellowing of the eyes/skin, or nausea)?\n3. **Insurance:** Do you have a specific insurance provider you would like to use?\n\nOnce you share this, I can instantly generate a list of top-rated specialists near you and help you book a slot!",
+      "sender": "bot",
+      "createdAt": "2026-08-21T14:53:47.555Z",
+      "updatedAt": "2026-08-21T14:53:47.555Z"
+    },
+    {
+      "_id": "17b62dbba562d3ba259673a5",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "has",
+      "sender": "user",
+      "createdAt": "2026-08-21T14:54:09.584Z",
+      "updatedAt": "2026-08-21T14:54:09.584Z"
+    },
+    {
+      "_id": "e505f9a0ca784cf065c12271",
+      "user": "73ee0858784ae1bab6bec850",
+      "content": "Hello! It looks like your message was cut off. \n\nHow can I help you today at MediCare Medical Services? \n\nAre you looking to:\n* **Book an appointment** with a doctor?\n* **Find a specialist** or medical department?\n* Ask about our **services, insurance, or billing**?\n* Get information on **prescriptions or test results**?\n\nPlease let me know how I can assist you!",
+      "sender": "bot",
+      "createdAt": "2026-08-21T14:54:12.420Z",
+      "updatedAt": "2026-08-21T14:54:12.420Z"
     }
   ]
 }

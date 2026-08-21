@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,6 +6,8 @@ import * as z from 'zod';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { Calendar, Clock, AlertCircle, FileText, CheckCircle2, ChevronRight, Activity, ShieldCheck } from 'lucide-react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 
 const appointmentSchema = z.object({
   service: z.string().min(1, { message: 'Please select a medical service.' }),
@@ -21,12 +23,53 @@ const BookAppointment = () => {
   const [services, setServices] = useState([]);
   const [successAppt, setSuccessAppt] = useState(null);
   const [submitError, setSubmitError] = useState(null);
+  const containerRef = useRef(null);
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, watch } = useForm({
     resolver: zodResolver(appointmentSchema),
   });
 
   const selectedServiceId = watch('service');
+
+  useGSAP(() => {
+    if (successAppt) return; // Skip entry animations if confirmed screen is active
+
+    // Header Animation
+    gsap.from('.booking-header', {
+      opacity: 0,
+      y: -20,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
+
+    // Form Container Entrance
+    gsap.from('.booking-form', {
+      opacity: 0,
+      x: -30,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
+
+    // Form Steps Stagger
+    gsap.from('.form-step', {
+      opacity: 0,
+      y: 15,
+      stagger: 0.1,
+      duration: 0.5,
+      ease: 'power3.out',
+      delay: 0.2
+    });
+
+    // Sidebar Widgets entrance
+    gsap.from('.booking-sidebar-widget', {
+      opacity: 0,
+      x: 30,
+      stagger: 0.15,
+      duration: 0.8,
+      ease: 'power3.out',
+      delay: 0.2
+    });
+  }, { scope: containerRef, dependencies: [successAppt, services] });
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -90,7 +133,7 @@ const BookAppointment = () => {
     <div className="max-w-4xl mx-auto px-4 py-12 space-y-10">
       
       {/* Header */}
-      <div className="text-left space-y-2 border-b border-slate-100 pb-6">
+      <div className="booking-header text-left space-y-2 border-b border-slate-100 pb-6">
         <h1 className="text-4xl font-black text-teal-950 font-heading mt-1">Book a Consultation</h1>
         <p className="text-slate-500 text-xs sm:text-sm">
           Select a medical service. Our booking algorithm automatically schedules you with an available physician.
@@ -147,7 +190,7 @@ const BookAppointment = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Main Booking Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="lg:col-span-8 bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-md space-y-6 text-left">
+          <form onSubmit={handleSubmit(onSubmit)} className="booking-form lg:col-span-8 bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-md space-y-6 text-left">
             
             {/* Error message */}
             {submitError && (
@@ -161,7 +204,7 @@ const BookAppointment = () => {
             )}
 
             {/* Step 1: Select Service */}
-            <div className="space-y-2">
+            <div className="form-step space-y-2">
               <label className="text-xs font-bold text-slate-700 uppercase tracking-widest flex items-center gap-1.5">
                 <Activity className="w-4 h-4 text-teal-850" />
                 1. Select Service / Specialty
@@ -188,7 +231,7 @@ const BookAppointment = () => {
             </div>
 
             {/* Step 2: Date Selector */}
-            <div className="space-y-2">
+            <div className="form-step space-y-2">
               <label className="text-xs font-bold text-slate-700 uppercase tracking-widest flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-teal-850" />
                 2. Select Date
@@ -209,7 +252,7 @@ const BookAppointment = () => {
             </div>
 
             {/* Step 3: Medical Notes */}
-            <div className="space-y-2">
+            <div className="form-step space-y-2">
               <label className="text-xs font-bold text-slate-700 uppercase tracking-widest flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-teal-850" />
                 3. Symptoms / Notes (Optional)
@@ -229,7 +272,7 @@ const BookAppointment = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="pt-2">
+            <div className="form-step pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -244,7 +287,7 @@ const BookAppointment = () => {
 
           {/* Sidebar Guidelines */}
           <div className="lg:col-span-4 space-y-6 text-left">
-            <div className="bg-slate-50 rounded-3xl border border-slate-100 p-6 space-y-4">
+            <div className="booking-sidebar-widget bg-slate-50 rounded-3xl border border-slate-100 p-6 space-y-4">
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Booking Guidelines</h4>
               
               <div className="space-y-3.5 text-xs text-slate-600">
@@ -263,7 +306,7 @@ const BookAppointment = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl border border-teal-100/50 p-6 space-y-3">
+            <div className="booking-sidebar-widget bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl border border-teal-100/50 p-6 space-y-3">
               <ShieldCheck className="w-8 h-8 text-teal-850" />
               <h4 className="text-sm font-bold text-teal-950 font-heading">HIPAA Compliant Data</h4>
               <p className="text-xs text-slate-600 leading-normal">

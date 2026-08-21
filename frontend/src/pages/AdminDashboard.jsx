@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -8,6 +8,8 @@ import {
   Plus, ToggleLeft, ToggleRight, List, UserCheck, Activity, AlertCircle, 
   ShieldCheck, Mail, User, Stethoscope, Lock, Trash2, Calendar, CreditCard, Clock, CheckCircle 
 } from 'lucide-react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 
 const serviceSchema = z.object({
   service_name: z.string().min(3, { message: 'Service name must be at least 3 characters.' }),
@@ -39,6 +41,26 @@ const AdminDashboard = () => {
   const [doctorsList, setDoctorsList] = useState([]);
   const [appointmentsList, setAppointmentsList] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
+  const containerRef = useRef(null);
+
+  useGSAP(() => {
+    // Initial entrance on load
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('.admin-header', { opacity: 0, y: -20, duration: 0.8 })
+      .from('.admin-tabs', { opacity: 0, y: 15, duration: 0.6 }, '-=0.4');
+  }, { scope: containerRef });
+
+  useGSAP(() => {
+    if (loadingData) return;
+    
+    // Animate tab content transitions when changing tabs
+    gsap.from('.admin-content-section', {
+      opacity: 0,
+      y: 20,
+      duration: 0.5,
+      ease: 'power3.out'
+    });
+  }, { scope: containerRef, dependencies: [activeForm, loadingData] });
 
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -196,10 +218,10 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       
       {/* 1. Header Admin Profile */}
-      <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden">
+      <div className="admin-header bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden">
         <div className="absolute top-0 right-0 w-44 h-44 bg-teal-50/30 rounded-bl-full -z-10"></div>
         <div className="flex items-center gap-5">
           <div className="w-16 h-16 rounded-2xl bg-teal-850 text-white flex items-center justify-center font-bold text-xl shadow-md">
@@ -222,7 +244,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Dashboard toggles */}
-        <div className="flex flex-wrap gap-1.5 bg-slate-100 p-1.5 rounded-2xl">
+        <div className="admin-tabs flex flex-wrap gap-1.5 bg-slate-100 p-1.5 rounded-2xl">
           <button
             onClick={() => handleTabChange('services')}
             className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
@@ -299,12 +321,13 @@ const AdminDashboard = () => {
       )}
 
       {/* 3. Main Content Section */}
-      {loadingData ? (
-        <div className="text-center py-12">
-          <Clock className="w-8 h-8 text-slate-300 animate-spin mx-auto" />
-          <p className="text-xs text-slate-400 mt-2">Loading data directories...</p>
-        </div>
-      ) : ['services', 'add-doctor', 'add-admin'].includes(activeForm) ? (
+      <div className="admin-content-section">
+        {loadingData ? (
+          <div className="text-center py-12">
+            <Clock className="w-8 h-8 text-slate-300 animate-spin mx-auto" />
+            <p className="text-xs text-slate-400 mt-2">Loading data directories...</p>
+          </div>
+        ) : ['services', 'add-doctor', 'add-admin'].includes(activeForm) ? (
         /* Split view dashboard layout for creation states */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in fade-in duration-200">
           
@@ -808,6 +831,7 @@ const AdminDashboard = () => {
 
         </div>
       )}
+      </div>
 
     </div>
   );

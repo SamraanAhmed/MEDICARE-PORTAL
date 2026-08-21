@@ -140,7 +140,10 @@ const Chat = () => {
       </div>
 
       {/* Main Conversation Canvas */}
-      <div className="flex-1 bg-white rounded-3xl border border-slate-100 p-6 overflow-y-auto space-y-4 shadow-xs flex flex-col justify-start">
+      <div 
+        data-lenis-prevent
+        className="flex-1 bg-white rounded-3xl border border-slate-100 p-6 overflow-y-auto space-y-4 shadow-xs flex flex-col justify-start"
+      >
         
         {messages.map((msg, i) => {
           const isBot = msg.sender === 'bot';
