@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const { admin, user, doctor, service, message, appointment, payment, contactForm } = require('../mongodb');
 const bycrpt = require('bcrypt');
 const dotenv = require('dotenv');
