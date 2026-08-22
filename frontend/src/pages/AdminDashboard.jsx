@@ -34,12 +34,15 @@ const doctorSignupSchema = z.object({
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [services, setServices] = useState([]);
-  const [activeForm, setActiveForm] = useState('services'); // 'services', 'add-admin', 'add-doctor', 'patients', 'doctors', 'appointments'
+  const [activeForm, setActiveForm] = useState('services'); // 'services', 'add-admin', 'add-doctor', 'patients', 'doctors', 'appointments', 'inquiries'
   
   // Data lists states
   const [patientsList, setPatientsList] = useState([]);
   const [doctorsList, setDoctorsList] = useState([]);
   const [appointmentsList, setAppointmentsList] = useState([]);
+  const [inquiriesList, setInquiriesList] = useState([]);
+  const [selectedInquiry, setSelectedInquiry] = useState(null);
+  const [loadingInquiryDetail, setLoadingInquiryDetail] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const containerRef = useRef(null);
 
@@ -104,6 +107,8 @@ const AdminDashboard = () => {
       setDoctorsList(d);
       const appts = await api.getAllAppointmentsAdmin();
       setAppointmentsList(appts);
+      const inqs = await api.getAllContactForms();
+      setInquiriesList(inqs);
     } catch (err) {
       console.warn("Failed to prefetch counts:", err);
     }
@@ -113,6 +118,7 @@ const AdminDashboard = () => {
     setActiveForm(tabName);
     setErrorMsg('');
     setSuccessMsg('');
+    setSelectedInquiry(null);
     setLoadingData(true);
     try {
       if (tabName === 'patients') {
@@ -126,11 +132,50 @@ const AdminDashboard = () => {
         setAppointmentsList(list);
       } else if (tabName === 'services') {
         await loadServices();
+      } else if (tabName === 'inquiries') {
+        const list = await api.getAllContactForms();
+        setInquiriesList(list);
       }
     } catch (err) {
       setErrorMsg(`Failed to query database for ${tabName}.`);
     } finally {
       setLoadingData(false);
+    }
+  };
+
+  const handleViewInquiry = async (id) => {
+    setErrorMsg('');
+    setLoadingInquiryDetail(true);
+    try {
+      const detail = await api.getContactFormDetail(id);
+      setSelectedInquiry(detail);
+      // Auto mark as seen if unread
+      if (!detail.seen) {
+        await api.markContactFormSeen(id);
+        // Refresh inquiry list to clear seen badge
+        const list = await api.getAllContactForms();
+        setInquiriesList(list);
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to fetch inquiry details.');
+    } finally {
+      setLoadingInquiryDetail(false);
+    }
+  };
+
+  const handleDeleteInquiry = async (id, name) => {
+    if (window.confirm(`Are you sure you want to permanently delete the inquiry from '${name}'?`)) {
+      setErrorMsg('');
+      setSuccessMsg('');
+      try {
+        await api.deleteContactForm(id);
+        setSuccessMsg(`Inquiry from '${name}' deleted successfully.`);
+        setSelectedInquiry(null);
+        const list = await api.getAllContactForms();
+        setInquiriesList(list);
+      } catch (err) {
+        setErrorMsg(err.message || 'Failed to delete inquiry.');
+      }
     }
   };
 
@@ -298,6 +343,20 @@ const AdminDashboard = () => {
           >
             <UserCheck className="w-4 h-4" />
             Add Admin
+          </button>
+          <button
+            onClick={() => handleTabChange('inquiries')}
+            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 relative ${
+              activeForm === 'inquiries' ? 'bg-white text-teal-850 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <Mail className="w-4 h-4" />
+            Inquiries
+            {inquiriesList.filter(i => !i.seen).length > 0 && (
+              <span className="absolute -top-1 -right-1 px-1.5 py-0.5 text-[8px] font-extrabold bg-rose-500 text-white rounded-full leading-none shadow-xs">
+                {inquiriesList.filter(i => !i.seen).length}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -826,6 +885,116 @@ const AdminDashboard = () => {
                   </table>
                 )}
               </div>
+            </div>
+          )}
+
+          {activeForm === 'inquiries' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in fade-in duration-200">
+              
+              {/* Left Column: Inquiry list */}
+              <div className="lg:col-span-6 space-y-4 text-left">
+                <h3 className="text-lg font-bold text-teal-950 font-heading pl-1">Patient Inquiries</h3>
+                <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-xs">
+                  {inquiriesList.length === 0 ? (
+                    <div className="p-8 text-center text-slate-400">No inquiries found.</div>
+                  ) : (
+                    <div className="divide-y divide-slate-50">
+                      {inquiriesList.map((inq) => (
+                        <div
+                          key={inq._id}
+                          onClick={() => handleViewInquiry(inq._id)}
+                          className={`p-5 flex items-start justify-between gap-4 cursor-pointer hover:bg-slate-55 transition-colors relative ${
+                            selectedInquiry?._id === inq._id ? 'bg-slate-50 border-l-4 border-teal-850' : ''
+                          }`}
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-sm font-bold text-slate-800">{inq.name}</h4>
+                              {!inq.seen && (
+                                <span className="bg-rose-50 text-rose-800 text-[8px] font-bold px-2 py-0.5 rounded-full uppercase border border-rose-100 animate-pulse">
+                                  Unread
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-500 font-medium">{inq.email}</p>
+                            <p className="text-xs font-semibold text-slate-700 mt-1 line-clamp-1">Subject: {inq.subject}</p>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteInquiry(inq._id, inq.name);
+                              }}
+                              className="p-1.5 rounded-lg border border-slate-100 hover:border-rose-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-all cursor-pointer"
+                              title="Delete Inquiry"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Inquiry details viewer */}
+              <div className="lg:col-span-6 text-left">
+                <h3 className="text-lg font-bold text-teal-950 font-heading pl-1">Inquiry Details</h3>
+                
+                {loadingInquiryDetail ? (
+                  <div className="bg-white rounded-3xl border border-slate-100 p-12 text-center">
+                    <Clock className="w-8 h-8 text-slate-300 animate-spin mx-auto" />
+                    <p className="text-xs text-slate-400 mt-2">Opening inquiry record...</p>
+                  </div>
+                ) : selectedInquiry ? (
+                  <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-md space-y-6 animate-in fade-in duration-300">
+                    <div className="border-b border-slate-100 pb-4 space-y-2">
+                      <div className="flex justify-between items-start gap-4">
+                        <div>
+                          <h4 className="text-base font-extrabold text-slate-800">{selectedInquiry.name}</h4>
+                          <a href={`mailto:${selectedInquiry.email}`} className="text-xs text-teal-705 hover:underline">{selectedInquiry.email}</a>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-semibold uppercase">
+                          {new Date(selectedInquiry.createdAt).toLocaleDateString(undefined, {
+                            month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                      
+                      <div className="pt-2">
+                        <span className="inline-block bg-teal-50 text-[10px] text-teal-850 font-bold px-2.5 py-0.5 rounded-md border border-teal-100">
+                          Subject: {selectedInquiry.subject}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 text-xs leading-relaxed text-slate-700 bg-slate-50/50 p-5 rounded-2xl border border-slate-100 font-body">
+                      <strong className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Message Content:</strong>
+                      <p className="whitespace-pre-wrap">{selectedInquiry.message}</p>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-[10px] text-slate-400">
+                        Status: {selectedInquiry.seen ? 'Read' : 'Unread'}
+                      </span>
+                      <button
+                        onClick={() => handleDeleteInquiry(selectedInquiry._id, selectedInquiry.name)}
+                        className="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Delete Message
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-slate-50/50 rounded-3xl border border-dashed border-slate-200 p-12 text-center text-slate-400">
+                    Select a patient inquiry from the register to read the detailed message body.
+                  </div>
+                )}
+              </div>
+
             </div>
           )}
 

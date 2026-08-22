@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import api from '../services/api';
 import MapEmbed from '../components/MapEmbed';
 import { Phone, Mail, MapPin, Send, HelpCircle, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useGSAP } from '@gsap/react';
@@ -25,12 +26,14 @@ const Contact = () => {
   });
 
   const onSubmit = async (data) => {
-    // Simulate API lead generation call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("Contact lead captured: ", data);
-    setSuccess(true);
-    reset();
-    setTimeout(() => setSuccess(false), 5000);
+    try {
+      await api.createContactForm(data.name, data.email, data.subject, data.message);
+      setSuccess(true);
+      reset();
+      setTimeout(() => setSuccess(false), 5000);
+    } catch (err) {
+      console.error("Failed to submit contact form:", err.message);
+    }
   };
 
   useGSAP(() => {
@@ -122,39 +125,41 @@ const Contact = () => {
         <div className="lg:col-span-5 space-y-8 text-left">
           
           {/* Quick info cards */}
-          <div className="contact-info-card bg-white rounded-3xl border border-slate-100 p-8 shadow-xs space-y-6">
-            <h3 className="text-xl font-bold text-teal-950 font-heading border-b border-slate-50 pb-3">Get in Touch</h3>
+          <div className="contact-info-card bg-black text-white rounded-3xl border border-slate-800 p-8 shadow-2xl space-y-6 relative overflow-hidden z-0">
+            <div className="absolute top-0 right-0 w-36 h-36 bg-teal-800/10 rounded-full blur-2xl -z-10"></div>
+            <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-teal-950/20 rounded-full blur-2xl -z-10"></div>
+            <h3 className="text-xl font-bold text-teal-100 font-heading border-b border-slate-800 pb-3">Get in Touch</h3>
             
             <div className="info-item flex items-start gap-4">
-              <div className="p-3 bg-teal-50 text-teal-800 rounded-2xl border border-teal-100 shrink-0">
+              <div className="p-3 bg-teal-500/10 text-teal-400 rounded-2xl border border-teal-500/20 shrink-0">
                 <Phone className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-slate-800 font-heading">Call Center</h4>
-                <p className="text-sm text-slate-600 mt-1">+92 (51) 111-844-844</p>
-                <p className="text-xs text-slate-400">Campus Exchange: +92 (51) 844-6666</p>
+                <h4 className="text-sm font-bold text-white font-heading">Call Center</h4>
+                <p className="text-sm text-slate-400 mt-1">+92 (51) 111-844-844</p>
+                <p className="text-xs text-slate-500">Campus Exchange: +92 (51) 844-6666</p>
               </div>
             </div>
 
             <div className="info-item flex items-start gap-4">
-              <div className="p-3 bg-teal-50 text-teal-800 rounded-2xl border border-teal-100 shrink-0">
+              <div className="p-3 bg-teal-500/10 text-teal-400 rounded-2xl border border-teal-500/20 shrink-0">
                 <Mail className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-slate-800 font-heading">Email Address</h4>
-                <p className="text-sm text-slate-600 mt-1">support@medicare-portal.com</p>
-                <p className="text-xs text-slate-400">Response time: within 24 hours</p>
+                <h4 className="text-sm font-bold text-white font-heading">Email Address</h4>
+                <p className="text-sm text-slate-400 mt-1">support@medicare-portal.com</p>
+                <p className="text-xs text-slate-500">Response time: within 24 hours</p>
               </div>
             </div>
 
             <div className="info-item flex items-start gap-4">
-              <div className="p-3 bg-teal-50 text-teal-800 rounded-2xl border border-teal-100 shrink-0">
+              <div className="p-3 bg-teal-500/10 text-teal-400 rounded-2xl border border-teal-500/20 shrink-0">
                 <MapPin className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-slate-800 font-heading">Main Campus</h4>
-                <p className="text-sm text-slate-600 mt-1">Ibadat International University, Islamabad, Pakistan</p>
-                <p className="text-xs text-slate-400">Japan Road, Sihala, Islamabad</p>
+                <h4 className="text-sm font-bold text-white font-heading">Main Campus</h4>
+                <p className="text-sm text-slate-400 mt-1">Ibadat International University, Islamabad, Pakistan</p>
+                <p className="text-xs text-slate-500">Japan Road, Sihala, Islamabad</p>
               </div>
             </div>
           </div>
@@ -178,11 +183,11 @@ const Contact = () => {
 
           {/* Success Banner */}
           {success && (
-            <div className="mt-6 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl text-emerald-800 text-sm flex items-start gap-3 animate-in fade-in duration-300">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+            <div className="mt-6 p-4 bg-teal-50 border border-teal-100 rounded-2xl text-teal-800 text-sm flex items-start gap-3 animate-in fade-in duration-300">
+              <CheckCircle2 className="w-5 h-5 text-teal-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold">Inquiry Sent Successfully!</p>
-                <p className="text-xs text-emerald-600 mt-0.5">Thank you for writing. We will get back to you shortly.</p>
+                <p className="text-xs text-teal-700 mt-0.5">Thank you for writing. We will get back to you shortly.</p>
               </div>
             </div>
           )}

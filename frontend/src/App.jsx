@@ -16,6 +16,7 @@ import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import About from './pages/About';
+import Feedback from './pages/Feedback';
 
 const App = () => {
   return (
@@ -41,6 +42,7 @@ const App = () => {
             
             {/* AI Assistant Messaging Desk */}
             <Route path="/chat" element={<Chat />} />
+            <Route path="/feedback" element={<Feedback />} />
             
             {/* Dashboards */}
             <Route path="/dashboard/patient" element={<PatientDashboard />} />

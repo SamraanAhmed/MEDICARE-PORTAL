@@ -1,14 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Shield, User, Globe, Activity } from 'lucide-react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
 
 const Welcome = () => {
   const { user, role } = useAuth();
   const navigate = useNavigate();
-  const containerRef = useRef(null);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -23,61 +20,30 @@ const Welcome = () => {
     }
   }, [user, role, navigate]);
 
-  // GSAP Entrance Animations
-  useGSAP(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-    // Animate background blobs first
-    tl.from('.bg-blob-1', { scale: 0, opacity: 0, duration: 1.5, delay: 0.1 })
-      .from('.bg-blob-2', { scale: 0, opacity: 0, duration: 1.5 }, '-=1.2');
-
-    // Animate main container slide up
-    tl.from('.welcome-card', { y: 60, opacity: 0, duration: 1 }, '-=1.2')
-      .from('.welcome-bar', { width: 0, duration: 0.8 }, '-=0.5');
-
-    // Logo pop
-    tl.from('.welcome-logo', { scale: 0, rotate: -15, duration: 0.8, ease: 'back.out(1.7)' }, '-=0.4')
-      .from('.welcome-logo-glow', { opacity: 0, duration: 0.5 }, '-=0.3');
-
-    // Typography stagger
-    tl.from('.welcome-title', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4')
-      .from('.welcome-subtitle', { y: 15, opacity: 0, duration: 0.5 }, '-=0.4')
-      .from('.welcome-desc', { y: 10, opacity: 0, duration: 0.5 }, '-=0.4');
-
-    // Stagger gateway links
-    tl.from('.gateway-link', { y: 30, opacity: 0, stagger: 0.15, duration: 0.6 }, '-=0.3')
-      .from('.welcome-trust', { opacity: 0, y: 5, duration: 0.5 }, '-=0.2');
-
-  }, { scope: containerRef });
-
   // Render selection portal if not logged in
   return (
-    <div ref={containerRef} className="min-h-[calc(100vh-80px)] flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-80px)] flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 relative overflow-hidden">
       {/* Background blobs */}
-      <div className="bg-blob-1 absolute top-[-25%] left-[-20%] w-[60%] h-[60%] rounded-full bg-teal-500/10 blur-3xl -z-10"></div>
-      <div className="bg-blob-2 absolute bottom-[-25%] right-[-20%] w-[60%] h-[60%] rounded-full bg-emerald-500/10 blur-3xl -z-10"></div>
+      <div className="absolute top-[-25%] left-[-20%] w-[60%] h-[60%] rounded-full bg-teal-500/10 blur-3xl -z-10"></div>
+      <div className="absolute bottom-[-25%] right-[-20%] w-[60%] h-[60%] rounded-full bg-emerald-500/10 blur-3xl -z-10"></div>
 
       <div className="welcome-card max-w-2xl w-full bg-white/80 backdrop-blur-md rounded-3xl border border-slate-100 p-8 sm:p-12 shadow-2xl text-center space-y-10 relative">
-        <div className="welcome-bar absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-700 to-emerald-500"></div>
-
+        
         {/* Medicare Logo Branding */}
         <div className="space-y-4 flex flex-col items-center">
-          <div className="relative group">
-            <div className="welcome-logo-glow absolute -inset-2 bg-gradient-to-r from-teal-500 to-emerald-500 opacity-20 blur-md group-hover:opacity-40 transition duration-300"></div>
-            <img 
-              src="/imgvid/medicarelogo.png" 
-              alt="MediCare Logo" 
-              className="welcome-logo h-24 sm:h-32 w-auto object-contain relative z-10 transition-transform group-hover:scale-105 duration-300"
-            />
-          </div>
+          <img 
+            src="/imgvid/medicarelogo.png" 
+            alt="MediCare Logo" 
+            className="h-24 sm:h-32 w-auto object-contain transition-transform hover:scale-105 duration-300"
+          />
           <div className="space-y-2">
-            <h1 className="welcome-title text-3xl sm:text-5xl font-black tracking-tight text-teal-950 font-heading">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-teal-950 font-kanit">
               WELCOME TO MEDICARE
             </h1>
-            <p className="welcome-subtitle text-teal-700 font-semibold tracking-wider uppercase text-xs sm:text-sm">
+            <p className="text-teal-700 font-semibold tracking-wider uppercase text-xs sm:text-sm">
               Empowering Your Wellness Journey
             </p>
-            <p className="welcome-desc text-slate-400 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
+            <p className="text-slate-400 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
               Access your medical dashboards, consult our 24/7 AI health assistant, or coordinate clinical care.
             </p>
           </div>
@@ -88,13 +54,14 @@ const Welcome = () => {
           {/* Patient Card */}
           <Link
             to="/auth"
-            className="gateway-link flex flex-col items-center p-6 bg-teal-850 hover:bg-teal-900 text-white rounded-2xl shadow-md transition-all hover:scale-103 cursor-pointer group"
+            className="flex flex-col items-center p-6 bg-black hover:bg-slate-900 text-white rounded-2xl border border-slate-800 hover:border-teal-500/40 shadow-xl transition-all hover:scale-103 cursor-pointer group relative overflow-hidden"
           >
-            <div className="p-3 bg-teal-800/80 rounded-xl mb-3 border border-teal-700/50 group-hover:scale-110 transition-transform duration-300">
-              <User className="w-6 h-6 text-emerald-400" />
+            <div className="absolute top-0 right-0 w-20 h-20 bg-teal-500/5 rounded-full blur-xl -z-10 group-hover:bg-teal-500/10 transition-colors"></div>
+            <div className="p-3 bg-teal-500/10 rounded-xl mb-3 border border-teal-500/20 group-hover:scale-110 transition-transform duration-300">
+              <User className="w-6 h-6 text-teal-400" />
             </div>
-            <h3 className="text-sm font-bold">Patient Portal</h3>
-            <p className="text-[10px] text-teal-200 mt-1 text-center leading-normal">
+            <h3 className="text-sm font-bold text-teal-100 font-heading">Patient Portal</h3>
+            <p className="text-[10px] text-slate-400 mt-1 text-center leading-normal">
               Book consultations & view health history
             </p>
           </Link>
@@ -102,12 +69,13 @@ const Welcome = () => {
           {/* Admin / Staff Card */}
           <Link
             to="/admin"
-            className="gateway-link flex flex-col items-center p-6 bg-slate-900 hover:bg-slate-950 text-white rounded-2xl shadow-md transition-all hover:scale-103 cursor-pointer group"
+            className="flex flex-col items-center p-6 bg-black hover:bg-slate-900 text-white rounded-2xl border border-slate-800 hover:border-teal-500/40 shadow-xl transition-all hover:scale-103 cursor-pointer group relative overflow-hidden"
           >
-            <div className="p-3 bg-slate-800 rounded-xl mb-3 border border-slate-700 group-hover:scale-110 transition-transform duration-300">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-teal-500/5 rounded-full blur-xl -z-10 group-hover:bg-teal-500/10 transition-colors"></div>
+            <div className="p-3 bg-teal-500/10 rounded-xl mb-3 border border-teal-500/20 group-hover:scale-110 transition-transform duration-300">
               <Shield className="w-6 h-6 text-teal-400" />
             </div>
-            <h3 className="text-sm font-bold">Staff Portal</h3>
+            <h3 className="text-sm font-bold text-teal-100 font-heading">Staff Portal</h3>
             <p className="text-[10px] text-slate-400 mt-1 text-center leading-normal">
               Doctors & Admin control panels
             </p>
@@ -116,12 +84,13 @@ const Welcome = () => {
           {/* Marketing Site Card */}
           <Link
             to="/home"
-            className="gateway-link flex flex-col items-center p-6 bg-white hover:bg-slate-50 text-slate-800 rounded-2xl border border-slate-200/80 shadow-sm transition-all hover:scale-103 cursor-pointer group"
+            className="flex flex-col items-center p-6 bg-black hover:bg-slate-900 text-white rounded-2xl border border-slate-800 hover:border-teal-500/40 shadow-xl transition-all hover:scale-103 cursor-pointer group relative overflow-hidden"
           >
-            <div className="p-3 bg-slate-100 rounded-xl mb-3 border border-slate-200/50 group-hover:scale-110 transition-transform duration-300">
-              <Globe className="w-6 h-6 text-teal-700" />
+            <div className="absolute top-0 right-0 w-20 h-20 bg-teal-500/5 rounded-full blur-xl -z-10 group-hover:bg-teal-500/10 transition-colors"></div>
+            <div className="p-3 bg-teal-500/10 rounded-xl mb-3 border border-teal-500/20 group-hover:scale-110 transition-transform duration-300">
+              <Globe className="w-6 h-6 text-teal-400" />
             </div>
-            <h3 className="text-sm font-bold text-teal-950">Visit Site</h3>
+            <h3 className="text-sm font-bold text-teal-100 font-heading">Visit Site</h3>
             <p className="text-[10px] text-slate-400 mt-1 text-center leading-normal">
               Browse clinics, specialities & contact us
             </p>
@@ -129,8 +98,8 @@ const Welcome = () => {
         </div>
 
         {/* Trust Badge */}
-        <div className="welcome-trust pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-slate-400 text-xs">
-          <Activity className="w-4 h-4 text-emerald-500 animate-pulse" />
+        <div className="pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-slate-400 text-xs">
+          <Activity className="w-4 h-4 text-teal-500 animate-pulse" />
           <span>Secure HIPAA-compliant healthcare channels</span>
         </div>
       </div>

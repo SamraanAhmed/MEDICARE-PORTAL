@@ -39,13 +39,13 @@ const StaffAuth = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-900 text-slate-100 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-80px)] flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-black text-slate-100 relative overflow-hidden">
       {/* Dynamic Background Accents */}
       <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] rounded-full bg-teal-800/20 blur-3xl"></div>
-      <div className="absolute bottom-[-20%] right-[-20%] w-[60%] h-[60%] rounded-full bg-emerald-800/25 blur-3xl"></div>
+      <div className="absolute bottom-[-20%] right-[-20%] w-[60%] h-[60%] rounded-full bg-teal-950/30 blur-3xl"></div>
 
       <div className="max-w-md w-full bg-slate-800/90 backdrop-blur-md rounded-3xl border border-slate-700 shadow-2xl overflow-hidden text-left relative z-10">
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-500 to-emerald-400"></div>
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-500 to-teal-700"></div>
 
         {/* Header */}
         <div className="p-8 pb-4">

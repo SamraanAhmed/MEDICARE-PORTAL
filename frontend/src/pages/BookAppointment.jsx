@@ -109,18 +109,21 @@ const BookAppointment = () => {
   // Redirect to Auth if not logged in
   if (!user) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-6">
-        <div className="w-16 h-16 rounded-full bg-teal-50 text-teal-800 flex items-center justify-center mx-auto border border-teal-100">
+      <div className="max-w-xl mx-auto px-6 py-12 text-center space-y-6 bg-black text-white rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden z-0">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-teal-800/10 rounded-full blur-3xl -z-10"></div>
+        <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-teal-950/20 rounded-full blur-3xl -z-10"></div>
+        
+        <div className="w-16 h-16 rounded-2xl bg-teal-500/10 text-teal-400 flex items-center justify-center mx-auto border border-teal-500/20">
           <Calendar className="w-8 h-8" />
         </div>
-        <h2 className="text-3xl font-black text-teal-950 font-heading">Consultation Booking</h2>
-        <p className="text-slate-500 text-sm max-w-sm mx-auto leading-relaxed">
+        <h2 className="text-3xl font-black text-white font-heading animate-pulse">Consultation Booking</h2>
+        <p className="text-slate-400 text-sm max-w-sm mx-auto leading-relaxed">
           Please log in to your patient account to schedule an appointment with our specialist doctors.
         </p>
         <div className="pt-2">
           <Link
             to="/auth"
-            className="px-8 py-3.5 bg-teal-850 hover:bg-teal-900 text-white font-bold rounded-xl shadow-md transition-colors"
+            className="inline-block px-8 py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-md transition-colors"
           >
             Access Sign In / Registration
           </Link>
@@ -143,7 +146,7 @@ const BookAppointment = () => {
       {successAppt ? (
         /* SUCCESS SCREEN */
         <div className="bg-white rounded-3xl border border-slate-100 p-8 sm:p-12 shadow-xl text-center space-y-8 animate-in zoom-in-95 duration-300">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto border border-emerald-100">
+          <div className="w-16 h-16 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mx-auto border border-teal-100">
             <CheckCircle2 className="w-10 h-10" />
           </div>
           
@@ -287,29 +290,31 @@ const BookAppointment = () => {
 
           {/* Sidebar Guidelines */}
           <div className="lg:col-span-4 space-y-6 text-left">
-            <div className="booking-sidebar-widget bg-slate-50 rounded-3xl border border-slate-100 p-6 space-y-4">
-              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Booking Guidelines</h4>
+            <div className="booking-sidebar-widget bg-black text-white rounded-3xl border border-slate-800 p-6 space-y-4 relative overflow-hidden z-0">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-teal-800/10 rounded-full blur-2xl -z-10"></div>
+              <h4 className="text-xs font-bold text-teal-400 uppercase tracking-wider">Booking Guidelines</h4>
               
-              <div className="space-y-3.5 text-xs text-slate-600">
+              <div className="space-y-3.5 text-xs text-slate-400">
                 <div className="flex gap-2">
-                  <span className="text-teal-800 font-extrabold">1.</span>
+                  <span className="text-teal-400 font-extrabold">1.</span>
                   <p>Our algorithm schedules appointments only with active, online doctors matching your selected clinical pillar.</p>
                 </div>
                 <div className="flex gap-2">
-                  <span className="text-teal-800 font-extrabold">2.</span>
+                  <span className="text-teal-400 font-extrabold">2.</span>
                   <p>A daily limit of 5 appointments per doctor is active in the database checks (`checkDoctorDailyAvailability`).</p>
                 </div>
                 <div className="flex gap-2">
-                  <span className="text-teal-800 font-extrabold">3.</span>
+                  <span className="text-teal-400 font-extrabold">3.</span>
                   <p>You can review and track appointment statuses in your Personal Patient Dashboard.</p>
                 </div>
               </div>
             </div>
 
-            <div className="booking-sidebar-widget bg-gradient-to-br from-teal-50 to-emerald-50 rounded-3xl border border-teal-100/50 p-6 space-y-3">
-              <ShieldCheck className="w-8 h-8 text-teal-850" />
-              <h4 className="text-sm font-bold text-teal-950 font-heading">HIPAA Compliant Data</h4>
-              <p className="text-xs text-slate-600 leading-normal">
+            <div className="booking-sidebar-widget bg-black text-white rounded-3xl border border-slate-800 p-6 space-y-3 relative overflow-hidden z-0">
+              <div className="absolute -bottom-5 -left-5 w-32 h-32 bg-teal-950/20 rounded-full blur-2xl -z-10"></div>
+              <ShieldCheck className="w-8 h-8 text-teal-400" />
+              <h4 className="text-sm font-bold text-teal-100 font-heading">HIPAA Compliant Data</h4>
+              <p className="text-xs text-slate-400 leading-normal">
                 Your medical record entries are stored in encrypted collections and are only shared with your assigned practitioner.
               </p>
             </div>

@@ -325,6 +325,24 @@ router.post('/appointment/mark/complete', authenticate, async (req, res) => {
     }
 });
 
+router.post('/doctor/availability', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'doctor') {
+            return res.status(403).json({ message: 'Forbidden: You are not a Doctor' });
+        }
+        const { available } = req.body;
+        const result = await updateDoctorAvailability({
+            doctor_id: req.user._id,
+            available: !!available
+        });
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+
 
 // admin only routes
 router.get('/get/all/contact/form', authenticate, async (req, res) => {
@@ -358,7 +376,7 @@ router.get('/get/contact/form', authenticate, async (req, res) => {
         if (req.user.role !== 'admin') {
             return res.status(403).json({ message: 'Forbidden: You are not an admin' });
         }
-        const result = await getAllContactForm(req.body.form_id);
+        const result = await getContactForm(req.query.form_id || req.body.form_id);
         res.status(200).json(result);
     } catch(error) {
         res.status(409).json({

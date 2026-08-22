@@ -18,8 +18,8 @@ const MapEmbed = () => {
         src={mapUrl}
         className="grayscale-[15%] contrast-[110%] brightness-[95%] filter transition-all hover:grayscale-0 duration-300"
       />
-      <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-md text-xs font-semibold text-teal-805 shadow-xs border border-slate-100 flex items-center gap-1.5 pointer-events-none">
-        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-md text-xs font-semibold text-teal-850 shadow-xs border border-slate-100 flex items-center gap-1.5 pointer-events-none">
+        <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
         MediCare Campus (Islamabad)
       </div>
     </div>

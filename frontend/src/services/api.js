@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:45987/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Create Axios instance
 const apiClient = axios.create({
@@ -105,6 +105,32 @@ export const api = {
     return response.data;
   },
 
+  // --- CONTACT INQUIRY ENDPOINTS ---
+  createContactForm: async (name, email, subject, message) => {
+    const response = await apiClient.post('/database/create/contact/form', { name, email, subject, message });
+    return response.data;
+  },
+
+  getAllContactForms: async () => {
+    const response = await apiClient.get('/database/get/all/contact/form');
+    return response.data;
+  },
+
+  getContactFormDetail: async (form_id) => {
+    const response = await apiClient.get(`/database/get/contact/form?form_id=${form_id}`);
+    return response.data;
+  },
+
+  markContactFormSeen: async (form_id) => {
+    const response = await apiClient.post('/database/contact/form/marked/seen', { form_id });
+    return response.data;
+  },
+
+  deleteContactForm: async (form_id) => {
+    const response = await apiClient.post('/database/contact/form/delete', { form_id });
+    return response.data;
+  },
+
   logout: async () => {
     const response = await apiClient.get('/database/logout');
     return response.data;
@@ -158,6 +184,19 @@ export const api = {
       const updated = services.map(s => s._id === service_id ? { ...s, available } : s);
       localStorage.setItem('medicare_services', JSON.stringify(updated));
       return updated;
+    }
+  },
+
+  toggleDoctorAvailability: async (available) => {
+    try {
+      const response = await apiClient.post('/database/doctor/availability', { available });
+      return response.data;
+    } catch (e) {
+      console.warn("toggleDoctorAvailability failed, using fallback:", e.message);
+      const user = JSON.parse(localStorage.getItem('medicare_user') || '{}');
+      const updated = { ...user, available };
+      localStorage.setItem('medicare_user', JSON.stringify(updated));
+      return { success: true, fallback: true };
     }
   },
 
@@ -253,8 +292,15 @@ export const api = {
     return response.data.message;
   },
 
-  getChatHistory: () => {
-    return JSON.parse(localStorage.getItem('medicare_messages') || '[]');
+  getChatHistory: async () => {
+    try {
+      const response = await apiClient.get('/database/chat/all');
+      localStorage.setItem('medicare_messages', JSON.stringify(response.data));
+      return response.data;
+    } catch (e) {
+      console.warn("getChatHistory failed, using local fallback:", e.message);
+      return JSON.parse(localStorage.getItem('medicare_messages') || '[]');
+    }
   },
 
   sendDirectMessage: (sender, content) => {

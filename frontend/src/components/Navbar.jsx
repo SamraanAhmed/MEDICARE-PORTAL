@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X, Calendar, Phone, User, LayoutDashboard, LogOut, Home, ArrowRight, ChevronDown, Info } from 'lucide-react';
+import { Menu, X, Calendar, Phone, User, LayoutDashboard, LogOut, Home, ArrowRight, ChevronDown, Info, MessageSquare } from 'lucide-react';
 
 const Navbar = () => {
   const { user, role, logout } = useAuth();
@@ -37,6 +37,14 @@ const Navbar = () => {
     { name: 'Book Appointment', path: '/book', icon: Calendar },
     { name: 'Contact', path: '/contact', icon: Phone },
   ];
+
+  const getNavLinks = () => {
+    const links = [...navLinks];
+    if (user && role === 'user') {
+      links.push({ name: 'Submit Feedback', path: '/feedback', icon: MessageSquare });
+    }
+    return links;
+  };
 
   const getDashboardPath = () => {
     if (role === 'admin') return '/dashboard/admin';
@@ -88,7 +96,7 @@ const Navbar = () => {
                     <img
                       src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=115E59&color=fff`}
                       alt={user.name}
-                      className="w-8 h-8 rounded-full border border-emerald-500 object-cover shrink-0"
+                      className="w-8 h-8 rounded-full border border-teal-500 object-cover shrink-0"
                     />
                     <div className="text-left hidden sm:block">
                       <p className="text-xs font-bold text-slate-800 leading-3">{user.name}</p>
@@ -111,9 +119,19 @@ const Navbar = () => {
                         to={getDashboardPath()}
                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-605 hover:bg-teal-50 hover:text-teal-850 transition-colors font-medium text-left"
                       >
-                        <LayoutDashboard className="w-4 h-4 text-slate-400" />
+                        <LayoutDashboard className="w-4 h-4 text-slate-405" />
                         My Dashboard
                       </Link>
+
+                      {role === 'user' && (
+                        <Link
+                          to="/feedback"
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-650 hover:bg-teal-50 hover:text-teal-850 transition-colors font-medium text-left"
+                        >
+                          <MessageSquare className="w-4 h-4 text-slate-405" />
+                          Submit Feedback
+                        </Link>
+                      )}
 
                       <button
                         onClick={handleLogout}
@@ -197,7 +215,7 @@ const Navbar = () => {
           data-lenis-prevent
           className="flex-1 px-4 py-6 space-y-2 overflow-y-auto"
         >
-          {navLinks.map((link) => {
+          {getNavLinks().map((link) => {
             const Icon = link.icon;
             const active = isActive(link.path);
             return (
@@ -228,7 +246,7 @@ const Navbar = () => {
               <img
                 src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=115E59&color=fff`}
                 alt={user.name}
-                className="w-10 h-10 rounded-full border border-emerald-500 object-cover"
+                className="w-10 h-10 rounded-full border border-teal-500 object-cover"
               />
               <div className="text-left">
                 <p className="text-sm font-bold text-slate-800 leading-tight">{user.name}</p>

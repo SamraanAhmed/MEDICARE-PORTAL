@@ -94,12 +94,16 @@ const FloatingChatbot = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center justify-center w-14 h-14 bg-teal-800 hover:bg-teal-950 text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 relative group cursor-pointer border border-teal-700/30"
+          className="flex items-center justify-center w-20 h-20 bg-transparent hover:scale-110 transition-all duration-300 relative group cursor-pointer overflow-hidden filter drop-shadow-[0_12px_12px_rgba(0,0,0,0.65)] animate-float"
           title="AI Health Assistant"
         >
-          <MessageSquare className="w-6 h-6 animate-pulse" />
-          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white animate-ping" />
-          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white" />
+          <img 
+            src="/imgvid/medicarechatbot.png" 
+            alt="AI Assistant" 
+            className="w-full h-full object-contain"
+          />
+          <span className="absolute top-2 right-2 w-3.5 h-3.5 bg-teal-500 rounded-full border border-white animate-ping" />
+          <span className="absolute top-2 right-2 w-3.5 h-3.5 bg-teal-500 rounded-full border border-white" />
         </button>
       )}
 
@@ -109,14 +113,18 @@ const FloatingChatbot = () => {
           {/* Header */}
           <div className="bg-teal-800 text-white p-4 flex justify-between items-center shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center font-bold text-white relative">
-                <Bot className="w-5 h-5 text-emerald-300" />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-teal-800" />
+              <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center font-bold text-white relative">
+                <img 
+                  src="/imgvid/medicarechatbot.png" 
+                  alt="AI Assistant Logo" 
+                  className="w-full h-full object-cover"
+                />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-teal-500 rounded-full border-2 border-teal-800" />
               </div>
               <div className="text-left font-sans">
                 <h3 className="text-sm font-extrabold flex items-center gap-1 font-heading text-white">
                   AI Advisor
-                  <span className="inline-flex items-center gap-0.5 text-[8px] bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.5 rounded-full uppercase">
+                  <span className="inline-flex items-center gap-0.5 text-[8px] bg-teal-500/20 text-teal-300 font-bold px-1.5 py-0.5 rounded-full uppercase">
                     <Sparkles className="w-2.5 h-2.5" />
                     Gemini
                   </span>
@@ -158,13 +166,21 @@ const FloatingChatbot = () => {
                   }`}
                 >
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 border text-[10px] font-bold ${
+                    className={`w-7 h-7 rounded-full overflow-hidden flex items-center justify-center shrink-0 border text-[10px] font-bold ${
                       isBot 
-                        ? 'bg-teal-55 border-teal-100 text-teal-800' 
-                        : 'bg-emerald-50 border-emerald-100 text-emerald-800'
+                        ? 'bg-teal-50 border-teal-100 text-teal-800' 
+                        : 'bg-slate-100 border-slate-200 text-slate-700'
                     }`}
                   >
-                    {isBot ? <Bot className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                    {isBot ? (
+                      <img 
+                        src="/imgvid/medicarechatbot.png" 
+                        alt="Bot" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-3.5 h-3.5" />
+                    )}
                   </div>
 
                   <div className="space-y-0.5">
@@ -187,8 +203,12 @@ const FloatingChatbot = () => {
 
             {loading && (
               <div className="flex items-start gap-2.5 max-w-[80%] self-start text-left animate-in fade-in duration-200">
-                <div className="w-7 h-7 rounded-full bg-teal-50 border border-teal-100 text-teal-800 flex items-center justify-center shrink-0">
-                  <Bot className="w-3.5 h-3.5 animate-bounce" />
+                <div className="w-7 h-7 rounded-full overflow-hidden bg-teal-50 border border-teal-100 text-teal-800 flex items-center justify-center shrink-0">
+                  <img 
+                    src="/imgvid/medicarechatbot.png" 
+                    alt="Bot Loading" 
+                    className="w-full h-full object-cover animate-pulse"
+                  />
                 </div>
                 <div className="bg-white border border-slate-100 shadow-xs px-4 py-2.5 rounded-2xl rounded-tl-xs flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-teal-600 animate-bounce delay-100"></span>

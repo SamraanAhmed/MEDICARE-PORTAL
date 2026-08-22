@@ -139,19 +139,20 @@ const PatientDashboard = () => {
     <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       
       {/* Upper Dashboard Header: User Info */}
-      <div className="dashboard-header bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-44 h-44 bg-teal-50/30 rounded-bl-full -z-10"></div>
+      <div className="dashboard-header bg-black text-white rounded-3xl border border-slate-800 p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden z-0">
+        <div className="absolute top-0 right-0 w-52 h-52 bg-teal-800/10 rounded-full blur-3xl -z-10"></div>
+        <div className="absolute -bottom-10 -left-10 w-52 h-52 bg-teal-950/20 rounded-full blur-3xl -z-10"></div>
         <div className="flex items-center gap-5">
           <img
             src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=115E59&color=fff`}
             alt={user.name}
-            className="w-20 h-20 rounded-full border-2 border-emerald-500 object-cover shrink-0 shadow-sm"
+            className="w-20 h-20 rounded-full border-2 border-teal-500 object-cover shrink-0 shadow-sm"
           />
           <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-black text-teal-950 font-heading">Welcome, {user.name}</h1>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
+            <h1 className="text-2xl sm:text-3xl font-black text-teal-100 font-heading">Welcome, {user.name}</h1>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-400">
               <span className="flex items-center gap-1">
-                <User className="w-4 h-4 text-teal-850" />
+                <User className="w-4 h-4 text-teal-400" />
                 Patient ID: {user._id?.substring(0, 10) || 'D1093'}
               </span>
               <span>•</span>
@@ -165,13 +166,13 @@ const PatientDashboard = () => {
         <div className="flex gap-3">
           <Link
             to="/book"
-            className="px-6 py-3.5 bg-teal-850 hover:bg-teal-900 text-white font-bold rounded-xl shadow-md text-sm transition-all cursor-pointer"
+            className="px-6 py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-md text-sm transition-all cursor-pointer"
           >
             New Consultation
           </Link>
           <Link
             to="/chat"
-            className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-all cursor-pointer"
+            className="px-6 py-3.5 bg-slate-900 hover:bg-slate-850 text-slate-100 border border-slate-800 font-bold rounded-xl text-sm transition-all cursor-pointer"
           >
             Chat Advisor
           </Link>
@@ -265,7 +266,7 @@ const PatientDashboard = () => {
                         <div className="mt-1.5 flex flex-wrap gap-1.5">
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
                             appt.paymentInfo.paid 
-                              ? 'bg-emerald-50 text-emerald-800 border-emerald-100' 
+                              ? 'bg-teal-50 text-teal-850 border-teal-100' 
                               : 'bg-amber-50 text-amber-800 border-amber-100'
                           }`}>
                             {appt.paymentInfo.paid 
@@ -278,11 +279,11 @@ const PatientDashboard = () => {
                       
                       {/* Prescriptions / proof display */}
                       {appt.status === 'completed' && appt.proof && (
-                        <div className="mt-2 p-2 bg-emerald-50 border border-emerald-100 rounded-lg text-[10px] text-emerald-800 flex items-start gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                        <div className="mt-2 p-2 bg-teal-50 border border-teal-105 rounded-lg text-[10px] text-teal-850 flex items-start gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0 mt-0.5" />
                           <div>
                             <strong>Prescription Proof:</strong>
-                            <p className="text-emerald-700">{appt.proof}</p>
+                            <p className="text-teal-700">{appt.proof}</p>
                           </div>
                         </div>
                       )}
@@ -297,7 +298,7 @@ const PatientDashboard = () => {
                         </span>
                       )}
                       {appt.status === 'completed' && (
-                        <span className="bg-emerald-50 text-emerald-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-emerald-100">
+                        <span className="bg-teal-50 text-teal-850 text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-teal-100">
                           Completed
                         </span>
                       )}
@@ -339,19 +340,21 @@ const PatientDashboard = () => {
 
         {/* Informative Side Card */}
         <div className="telehealth-reminders lg:col-span-4 space-y-6 text-left">
-          <div className="bg-slate-900 text-white rounded-3xl p-6 relative overflow-hidden border border-slate-800 shadow-md">
-            <h4 className="text-xs font-bold text-teal-300 uppercase tracking-wider mb-2">Telehealth Reminders</h4>
-            <ul className="space-y-4 text-xs text-slate-300 mt-4 leading-relaxed font-body">
+          <div className="bg-black text-white rounded-3xl p-6 relative overflow-hidden border border-slate-800 shadow-xl z-0">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-teal-800/10 rounded-full blur-2xl -z-10"></div>
+            <div className="absolute -bottom-5 -left-5 w-32 h-32 bg-teal-950/20 rounded-full blur-2xl -z-10"></div>
+            <h4 className="text-xs font-bold text-teal-400 uppercase tracking-wider mb-2">Telehealth Reminders</h4>
+            <ul className="space-y-4 text-xs text-slate-400 mt-4 leading-relaxed font-body">
               <li className="flex gap-2">
-                <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
+                <Clock className="w-4 h-4 text-teal-400 shrink-0" />
                 <span>Join virtual desk consults 5 minutes prior to scheduled slots.</span>
               </li>
               <li className="flex gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-teal-400 shrink-0" />
                 <span>Keep medical record files ready. You can query clinical details with the AI bot.</span>
               </li>
               <li className="flex gap-2">
-                <UserCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <UserCheck className="w-4 h-4 text-teal-400 shrink-0" />
                 <span>Proof documents (prescriptions/notes) will show directly on booking cards post completion.</span>
               </li>
             </ul>
@@ -400,8 +403,8 @@ const PatientDashboard = () => {
             )}
 
             {paymentSuccess && (
-              <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
+              <div className="p-3 bg-teal-50 border border-teal-100 rounded-xl text-teal-800 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4.5 h-4.5 text-teal-600 shrink-0" />
                 <p className="font-semibold">{paymentSuccess}</p>
               </div>
             )}

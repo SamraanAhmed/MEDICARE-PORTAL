@@ -11,19 +11,27 @@ const Chat = () => {
   const chatEndRef = useRef(null);
 
   useEffect(() => {
-    // Retrieve historical chat logs from localStorage cache
-    const history = api.getChatHistory();
-    if (history.length === 0) {
-      // Seed initial welcoming message
-      const welcome = {
-        sender: 'bot',
-        content: `Hello ${user ? user.name : 'Guest'}! I am your MediCare AI Health Assistant. Ask me anything about our clinics, specialized services, doctor availability, or symptom screening guidelines.`,
-        created_at: new Date(),
-      };
-      setMessages([welcome]);
-      api.sendDirectMessage('bot', welcome.content);
-    } else {
-      setMessages(history);
+    const fetchHistory = async () => {
+      try {
+        const history = await api.getChatHistory();
+        if (history.length === 0) {
+          // Seed initial welcoming message
+          const welcome = {
+            sender: 'bot',
+            content: `Hello ${user ? user.name : 'Guest'}! I am your MediCare AI Health Assistant. Ask me anything about our clinics, specialized services, doctor availability, or symptom screening guidelines.`,
+            created_at: new Date(),
+          };
+          setMessages([welcome]);
+          api.sendDirectMessage('bot', welcome.content);
+        } else {
+          setMessages(history);
+        }
+      } catch (err) {
+        console.error("Failed to load chat history:", err);
+      }
+    };
+    if (user) {
+      fetchHistory();
     }
   }, [user]);
 

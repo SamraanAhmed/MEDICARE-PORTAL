@@ -54,13 +54,15 @@ const DoctorDashboard = () => {
   const handleToggleAvailability = async () => {
     const nextVal = !isAvailable;
     try {
-      // Update doctor availability in database / local storage
+      // Update doctor availability in backend database
+      await api.toggleDoctorAvailability(nextVal);
       setIsAvailable(nextVal);
       // Update Auth context user profile
       const updatedUser = { ...user, available: nextVal };
       localStorage.setItem('medicare_user', JSON.stringify(updatedUser));
     } catch (err) {
       console.warn("Failed to toggle availability status", err);
+      alert(err.message || "Failed to update availability status on server.");
     }
   };
 

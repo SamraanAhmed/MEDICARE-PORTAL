@@ -43,12 +43,12 @@ const About = () => {
     <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
       
       {/* 1. Hero / Vision Banner */}
-      <div className="relative rounded-3xl bg-teal-950 text-white overflow-hidden p-8 sm:p-16 text-left border border-teal-900 shadow-xl">
+      <div className="relative rounded-3xl bg-black text-white overflow-hidden p-8 sm:p-16 text-left border border-slate-800 shadow-xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-teal-800/10 rounded-full blur-3xl -z-10"></div>
-        <div className="absolute -bottom-10 -left-10 w-96 h-96 bg-emerald-800/10 rounded-full blur-3xl -z-10"></div>
+        <div className="absolute -bottom-10 -left-10 w-96 h-96 bg-teal-950/20 rounded-full blur-3xl -z-10"></div>
         
         <div className="max-w-3xl space-y-6">
-          <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-350 border border-emerald-500/30 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1 bg-teal-500/20 text-teal-300 border border-teal-500/30 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
             <HeartPulse className="w-3.5 h-3.5" />
             Healthcare Innovation
           </span>
@@ -66,25 +66,25 @@ const About = () => {
         {/* Dynamic Metric Ticks */}
         <div className="about-hero-stats grid grid-cols-2 md:grid-cols-4 gap-6 pt-10 border-t border-teal-900 mt-12 text-center md:text-left">
           <div className="space-y-1">
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-heading">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-teal-400 font-heading">
               <span className="stat-count">12000</span>+
             </h3>
             <p className="text-xs text-teal-200 uppercase tracking-widest font-semibold">Registered Patients</p>
           </div>
           <div className="space-y-1">
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-heading">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-teal-400 font-heading">
               <span className="stat-count">65</span>+
             </h3>
             <p className="text-xs text-teal-200 uppercase tracking-widest font-semibold">Specialist Doctors</p>
           </div>
           <div className="space-y-1">
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-heading">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-teal-400 font-heading">
               <span className="stat-count">100</span>%
             </h3>
             <p className="text-xs text-teal-200 uppercase tracking-widest font-semibold">Safe Data Auditing</p>
           </div>
           <div className="space-y-1">
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-heading">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-teal-400 font-heading">
               <span className="stat-count">24</span>/7
             </h3>
             <p className="text-xs text-teal-200 uppercase tracking-widest font-semibold">AI Support Access</p>
@@ -115,11 +115,11 @@ const About = () => {
             </p>
             <ul className="space-y-2.5 text-xs text-slate-650 pt-2 border-t border-slate-50">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-teal-500 shrink-0" />
                 <span>Japan Road, Sihala location</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-teal-500 shrink-0" />
                 <span>Direct student/staff integration</span>
               </li>
             </ul>
@@ -137,11 +137,11 @@ const About = () => {
             </p>
             <ul className="space-y-2.5 text-xs text-slate-650 pt-2 border-t border-slate-50">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-teal-500 shrink-0" />
                 <span>Immediate response panels</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-teal-500 shrink-0" />
                 <span>Pre-clinical consultation checks</span>
               </li>
             </ul>
@@ -159,11 +159,11 @@ const About = () => {
             </p>
             <ul className="space-y-2.5 text-xs text-slate-650 pt-2 border-t border-slate-50">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-teal-500 shrink-0" />
                 <span>Protected data stores</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-teal-500 shrink-0" />
                 <span>Authenticated doctor reviews</span>
               </li>
             </ul>
@@ -185,11 +185,11 @@ const About = () => {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center gap-3">
-              <Award className="w-5 h-5 text-emerald-600 shrink-0" />
+              <Award className="w-5 h-5 text-teal-600 shrink-0" />
               <span className="text-xs font-bold text-slate-700">HEC Recognized Standards</span>
             </div>
             <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center gap-3">
-              <Building2 className="w-5 h-5 text-emerald-600 shrink-0" />
+              <Building2 className="w-5 h-5 text-teal-600 shrink-0" />
               <span className="text-xs font-bold text-slate-700">On-Campus Dispatch Desk</span>
             </div>
           </div>
@@ -197,10 +197,11 @@ const About = () => {
 
         <div className="lg:col-span-6 relative">
           {/* Visual card mockup demonstrating high aesthetics */}
-          <div className="bg-slate-900 text-white p-8 sm:p-12 rounded-3xl border border-slate-800 shadow-xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-36 h-36 bg-teal-500/10 rounded-bl-full"></div>
+          <div className="bg-black text-white p-8 sm:p-12 rounded-3xl border border-slate-800 shadow-xl overflow-hidden relative z-0">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-teal-800/10 rounded-full blur-3xl -z-10"></div>
+            <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-teal-950/20 rounded-full blur-3xl -z-10"></div>
             <div className="space-y-4">
-              <h4 className="text-emerald-400 font-bold uppercase tracking-widest text-xs">Administrative Services</h4>
+              <h4 className="text-teal-400 font-bold uppercase tracking-widest text-xs">Administrative Services</h4>
               <h3 className="text-xl sm:text-2xl font-black font-heading leading-snug">Hospital Dispatch Desk Sihala</h3>
               <p className="text-xs text-slate-400 leading-relaxed font-body">
                 Our main campus dispatch coordinates medical transports, clinical queues, prescription refills, 
@@ -208,7 +209,7 @@ const About = () => {
               </p>
               <div className="pt-4 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400">
                 <span>Direct Hotline: +92 (51) 844-6666</span>
-                <span className="text-emerald-400 font-bold uppercase">Open Daily</span>
+                <span className="text-teal-400 font-bold uppercase">Open Daily</span>
               </div>
             </div>
           </div>

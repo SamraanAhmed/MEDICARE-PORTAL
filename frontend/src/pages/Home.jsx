@@ -56,7 +56,7 @@ const Home = () => {
             <div className="lg:col-span-7 space-y-6 text-left animate-in slide-in-from-left duration-500">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-teal-950 leading-tight font-heading">
                 Empowering Your <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-700 to-emerald-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-850 to-teal-600">
                   Wellness Journey
                 </span>
               </h1>
@@ -85,7 +85,7 @@ const Home = () => {
             {/* Right Graphics Column */}
             <div className="lg:col-span-5 relative flex justify-center items-center animate-in slide-in-from-right duration-500">
               <div className="absolute -z-10 w-72 h-72 rounded-full bg-teal-500/10 filter blur-3xl"></div>
-              <div className="absolute -z-10 w-60 h-60 rounded-full bg-emerald-500/10 filter blur-3xl translate-x-12 translate-y-12"></div>
+              <div className="absolute -z-10 w-60 h-60 rounded-full bg-teal-500/10 filter blur-3xl translate-x-12 translate-y-12"></div>
               
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-4/3 w-full max-w-md hover-scale">
                 <img
@@ -106,7 +106,7 @@ const Home = () => {
                 </div>
 
                 <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-xs px-4 py-2.5 rounded-2xl border border-slate-100 shadow-lg flex items-center gap-3">
-                  <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-ping"></div>
+                  <div className="w-3.5 h-3.5 rounded-full bg-teal-500 animate-ping"></div>
                   <div>
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Available Doctors</p>
                     <p className="text-sm font-extrabold text-slate-800">12 Specialists Online</p>
@@ -120,15 +120,15 @@ const Home = () => {
       </section>
 
       {/* 2. Statistics Section */}
-      <section className="bg-teal-900 py-16 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-teal-800/80 via-teal-950 to-slate-950 -z-10"></div>
+      <section className="bg-black py-16 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-teal-950/80 via-slate-950 to-black -z-10"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {statistics.map((stat, i) => {
               const Icon = stat.icon;
               return (
                 <div key={i} className="text-center space-y-2 border-r last:border-0 border-teal-800/60 last:border-r-0">
-                  <div className="inline-flex p-3 rounded-full bg-teal-800/50 text-emerald-400 mb-2">
+                  <div className="inline-flex p-3 rounded-full bg-teal-800/50 text-teal-400 mb-2">
                     <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">{stat.value}</h3>
@@ -177,7 +177,7 @@ const Home = () => {
                   </div>
                   <Link
                     to="/book"
-                    className="text-xs font-bold text-teal-800 hover:text-emerald-500 flex items-center gap-1.5 transition-colors group/link"
+                    className="text-xs font-bold text-teal-800 hover:text-teal-600 flex items-center gap-1.5 transition-colors group/link"
                   >
                     Schedule Specialist
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1" />
@@ -191,8 +191,8 @@ const Home = () => {
 
       {/* 4. Telehealth Promo / AI Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-br from-teal-900 to-slate-900 rounded-3xl p-8 sm:p-12 lg:p-16 text-white relative overflow-hidden shadow-xl border border-teal-800/30">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full filter blur-3xl -z-10 translate-x-12 -translate-y-12"></div>
+        <div className="bg-gradient-to-br from-black to-slate-950 rounded-3xl p-8 sm:p-12 lg:p-16 text-white relative overflow-hidden shadow-xl border border-slate-800">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full filter blur-3xl -z-10 translate-x-12 -translate-y-12"></div>
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-6 text-left">
@@ -206,7 +206,7 @@ const Home = () => {
               <div className="pt-2">
                 <Link
                   to="/chat"
-                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-teal-950 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-teal-500 hover:bg-teal-600 text-slate-950 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer"
                 >
                   Start Consultation Chat
                   <MessageSquare className="w-4 h-4" />
@@ -220,13 +220,13 @@ const Home = () => {
                   <div className="w-10 h-10 rounded-full bg-teal-800 flex items-center justify-center font-bold text-white">AI</div>
                   <div>
                     <h4 className="text-xs font-extrabold text-white">MediCare Assistant</h4>
-                    <p className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <p className="text-[10px] text-teal-400 font-semibold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-ping"></span>
                       Online & Listening
                     </p>
                   </div>
                 </div>
-                <div className="p-3 bg-slate-900/60 rounded-xl text-xs text-slate-300 leading-relaxed italic border-l-2 border-emerald-500">
+                <div className="p-3 bg-slate-900/60 rounded-xl text-xs text-slate-300 leading-relaxed italic border-l-2 border-teal-500">
                   "Hello! I can help check available services, analyze symptoms, and guide your booking flow."
                 </div>
               </div>
@@ -250,7 +250,7 @@ const Home = () => {
               "Booking a cardiologist was incredibly fast. I selected Cardiology, and within seconds the portal scheduled me with Dr. Sarah Jenkins on my chosen date. Fully digital!"
             </p>
             <div className="flex items-center gap-3 mt-6 pt-4 border-t border-slate-50">
-              <img src="https://ui-avatars.com/api/?name=James+Carter&background=10B981&color=fff" alt="User Avatar" className="w-10 h-10 rounded-full" />
+              <img src="https://ui-avatars.com/api/?name=James+Carter&background=115E59&color=fff" alt="User Avatar" className="w-10 h-10 rounded-full" />
               <div>
                 <h4 className="text-xs font-extrabold text-slate-800">James Carter</h4>
                 <p className="text-[10px] text-slate-400">Registered Patient</p>

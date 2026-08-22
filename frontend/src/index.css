@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-teal-dark: #115E59;
+  --color-teal-dark: #008080;
   --color-teal-850: #115E59; /* Maps to primary Teal theme color */
   --color-teal-900: #0F4C47; /* Slightly darker shade of teal for hover states */
-  --color-emerald-accent: #10B981;
   --color-bg-medicare: #FAFFFD;
+  --color-footer-bg: #000000; /* Pure black background for the footer */
   
-  --font-heading: 'Exo 2', sans-serif;
+  --font-heading: 'Nunito', sans-serif;
+  --font-kanit: 'Kanit', sans-serif;
   --font-body: 'Montserrat', sans-serif;
 }
 
@@ -21,6 +22,13 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
+  font-weight: 800; /* Bolder feel by default */
+}
+
+/* Extra bold and clean look for very large main page headings */
+h1, .text-4xl, .text-5xl, .text-6xl, .text-7xl {
+  font-weight: 900 !important;
+  letter-spacing: -0.025em !important;
 }
 
 /* Custom scrollbars for a premium feel */
@@ -45,4 +53,30 @@ h1, h2, h3, h4, h5, h6 {
 }
 .hover-scale:hover {
   transform: translateY(-2px) scale(1.01);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Ensure Medicare logos are simple without borders or border radius */
+img[src*="medicarelogo"] {
+  border: none !important;
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Override text-white utility to use the custom off-white/light teal theme color #f0fdfa */
+.text-white {
+  color: #f0fdfa !important;
 }
