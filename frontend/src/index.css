@@ -7,8 +7,8 @@
   --color-emerald-accent: #10B981;
   --color-bg-medicare: #FAFFFD;
   
-  --font-heading: 'Exo 2', sans-serif;
-  --font-body: 'Montserrat', sans-serif;
+  --font-heading: 'Nunito', sans-serif;
+  --font-body: 'Source Sans 3', sans-serif;
 }
 
 body {
@@ -46,3 +46,12 @@ h1, h2, h3, h4, h5, h6 {
 .hover-scale:hover {
   transform: translateY(-2px) scale(1.01);
 }
+
+/* Gentle floating animation for hero badges */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+.animate-bounce-slow {
+  animation: float 3.5s ease-in-out infinite;
+}

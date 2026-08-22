@@ -100,12 +100,16 @@ const StaffAuth = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" autoComplete="off">
+            {/* Honeypot inputs — absorb browser autofill */}
+            <input type="text" style={{display:'none'}} autoComplete="username" />
+            <input type="password" style={{display:'none'}} autoComplete="new-password" />
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Email Address</label>
               <input
                 type="email"
                 placeholder="staff@medicare.com"
+                autoComplete="email"
                 {...register('email')}
                 className={`w-full px-4 py-3 bg-slate-900 border text-sm rounded-xl text-slate-100 placeholder-slate-500 transition-all focus:outline-hidden focus:border-teal-500 focus:ring-1 focus:ring-teal-500 ${
                   errors.email ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-700'
@@ -124,6 +128,9 @@ const StaffAuth = () => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
+                  autoComplete="new-password"
+                  readOnly
+                  onFocus={(e) => e.target.removeAttribute('readonly')}
                   {...register('password')}
                   className={`w-full px-4 py-3 bg-slate-900 border text-sm rounded-xl text-slate-100 placeholder-slate-500 transition-all focus:outline-hidden focus:border-teal-500 focus:ring-1 focus:ring-teal-500 pr-10 ${
                     errors.password ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-700'

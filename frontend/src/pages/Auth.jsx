@@ -1,12 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
 
 // Zod schemas for forms
 const loginSchema = z.object({
@@ -28,9 +26,8 @@ const Auth = () => {
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
   const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState(null);
-  const containerRef = useRef(null);
 
-  // Zod form setups
+  // Hook forms setup
   const { register: registerLogin, handleSubmit: handleLoginSubmit, formState: { errors: loginErrors, isSubmitting: isLoggingIn } } = useForm({
     resolver: zodResolver(loginSchema),
   });
@@ -41,35 +38,6 @@ const Auth = () => {
       gender: 'not-specified',
     }
   });
-
-  useGSAP(() => {
-    // Initial card entrance
-    gsap.from('.auth-card', {
-      opacity: 0,
-      y: 40,
-      duration: 0.8,
-      ease: 'power3.out'
-    });
-
-    gsap.from('.auth-header-el', {
-      opacity: 0,
-      y: -15,
-      stagger: 0.1,
-      duration: 0.6,
-      ease: 'power3.out'
-    });
-  }, { scope: containerRef });
-
-  useGSAP(() => {
-    // Animate form fields whenever activeTab switches
-    gsap.from('.auth-field', {
-      opacity: 0,
-      y: 10,
-      stagger: 0.08,
-      duration: 0.4,
-      ease: 'power3.out'
-    });
-  }, { scope: containerRef, dependencies: [activeTab] });
 
   const onLoginSubmit = async (data) => {
     setSubmitError(null);
@@ -98,19 +66,19 @@ const Auth = () => {
   };
 
   return (
-    <div ref={containerRef} className="min-h-[calc(100vh-80px)] flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50/50">
-      <div className="auth-card max-w-md w-full bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden text-left relative">
+    <div className="min-h-[calc(100vh-80px)] flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50/50">
+      <div className="max-w-md w-full bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden text-left relative">
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-700 to-emerald-500"></div>
 
         {/* Brand & Toggle Header */}
         <div className="p-8 pb-4">
           <div className="text-center space-y-2">
-            <h2 className="auth-header-el text-3xl font-black text-teal-950 font-heading">MediCare Patient Portal</h2>
-            <p className="auth-header-el text-xs text-slate-400">Access your medical files and book appointments</p>
+            <h2 className="text-3xl font-black text-teal-950 font-heading">MediCare Patient Portal</h2>
+            <p className="text-xs text-slate-400">Access your medical files and book appointments</p>
           </div>
 
           {/* Login/Register Tabs */}
-          <div className="auth-header-el mt-8 grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl">
+          <div className="mt-8 grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl">
             <button
               onClick={() => { setActiveTab('login'); setSubmitError(null); }}
               className={`py-3 text-sm font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
@@ -148,12 +116,16 @@ const Auth = () => {
 
           {activeTab === 'login' ? (
             /* LOGIN FORM */
-            <form onSubmit={handleLoginSubmit(onLoginSubmit)} className="space-y-4">
-              <div className="auth-field space-y-1">
+            <form onSubmit={handleLoginSubmit(onLoginSubmit)} className="space-y-4" autoComplete="off">
+              {/* Honeypot inputs — absorb browser autofill before real fields */}
+              <input type="text" style={{display:'none'}} autoComplete="username" />
+              <input type="password" style={{display:'none'}} autoComplete="current-password" />
+              <div className="space-y-1">
                 <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Email Address</label>
                 <input
                   type="email"
                   placeholder="john.doe@medicare.com"
+                  autoComplete="email"
                   {...registerLogin('email')}
                   className={`w-full px-4 py-3 rounded-xl border bg-slate-50/50 text-sm transition-all focus:outline-hidden focus:bg-white focus:ring-2 focus:ring-teal-700 ${
                     loginErrors.email ? 'border-rose-300 focus:ring-rose-500' : 'border-slate-200'
@@ -166,12 +138,15 @@ const Auth = () => {
                 )}
               </div>
 
-              <div className="auth-field space-y-1 relative">
+              <div className="space-y-1 relative">
                 <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
+                    autoComplete="new-password"
+                    readOnly
+                    onFocus={(e) => e.target.removeAttribute('readonly')}
                     {...registerLogin('password')}
                     className={`w-full px-4 py-3 rounded-xl border bg-slate-50/50 text-sm transition-all focus:outline-hidden focus:bg-white focus:ring-2 focus:ring-teal-700 pr-10 ${
                       loginErrors.password ? 'border-rose-300 focus:ring-rose-500' : 'border-slate-200'
@@ -180,7 +155,7 @@ const Auth = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650 focus:outline-hidden cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -195,17 +170,20 @@ const Auth = () => {
               <button
                 type="submit"
                 disabled={isLoggingIn}
-                className="auth-field w-full mt-4 py-3.5 bg-teal-800 text-white rounded-xl font-bold shadow-md hover:bg-teal-900 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:bg-slate-300 disabled:shadow-none"
+                className="w-full mt-4 py-3.5 bg-teal-800 text-white rounded-xl font-bold shadow-md hover:bg-teal-900 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:bg-slate-300 disabled:shadow-none"
               >
                 {isLoggingIn ? 'Logging in...' : 'Login as Patient'}
               </button>
             </form>
           ) : (
             /* REGISTRATION FORM */
-            <form onSubmit={handleSignupSubmit(onSignupSubmit)} className="space-y-4">
+            <form onSubmit={handleSignupSubmit(onSignupSubmit)} className="space-y-4" autoComplete="off">
+              {/* Honeypot inputs — absorb browser autofill */}
+              <input type="text" style={{display:'none'}} autoComplete="username" />
+              <input type="password" style={{display:'none'}} autoComplete="new-password" />
               
               {/* Full Name */}
-              <div className="auth-field space-y-1">
+              <div className="space-y-1">
                 <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Full Name</label>
                 <input
                   type="text"
@@ -223,11 +201,12 @@ const Auth = () => {
               </div>
 
               {/* Email */}
-              <div className="auth-field space-y-1">
+              <div className="space-y-1">
                 <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Email Address</label>
                 <input
                   type="email"
                   placeholder="john.doe@medicare.com"
+                  autoComplete="email"
                   {...registerSignup('email')}
                   className={`w-full px-4 py-3 rounded-xl border bg-slate-50/50 text-sm transition-all focus:outline-hidden focus:bg-white focus:ring-2 focus:ring-teal-700 ${
                     signupErrors.email ? 'border-rose-300 focus:ring-rose-500' : 'border-slate-200'
@@ -241,12 +220,15 @@ const Auth = () => {
               </div>
 
               {/* Password */}
-              <div className="auth-field space-y-1 relative">
+              <div className="space-y-1 relative">
                 <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="•••••••• (Min 6 chars)"
+                    autoComplete="new-password"
+                    readOnly
+                    onFocus={(e) => e.target.removeAttribute('readonly')}
                     {...registerSignup('password')}
                     className={`w-full px-4 py-3 rounded-xl border bg-slate-50/50 text-sm transition-all focus:outline-hidden focus:bg-white focus:ring-2 focus:ring-teal-700 pr-10 ${
                       signupErrors.password ? 'border-rose-300 focus:ring-rose-500' : 'border-slate-200'
@@ -255,7 +237,7 @@ const Auth = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650 focus:outline-hidden cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-hidden cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -268,7 +250,7 @@ const Auth = () => {
               </div>
 
               {/* Gender */}
-              <div className="auth-field space-y-1">
+              <div className="space-y-1">
                 <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Gender</label>
                 <select
                   {...registerSignup('gender')}
@@ -288,7 +270,7 @@ const Auth = () => {
               <button
                 type="submit"
                 disabled={isRegistering}
-                className="auth-field w-full mt-4 py-3.5 bg-teal-800 text-white rounded-xl font-bold shadow-md hover:bg-teal-900 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:bg-slate-300 disabled:shadow-none"
+                className="w-full mt-4 py-3.5 bg-teal-800 text-white rounded-xl font-bold shadow-md hover:bg-teal-900 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:bg-slate-300 disabled:shadow-none"
               >
                 {isRegistering ? 'Registering...' : 'Register as Patient'}
               </button>
