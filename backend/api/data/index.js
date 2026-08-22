@@ -13,7 +13,8 @@ const {
 
     checkDoctorDailyAvailability,
     
-    deleteAdmin, deleteDoctor, deleteMessages, deleteUser, deleteContactForm
+    deleteAdmin, deleteDoctor, deleteMessages, deleteUser, deleteContactForm,
+    getDoctorNotice
 } = require('../../database/queries');
 const { 
     authenticate, checkAuthentication, jwt
@@ -318,6 +319,19 @@ router.post('/appointment/mark/complete', authenticate, async (req, res) => {
             throw new Error('You cannt mark this appointment');
         }
         
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+router.get('/doctor/notice', authenticate, async (req, res) => {
+    try {
+        if (req.user.role !== 'doctor') {
+            return res.status(403).json({ message: 'Forbidden: You are not an Doctor' });
+        }
+        const result = await getDoctorNotice(req.user._id);
+        res.status(200).json(result);
     } catch (error) {
         res.status(500).json({
             message: error.message
