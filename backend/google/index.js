@@ -4,7 +4,7 @@ require("dotenv").config();
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API);
 
 const gemini = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: "gemini-3.5-flash",
   systemInstruction:
     "You are an assistant at MediCare Medical services Website.",
   generationConfig: {
