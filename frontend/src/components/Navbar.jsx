@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-<<<<<<< HEAD
-import { Menu, X, Calendar, MessageSquare, Phone, User, LayoutDashboard, LogOut, ChevronDown, Activity } from 'lucide-react';
-import navLogo from '../assets/nav logo.png';
-
-=======
 import { Menu, X, Calendar, Phone, User, LayoutDashboard, LogOut, Home, ArrowRight, ChevronDown, Info } from 'lucide-react';
->>>>>>> a572ace25d9323f319ecd108f9ceb1ba0e0c2c54
 
 const Navbar = () => {
   const { user, role, logout } = useAuth();
@@ -51,97 +45,6 @@ const Navbar = () => {
   };
 
   return (
-<<<<<<< HEAD
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20">
-          {/* Logo Brand */}
-          <div className="flex items-center">
-            <Link to="/home" className="flex items-center group ml-9">
-              <img 
-                src={navLogo} 
-                alt="MediCare" 
-                className="h-[68px] w-auto object-contain transition-transform group-hover:scale-105 duration-300"
-              />
-            </Link>
-          </div>
-
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center space-x-6">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className={`relative py-2 text-sm font-medium transition-colors hover:text-teal-800 ${
-                    isActive(link.path) ? 'text-teal-800 font-semibold' : 'text-slate-500'
-                  }`}
-                >
-                  <span className="flex items-center gap-1.5">
-                    {Icon && <Icon className="w-4 h-4" />}
-                    {link.name}
-                  </span>
-                  {isActive(link.path) && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
-                  )}
-                </Link>
-              );
-            })}
-
-            {/* Auth Buttons or Dropdown */}
-            {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer"
-                >
-                  <img
-                    src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=115E59&color=fff`}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full border border-emerald-500 object-cover"
-                  />
-                  <div className="text-left hidden lg:block">
-                    <p className="text-xs font-semibold text-slate-800 leading-3">{user.name}</p>
-                    <span className="text-[10px] text-emerald-600 capitalize font-medium">{role}</span>
-                  </div>
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
-                </button>
-
-                {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 animate-in fade-in slide-in-from-top-3 duration-200">
-                    <div className="px-4 py-2 border-b border-slate-50">
-                      <p className="text-xs text-slate-400">Signed in as</p>
-                      <p className="text-sm font-bold text-slate-800 truncate">{user.name}</p>
-                      <span className="inline-block bg-teal-50 text-[10px] text-teal-800 font-semibold px-2 py-0.5 rounded-full mt-1 capitalize">
-                        {role}
-                      </span>
-                    </div>
-
-                    <Link
-                      to={getDashboardPath()}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-600 hover:bg-teal-50 hover:text-teal-800 transition-colors"
-                    >
-                      <LayoutDashboard className="w-4 h-4" />
-                      My Dashboard
-                    </Link>
-
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors text-left cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Link
-                to="/auth"
-                className="px-6 py-2.5 bg-teal-800 text-white rounded-full font-semibold hover:bg-teal-900 transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm"
-=======
     <>
       <nav className={`sticky top-0 z-40 transition-all duration-300 ${
         scrolled 
@@ -157,7 +60,6 @@ const Navbar = () => {
                 onClick={() => setDrawerOpen(true)}
                 className="p-2.5 rounded-full text-slate-650 hover:text-teal-850 hover:bg-slate-50 transition-all focus:outline-hidden cursor-pointer"
                 aria-label="Open navigation menu"
->>>>>>> a572ace25d9323f319ecd108f9ceb1ba0e0c2c54
               >
                 <Menu className="w-6.5 h-6.5" />
               </button>
