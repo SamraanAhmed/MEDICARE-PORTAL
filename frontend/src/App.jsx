@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
+import SmoothScroll from './components/SmoothScroll';
 
 // Pages import
 import Home from './pages/Home';
@@ -14,19 +15,22 @@ import Chat from './pages/Chat';
 import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import About from './pages/About';
 
 const App = () => {
   return (
     <AuthProvider>
       <Router>
-        <Layout>
-          <Routes>
+        <SmoothScroll>
+          <Layout>
+            <Routes>
             {/* Landing page */}
             <Route path="/" element={<Welcome />} />
             <Route path="/home" element={<Home />} />
             
             {/* Lead generation and Contact */}
             <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<About />} />
             
             {/* Login & Register Tabbed Interface */}
             <Route path="/auth" element={<Auth />} />
@@ -47,8 +51,9 @@ const App = () => {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
-      </Router>
-    </AuthProvider>
+      </SmoothScroll>
+    </Router>
+  </AuthProvider>
   );
 };
 

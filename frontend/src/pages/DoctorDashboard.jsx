@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { Calendar, User, CheckCircle2, Clock, XCircle, FileText, Stethoscope, Mail, ShieldAlert, Award } from 'lucide-react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 
 const DoctorDashboard = () => {
   const { user } = useAuth();
@@ -11,6 +13,7 @@ const DoctorDashboard = () => {
   const [activeProofInput, setActiveProofInput] = useState(null); // ID of appointment being completed
   const [proofText, setProofText] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const containerRef = useRef(null);
 
   useEffect(() => {
     if (user) {
@@ -18,6 +21,16 @@ const DoctorDashboard = () => {
       setIsAvailable(user.available !== false);
     }
   }, [user]);
+
+  useGSAP(() => {
+    if (loading) return;
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('.doctor-header', { opacity: 0, y: -20, duration: 0.8 })
+      .from('.doctor-availability-card', { opacity: 0, x: 30, duration: 0.6 }, '-=0.5')
+      .from('.doctor-queue-column', { opacity: 0, x: -30, duration: 0.8 }, '-=0.4')
+      .from('.doctor-sidebar-widget', { opacity: 0, x: 30, duration: 0.8 }, '-=0.8');
+  }, { scope: containerRef, dependencies: [loading] });
 
   const loadDoctorData = async () => {
     setLoading(true);
@@ -100,10 +113,10 @@ const DoctorDashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       
       {/* 1. Header Profile Box */}
-      <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden">
+      <div className="doctor-header bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden">
         <div className="absolute top-0 right-0 w-44 h-44 bg-teal-50/30 rounded-bl-full -z-10"></div>
         <div className="flex items-center gap-5">
           <img
@@ -128,7 +141,7 @@ const DoctorDashboard = () => {
         </div>
 
         {/* Live Availability Toggle Card */}
-        <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between gap-6">
+        <div className="doctor-availability-card p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between gap-6">
           <div className="text-left">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Desk Scheduling</p>
             <h4 className="text-sm font-bold text-slate-800 mt-0.5">Availability Status</h4>
@@ -150,7 +163,7 @@ const DoctorDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Appointments Queue */}
-        <div className="lg:col-span-8 space-y-4 text-left">
+        <div className="doctor-queue-column lg:col-span-8 space-y-4 text-left">
           <h3 className="text-lg font-bold text-teal-950 font-heading pl-1">Consultation Waiting Queue</h3>
           
           {loading ? (
@@ -260,7 +273,7 @@ const DoctorDashboard = () => {
         </div>
 
         {/* Side Panel Guide */}
-        <div className="lg:col-span-4 space-y-6 text-left">
+        <div className="doctor-sidebar-widget lg:col-span-4 space-y-6 text-left">
           <div className="bg-slate-900 text-white rounded-3xl p-6 relative overflow-hidden border border-slate-800 shadow-md">
             <h4 className="text-xs font-bold text-teal-300 uppercase tracking-wider mb-2">Physician Guidelines</h4>
             <ul className="space-y-4 text-xs text-slate-300 mt-4 leading-relaxed font-body">

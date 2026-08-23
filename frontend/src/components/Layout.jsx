@@ -1,6 +1,7 @@
 import React from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import FloatingChatbot from './FloatingChatbot';
 
 const Layout = ({ children }) => {
   return (
@@ -12,6 +13,9 @@ const Layout = ({ children }) => {
       <main className="flex-grow animate-in fade-in duration-300">
         {children}
       </main>
+
+      {/* Floating AI Chatbot */}
+      <FloatingChatbot />
 
       {/* Footnote and contact blocks */}
       <Footer />

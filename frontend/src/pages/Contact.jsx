@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import MapEmbed from '../components/MapEmbed';
 import { Phone, Mail, MapPin, Send, HelpCircle, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const contactSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -14,6 +19,7 @@ const contactSchema = z.object({
 
 const Contact = () => {
   const [success, setSuccess] = useState(false);
+  const containerRef = useRef(null);
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm({
     resolver: zodResolver(contactSchema),
   });
@@ -27,11 +33,84 @@ const Contact = () => {
     setTimeout(() => setSuccess(false), 5000);
   };
 
+  useGSAP(() => {
+    // Header Animation
+    gsap.from('.contact-header', {
+      opacity: 0,
+      y: 30,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
+
+    // Left Column Info Cards ScrollTrigger
+    gsap.from('.contact-info-card', {
+      scrollTrigger: {
+        trigger: '.contact-info-card',
+        start: 'top 85%',
+        toggleActions: 'play none none none'
+      },
+      opacity: 0,
+      x: -40,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
+
+    // Stagger Info Items
+    gsap.from('.info-item', {
+      scrollTrigger: {
+        trigger: '.contact-info-card',
+        start: 'top 80%'
+      },
+      opacity: 0,
+      y: 15,
+      stagger: 0.1,
+      duration: 0.5,
+      ease: 'power3.out'
+    });
+
+    // Map Embed ScrollTrigger
+    gsap.from('.contact-map', {
+      scrollTrigger: {
+        trigger: '.contact-map',
+        start: 'top 85%'
+      },
+      opacity: 0,
+      y: 30,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
+
+    // Form Container ScrollTrigger
+    gsap.from('.contact-form-card', {
+      scrollTrigger: {
+        trigger: '.contact-form-card',
+        start: 'top 85%'
+      },
+      opacity: 0,
+      x: 40,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
+
+    // Form elements inside card
+    gsap.from('.form-el', {
+      scrollTrigger: {
+        trigger: '.contact-form-card',
+        start: 'top 75%'
+      },
+      opacity: 0,
+      y: 15,
+      stagger: 0.08,
+      duration: 0.5,
+      ease: 'power3.out'
+    });
+  }, { scope: containerRef });
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+    <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
       
       {/* Page Header */}
-      <div className="text-center max-w-2xl mx-auto space-y-4">
+      <div className="contact-header text-center max-w-2xl mx-auto space-y-4">
         <h1 className="text-4xl font-black text-teal-950 font-heading">Contact Our Medical Office</h1>
         <p className="text-slate-500 text-sm sm:text-base">
           Have an inquiry, feedback, or need administrative assistance? Reach out to our front desk.
@@ -43,21 +122,21 @@ const Contact = () => {
         <div className="lg:col-span-5 space-y-8 text-left">
           
           {/* Quick info cards */}
-          <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-xs space-y-6">
+          <div className="contact-info-card bg-white rounded-3xl border border-slate-100 p-8 shadow-xs space-y-6">
             <h3 className="text-xl font-bold text-teal-950 font-heading border-b border-slate-50 pb-3">Get in Touch</h3>
             
-            <div className="flex items-start gap-4">
+            <div className="info-item flex items-start gap-4">
               <div className="p-3 bg-teal-50 text-teal-800 rounded-2xl border border-teal-100 shrink-0">
                 <Phone className="w-5 h-5" />
               </div>
               <div>
                 <h4 className="text-sm font-bold text-slate-800 font-heading">Call Center</h4>
-                <p className="text-sm text-slate-600 mt-1">+1 (212) 555-0199</p>
-                <p className="text-xs text-slate-400">Toll Free: +1 (800) MED-CARE</p>
+                <p className="text-sm text-slate-600 mt-1">+92 (51) 111-844-844</p>
+                <p className="text-xs text-slate-400">Campus Exchange: +92 (51) 844-6666</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-4">
+            <div className="info-item flex items-start gap-4">
               <div className="p-3 bg-teal-50 text-teal-800 rounded-2xl border border-teal-100 shrink-0">
                 <Mail className="w-5 h-5" />
               </div>
@@ -68,20 +147,20 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="flex items-start gap-4">
+            <div className="info-item flex items-start gap-4">
               <div className="p-3 bg-teal-50 text-teal-800 rounded-2xl border border-teal-100 shrink-0">
                 <MapPin className="w-5 h-5" />
               </div>
               <div>
                 <h4 className="text-sm font-bold text-slate-800 font-heading">Main Campus</h4>
-                <p className="text-sm text-slate-600 mt-1">350 5th Ave, New York, NY 10118</p>
-                <p className="text-xs text-slate-400">Emprire State Suite 45B</p>
+                <p className="text-sm text-slate-600 mt-1">Ibadat International University, Islamabad, Pakistan</p>
+                <p className="text-xs text-slate-400">Japan Road, Sihala, Islamabad</p>
               </div>
             </div>
           </div>
 
           {/* Interactive OSM Map */}
-          <div className="space-y-3">
+          <div className="contact-map space-y-3">
             <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wider pl-1">Hospital Location</h4>
             <MapEmbed />
           </div>
@@ -89,11 +168,11 @@ const Contact = () => {
         </div>
 
         {/* Right Column: Contact Inquiry Form */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-100 p-8 sm:p-10 shadow-md text-left relative overflow-hidden">
+        <div className="contact-form-card lg:col-span-7 bg-white rounded-3xl border border-slate-100 p-8 sm:p-10 shadow-md text-left relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50/50 rounded-bl-full -z-10"></div>
           
-          <h3 className="text-2xl font-bold text-teal-950 font-heading">Submit an Inquiry</h3>
-          <p className="text-slate-500 text-xs mt-1 leading-relaxed">
+          <h3 className="form-el text-2xl font-bold text-teal-950 font-heading">Submit an Inquiry</h3>
+          <p className="form-el text-slate-500 text-xs mt-1 leading-relaxed">
             Fill out the form below and our medical coordinators will route your request to the correct department.
           </p>
 
@@ -110,7 +189,7 @@ const Contact = () => {
 
           {/* Form fields */}
           <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="form-el grid grid-cols-1 sm:grid-cols-2 gap-5">
               
               {/* Name */}
               <div className="space-y-2">
@@ -153,7 +232,7 @@ const Contact = () => {
             </div>
 
             {/* Subject */}
-            <div className="space-y-2">
+            <div className="form-el space-y-2">
               <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Subject</label>
               <input
                 type="text"
@@ -172,7 +251,7 @@ const Contact = () => {
             </div>
 
             {/* Message */}
-            <div className="space-y-2">
+            <div className="form-el space-y-2">
               <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Your Message</label>
               <textarea
                 rows="5"
@@ -191,7 +270,7 @@ const Contact = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="pt-2">
+            <div className="form-el pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
