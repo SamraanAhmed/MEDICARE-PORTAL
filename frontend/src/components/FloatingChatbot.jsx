@@ -14,18 +14,25 @@ const FloatingChatbot = () => {
 
   // Load chat history on mount or user change
   useEffect(() => {
-    const history = api.getChatHistory();
-    if (history.length === 0) {
-      const welcome = {
-        sender: 'bot',
-        content: `Hello ${user ? user.name : 'Guest'}! I am your MediCare AI Health Assistant. Ask me anything about our clinics, specialized services, doctor availability, or symptom screening guidelines.`,
-        created_at: new Date(),
-      };
-      setMessages([welcome]);
-      api.sendDirectMessage('bot', welcome.content);
-    } else {
-      setMessages(history);
-    }
+    const fetchHistory = async () => {
+      try {
+        const history = await api.getChatHistory();
+        if (!history || history.length === 0) {
+          const welcome = {
+            sender: 'bot',
+            content: `Hello ${user ? user.name : 'Guest'}! I am your MediCare AI Health Assistant. Ask me anything about our clinics, specialized services, doctor availability, or symptom screening guidelines.`,
+            created_at: new Date(),
+          };
+          setMessages([welcome]);
+          api.sendDirectMessage('bot', welcome.content);
+        } else {
+          setMessages(history);
+        }
+      } catch (err) {
+        console.error("Failed to load chat history in floating chatbot:", err);
+      }
+    };
+    fetchHistory();
   }, [user, isOpen]); // Reload history when opened or user changes
 
   // Auto-scroll to bottom
@@ -34,6 +41,17 @@ const FloatingChatbot = () => {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, loading, isOpen]);
+
+  // Listen for custom event to open chatbot widget in-place
+  useEffect(() => {
+    const handleOpenChatbot = () => {
+      setIsOpen(true);
+    };
+    window.addEventListener('open-chatbot', handleOpenChatbot);
+    return () => {
+      window.removeEventListener('open-chatbot', handleOpenChatbot);
+    };
+  }, []);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -58,7 +76,7 @@ const FloatingChatbot = () => {
       } else {
         // Mock response if guest access
         await new Promise((resolve) => setTimeout(resolve, 1500));
-        const botMock = "I am a medical assistant bot. Please Sign In to verify credentials and access the full Gemini-powered diagnostic assistant.";
+        const botMock = "I am a medical assistant bot. Please Sign In to verify credentials and access the full AI-powered diagnostic assistant.";
         setMessages((prev) => [
           ...prev,
           { sender: 'bot', content: botMock, created_at: new Date() }
@@ -113,21 +131,17 @@ const FloatingChatbot = () => {
           {/* Header */}
           <div className="bg-teal-800 text-white p-4 flex justify-between items-center shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center font-bold text-white relative">
+              <div className="w-9 h-9 flex items-center justify-center font-bold text-white relative">
                 <img 
                   src="/imgvid/medicarechatbot.png" 
                   alt="AI Assistant Logo" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-teal-500 rounded-full border-2 border-teal-800" />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-teal-500 rounded-full" />
               </div>
               <div className="text-left font-sans">
                 <h3 className="text-sm font-extrabold flex items-center gap-1 font-heading text-white">
                   AI Advisor
-                  <span className="inline-flex items-center gap-0.5 text-[8px] bg-teal-500/20 text-teal-300 font-bold px-1.5 py-0.5 rounded-full uppercase">
-                    <Sparkles className="w-2.5 h-2.5" />
-                    Gemini
-                  </span>
                 </h3>
                 <p className="text-[10px] text-teal-100">Virtual Screening desk • HIPAA Compliant</p>
               </div>
@@ -166,17 +180,17 @@ const FloatingChatbot = () => {
                   }`}
                 >
                   <div
-                    className={`w-7 h-7 rounded-full overflow-hidden flex items-center justify-center shrink-0 border text-[10px] font-bold ${
+                    className={`w-7 h-7 shrink-0 text-[10px] font-bold flex items-center justify-center ${
                       isBot 
-                        ? 'bg-teal-50 border-teal-100 text-teal-800' 
-                        : 'bg-slate-100 border-slate-200 text-slate-700'
+                        ? '' 
+                        : 'rounded-full overflow-hidden border bg-slate-100 border-slate-200 text-slate-700'
                     }`}
                   >
                     {isBot ? (
                       <img 
                         src="/imgvid/medicarechatbot.png" 
                         alt="Bot" 
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     ) : (
                       <User className="w-3.5 h-3.5" />
@@ -203,11 +217,11 @@ const FloatingChatbot = () => {
 
             {loading && (
               <div className="flex items-start gap-2.5 max-w-[80%] self-start text-left animate-in fade-in duration-200">
-                <div className="w-7 h-7 rounded-full overflow-hidden bg-teal-50 border border-teal-100 text-teal-800 flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 flex items-center justify-center shrink-0">
                   <img 
                     src="/imgvid/medicarechatbot.png" 
                     alt="Bot Loading" 
-                    className="w-full h-full object-cover animate-pulse"
+                    className="w-full h-full object-contain animate-pulse"
                   />
                 </div>
                 <div className="bg-white border border-slate-100 shadow-xs px-4 py-2.5 rounded-2xl rounded-tl-xs flex items-center gap-1.5">

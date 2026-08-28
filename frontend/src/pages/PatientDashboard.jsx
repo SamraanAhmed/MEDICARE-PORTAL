@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Calendar, Heart, ShieldCheck, Activity, Trash2, Clock, CheckCircle2, User, UserCheck, Eye, CreditCard, AlertCircle, X } from 'lucide-react';
+import { Calendar, Heart, ShieldCheck, Activity, Trash2, Clock, CheckCircle2, User, UserCheck, Eye, CreditCard, AlertCircle, X, Download, Printer } from 'lucide-react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 
@@ -12,6 +12,9 @@ const PatientDashboard = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
+  
+  const [reportModal, setReportModal] = useState(null);
+  const [activeTab, setActiveTab] = useState('appointments');
   
   // Payment states
   const [payingAppointment, setPayingAppointment] = useState(null);
@@ -119,13 +122,95 @@ const PatientDashboard = () => {
     }
   };
 
-  // Mock health metrics trackers for premium visual appeal
-  const healthMetrics = [
-    { label: 'Heart Rate', value: '72 bpm', status: 'Optimal', color: 'text-rose-500 bg-rose-50 border-rose-100', change: 'Normal resting rate' },
-    { label: 'Blood Pressure', value: '118/79 mmHg', status: 'Normal', color: 'text-teal-500 bg-teal-50 border-teal-100', change: 'Sys/Dias standard' },
-    { label: 'Sleep Cycles', value: '7.8 hrs', status: 'Restful', color: 'text-indigo-500 bg-indigo-50 border-indigo-100', change: 'Avg 82% deep sleep' },
-    { label: 'Blood Glucose', value: '94 mg/dL', status: 'Fasting', color: 'text-amber-500 bg-amber-50 border-amber-100', change: 'Pre-meal reading' }
-  ];
+  // Download report as printable HTML file
+  const handleDownloadReport = (appt) => {
+    const doc = appt.doctor;
+    const svc = typeof appt.service === 'object' ? appt.service : (services.find(s => s._id === appt.service) || {});
+    const v = appt.vitals || {};
+    const dateStr = new Date(appt.appointment_date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const html = [
+      '<!DOCTYPE html><html><head><title>MediCare Report</title>',
+      '<style>',
+      '* { margin: 0; padding: 0; box-sizing: border-box; }',
+      'body { font-family: Segoe UI, Tahoma, sans-serif; padding: 48px; color: #1e293b; }',
+      '.header { text-align: center; border-bottom: 3px solid #0f766e; padding-bottom: 24px; margin-bottom: 32px; }',
+      '.header h1 { color: #0f766e; font-size: 28px; }',
+      '.header p { color: #64748b; font-size: 13px; margin-top: 4px; }',
+      '.section { margin-bottom: 28px; }',
+      '.section h3 { color: #0f766e; font-size: 14px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }',
+      '.info-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 14px; }',
+      '.info-row strong { min-width: 100px; color: #475569; }',
+      '.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }',
+      '.metric { background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid #e2e8f0; }',
+      '.metric label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }',
+      '.metric p { font-size: 20px; font-weight: 800; margin-top: 6px; color: #0f172a; }',
+      '.notes { background: #f0fdfa; padding: 20px; border-radius: 10px; border-left: 4px solid #0f766e; font-size: 14px; line-height: 1.7; white-space: pre-wrap; }',
+      '.footer { text-align: center; margin-top: 48px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; }',
+      '</style></head><body>',
+      '<div class="header"><h1>MediCare</h1><p>Medical Consultation Report</p></div>',
+      '<div class="section"><h3>Appointment Details</h3>',
+      '<div class="info-row"><strong>Date:</strong><span>' + dateStr + '</span></div>',
+      '<div class="info-row"><strong>Service:</strong><span>' + (svc.service_name || 'Consultation') + '</span></div>',
+      '<div class="info-row"><strong>Doctor:</strong><span>' + (doc?.name || 'Specialist') + '</span></div>',
+      '<div class="info-row"><strong>Division:</strong><span>' + ((doc?.pillar || 'general').charAt(0).toUpperCase() + (doc?.pillar || 'general').slice(1)) + '</span></div>',
+      '</div>',
+      '<div class="section"><h3>Clinical Notes</h3>',
+      '<div class="notes">' + (appt.proof || 'No notes provided.') + '</div></div>',
+      '<div class="section"><h3>Vitals Report</h3><div class="grid">',
+      '<div class="metric"><label>Heart Rate</label><p>' + (v.heartRate || 'N/A') + '</p></div>',
+      '<div class="metric"><label>Blood Pressure</label><p>' + (v.bloodPressure || 'N/A') + '</p></div>',
+      '<div class="metric"><label>Sleep Cycles</label><p>' + (v.sleepCycles || 'N/A') + '</p></div>',
+      '<div class="metric"><label>Blood Glucose</label><p>' + (v.bloodGlucose || 'N/A') + '</p></div>',
+      '</div></div>',
+      '<div class="footer"><p>Generated by MediCare Portal on ' + new Date().toLocaleString() + '</p></div>',
+      '</body></html>'
+    ].join('\n');
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'MediCare_Report_' + new Date(appt.appointment_date).toISOString().split('T')[0] + '.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Auto-compute vitals from the latest completed appointment report
+  const getHealthMetrics = () => {
+    const completedWithVitals = appointments.filter(a => a.status === 'completed' && a.vitals);
+    const latestReport = completedWithVitals.length > 0 ? completedWithVitals[completedWithVitals.length - 1] : null;
+    if (latestReport && latestReport.vitals) {
+      const v = latestReport.vitals;
+      return [
+        { label: 'Heart Rate', value: v.heartRate && v.heartRate !== 'N/A' ? v.heartRate : 'N/A', status: 'Reported', color: 'text-rose-500 bg-rose-50 border-rose-100', change: `Latest from Dr. ${latestReport.doctor?.name || 'Specialist'}` },
+        { label: 'Blood Pressure', value: v.bloodPressure && v.bloodPressure !== 'N/A' ? v.bloodPressure : 'N/A', status: 'Reported', color: 'text-teal-500 bg-teal-50 border-teal-100', change: 'From latest checkup' },
+        { label: 'Sleep Cycles', value: v.sleepCycles && v.sleepCycles !== 'N/A' ? v.sleepCycles : 'N/A', status: 'Reported', color: 'text-indigo-500 bg-indigo-50 border-indigo-100', change: 'Recorded duration' },
+        { label: 'Blood Glucose', value: v.bloodGlucose && v.bloodGlucose !== 'N/A' ? v.bloodGlucose : 'N/A', status: 'Reported', color: 'text-amber-500 bg-amber-50 border-amber-100', change: 'Glucose screening' }
+      ];
+    }
+    return [
+      { label: 'Heart Rate', value: '72 bpm', status: 'Optimal', color: 'text-rose-500 bg-rose-50 border-rose-100', change: 'Normal resting rate' },
+      { label: 'Blood Pressure', value: '118/79 mmHg', status: 'Normal', color: 'text-teal-500 bg-teal-50 border-teal-100', change: 'Sys/Dias standard' },
+      { label: 'Sleep Cycles', value: '7.8 hrs', status: 'Restful', color: 'text-indigo-500 bg-indigo-50 border-indigo-100', change: 'Avg 82% deep sleep' },
+      { label: 'Blood Glucose', value: '94 mg/dL', status: 'Fasting', color: 'text-amber-500 bg-amber-50 border-amber-100', change: 'Pre-meal reading' }
+    ];
+  };
+
+  const healthMetrics = getHealthMetrics();
+
+  // Computed values for report modal
+  const reportDoc = reportModal?.doctor;
+  const reportSvc = reportModal ? (typeof reportModal.service === 'object' ? reportModal.service : (services.find(s => s._id === reportModal.service) || {})) : {};
+  const reportVitals = reportModal?.vitals || {};
+
+  const filteredAppointments = appointments.filter(appt => {
+    if (activeTab === 'appointments') {
+      return appt.status === 'pending' || appt.status === 'cancelled';
+    } else {
+      return appt.status === 'completed';
+    }
+  });
 
   if (!user) {
     return (
@@ -172,12 +257,17 @@ const PatientDashboard = () => {
           </Link>
           <Link
             to="/chat"
+            onClick={(e) => {
+              e.preventDefault();
+              window.dispatchEvent(new CustomEvent('open-chatbot'));
+            }}
             className="px-6 py-3.5 bg-slate-900 hover:bg-slate-850 text-slate-100 border border-slate-800 font-bold rounded-xl text-sm transition-all cursor-pointer"
           >
             Chat Advisor
           </Link>
         </div>
       </div>
+
 
       {/* Health Vitals Summary Row */}
       <div className="space-y-4">
@@ -207,22 +297,52 @@ const PatientDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Appointments List Column */}
-        <div className="appt-register lg:col-span-8 space-y-4 text-left">
-          <h3 className="text-lg font-bold text-teal-950 font-heading pl-1">Appointment Register</h3>
+        <div className="appt-register lg:col-span-8 space-y-6 text-left">
+          
+          {/* Tabs header */}
+          <div className="flex gap-4 border-b border-slate-100 pb-2">
+            <button
+              onClick={() => setActiveTab('appointments')}
+              className={`pb-2 px-1 text-sm font-bold border-b-2 transition-all cursor-pointer ${
+                activeTab === 'appointments'
+                  ? 'border-teal-800 text-teal-850'
+                  : 'border-transparent text-slate-400 hover:text-slate-650'
+              }`}
+            >
+              Appointment Register
+            </button>
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`pb-2 px-1 text-sm font-bold border-b-2 transition-all cursor-pointer ${
+                activeTab === 'reports'
+                  ? 'border-teal-800 text-teal-850'
+                  : 'border-transparent text-slate-400 hover:text-slate-650'
+              }`}
+            >
+              Medical Reports
+            </button>
+          </div>
           
           {loading ? (
             <p className="text-slate-500 text-sm">Querying schedules...</p>
-          ) : appointments.length === 0 ? (
+          ) : filteredAppointments.length === 0 ? (
             <div className="bg-white rounded-3xl border border-slate-100 p-10 text-center space-y-4">
               <Calendar className="w-10 h-10 text-slate-300 mx-auto" />
-              <p className="text-slate-500 text-sm">You do not have any appointments booked.</p>
-              <Link to="/book" className="text-sm font-bold text-teal-850 hover:underline inline-block">
-                Schedule your first checkup →
-              </Link>
+              <p className="text-slate-500 text-sm">
+                {activeTab === 'appointments' 
+                  ? 'You do not have any pending or cancelled appointments.' 
+                  : 'You do not have any completed medical reports yet.'
+                }
+              </p>
+              {activeTab === 'appointments' && (
+                <Link to="/book" className="text-sm font-bold text-teal-850 hover:underline inline-block">
+                  Schedule your first checkup →
+                </Link>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
-              {appointments.map((appt) => {
+              {filteredAppointments.map((appt) => {
                 const dateStr = new Date(appt.appointment_date).toLocaleDateString(undefined, {
                   weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
                 });
@@ -243,7 +363,7 @@ const PatientDashboard = () => {
                         className="w-12 h-12 rounded-full object-cover border border-slate-100 shrink-0"
                       />
                       <div>
-                        <h4 className="text-sm font-bold text-slate-800 leading-tight">{appt.doctor?.name || 'Dr. Assigned Speciality'}</h4>
+                        <h4 className="text-sm font-bold text-slate-805 leading-tight">{appt.doctor?.name || 'Dr. Assigned Speciality'}</h4>
                         <span className="text-[10px] text-teal-800 font-semibold capitalize mt-0.5 inline-block">
                           {appt.doctor?.pillar} Division
                         </span>
@@ -309,6 +429,16 @@ const PatientDashboard = () => {
                       )}
 
                       <div className="flex gap-2">
+                        {appt.status === 'completed' && (
+                          <button
+                            onClick={() => setReportModal(appt)}
+                            className="px-2.5 py-1 bg-teal-850 hover:bg-teal-900 text-white font-bold rounded-lg text-[10px] flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            Check Report
+                          </button>
+                        )}
+
                         {appt.status === 'pending' && appt.paymentInfo && !appt.paymentInfo.paid && (
                           <button
                             onClick={() => handleOpenPaymentModal(appt)}
@@ -440,6 +570,89 @@ const PatientDashboard = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Medical Report Detail Modal */}
+      {reportModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-2xl max-w-lg w-full space-y-6 text-left relative animate-in zoom-in-95 duration-250 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setReportModal(null)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="space-y-1">
+              <h3 className="text-xl font-bold text-slate-800 font-heading">Medical Report</h3>
+              <p className="text-xs text-slate-400">Consultation completed on {new Date(reportModal.appointment_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</p>
+            </div>
+
+            {/* Doctor & Service Info */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
+              <div className="flex items-center gap-3">
+                <img src={reportDoc?.avatar || 'https://ui-avatars.com/api/?name=Dr+Staff'} alt={reportDoc?.name} className="w-10 h-10 rounded-full object-cover border border-slate-200" />
+                <div>
+                  <h4 className="text-sm font-bold text-slate-800">{reportDoc?.name || 'Assigned Specialist'}</h4>
+                  <p className="text-[10px] text-teal-800 font-semibold capitalize">{reportDoc?.pillar || 'General'} Division</p>
+                </div>
+              </div>
+              <div className="flex justify-between text-xs text-slate-500 pt-1">
+                <span>Service:</span>
+                <span className="font-semibold text-slate-800">{reportSvc?.service_name || 'Consultation'}</span>
+              </div>
+            </div>
+
+            {/* Clinical Notes */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-teal-950 uppercase tracking-widest">Clinical Notes & Prescriptions</h4>
+              <div className="p-4 bg-teal-50/50 rounded-2xl border border-teal-100 border-l-4 border-l-teal-800 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap font-body">
+                {reportModal.proof || 'No clinical notes provided.'}
+              </div>
+            </div>
+
+            {/* Vitals Grid */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-teal-950 uppercase tracking-widest">Vitals Report</h4>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-rose-50 p-3 rounded-xl border border-rose-100">
+                  <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider">Heart Rate</span>
+                  <p className="text-lg font-black text-slate-800 mt-1">{reportVitals.heartRate || 'N/A'}</p>
+                </div>
+                <div className="bg-teal-50 p-3 rounded-xl border border-teal-100">
+                  <span className="text-[10px] font-bold text-teal-500 uppercase tracking-wider">Blood Pressure</span>
+                  <p className="text-lg font-black text-slate-800 mt-1">{reportVitals.bloodPressure || 'N/A'}</p>
+                </div>
+                <div className="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
+                  <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Sleep Cycles</span>
+                  <p className="text-lg font-black text-slate-800 mt-1">{reportVitals.sleepCycles || 'N/A'}</p>
+                </div>
+                <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
+                  <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Blood Glucose</span>
+                  <p className="text-lg font-black text-slate-800 mt-1">{reportVitals.bloodGlucose || 'N/A'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Download & Print Actions */}
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => handleDownloadReport(reportModal)}
+                className="flex-1 py-3 bg-teal-850 hover:bg-teal-900 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
+              >
+                <Download className="w-4 h-4" />
+                Download Report
+              </button>
+              <button
+                onClick={() => { window.print(); }}
+                className="flex-1 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-xl text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Printer className="w-4 h-4" />
+                Print
+              </button>
+            </div>
           </div>
         </div>
       )}

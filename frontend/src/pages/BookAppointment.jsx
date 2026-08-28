@@ -221,7 +221,7 @@ const BookAppointment = () => {
                 <option value="">Choose Service...</option>
                 {services.map((s) => (
                   <option key={s._id} value={s._id}>
-                    {s.service_name} ({s.pillar.toUpperCase()})
+                    {s.service_name} ({(s.pillar || 'general').toUpperCase()})
                   </option>
                 ))}
               </select>

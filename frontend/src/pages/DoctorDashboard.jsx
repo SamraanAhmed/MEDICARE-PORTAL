@@ -12,6 +12,10 @@ const DoctorDashboard = () => {
   const [isAvailable, setIsAvailable] = useState(true);
   const [activeProofInput, setActiveProofInput] = useState(null); // ID of appointment being completed
   const [proofText, setProofText] = useState('');
+  const [heartRate, setHeartRate] = useState('');
+  const [bloodPressure, setBloodPressure] = useState('');
+  const [sleepCycles, setSleepCycles] = useState('');
+  const [bloodGlucose, setBloodGlucose] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const containerRef = useRef(null);
 
@@ -41,7 +45,7 @@ const DoctorDashboard = () => {
       // Filter appointments belonging to this doctor (if backend isn't filtering properly yet)
       const filtered = data.filter(appt => {
         const docId = appt.doctor?._id || appt.doctor;
-        return docId === user._id && appt.status === 'pending';
+        return docId?.toString() === user._id?.toString() && appt.status === 'pending';
       });
       setAppointments(filtered);
     } catch (e) {
@@ -74,6 +78,10 @@ const DoctorDashboard = () => {
   const handleCancelCompletion = () => {
     setActiveProofInput(null);
     setProofText('');
+    setHeartRate('');
+    setBloodPressure('');
+    setSleepCycles('');
+    setBloodGlucose('');
   };
 
   const handleSaveCompletion = async (apptId) => {
@@ -82,11 +90,22 @@ const DoctorDashboard = () => {
       return;
     }
 
+    const vitalsObj = {
+      heartRate: heartRate.trim() ? `${heartRate.trim()} bpm` : 'N/A',
+      bloodPressure: bloodPressure.trim() ? `${bloodPressure.trim()} mmHg` : 'N/A',
+      sleepCycles: sleepCycles.trim() ? `${sleepCycles.trim()} hrs` : 'N/A',
+      bloodGlucose: bloodGlucose.trim() ? `${bloodGlucose.trim()} mg/dL` : 'N/A'
+    };
+
     try {
-      // Call doctor appointment completion logic
-      await api.completeAppointment(apptId, proofText);
+      // Call doctor appointment completion logic with vitals
+      await api.completeAppointment(apptId, proofText, vitalsObj);
       setActiveProofInput(null);
       setProofText('');
+      setHeartRate('');
+      setBloodPressure('');
+      setSleepCycles('');
+      setBloodGlucose('');
       
       // Reload lists
       loadDoctorData();
@@ -210,13 +229,24 @@ const DoctorDashboard = () => {
                       {/* Initial Action Buttons */}
                       {!isCompleting && (
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => handleCompleteClick(appt._id)}
-                            className="px-4 py-2 bg-teal-850 hover:bg-teal-900 text-white font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Complete Consult
-                          </button>
+                          {new Date(appt.appointment_date).toDateString() === new Date().toDateString() ? (
+                            <button
+                              onClick={() => handleCompleteClick(appt._id)}
+                              className="px-4 py-2 bg-teal-850 hover:bg-teal-900 text-white font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              Complete Consult
+                            </button>
+                          ) : (
+                            <button
+                              disabled
+                              className="px-4 py-2 bg-slate-100 text-slate-400 font-semibold rounded-xl text-xs flex items-center gap-1 cursor-not-allowed border border-slate-200"
+                              title="Consultation is only available on the scheduled appointment date."
+                            >
+                              <Clock className="w-3.5 h-3.5" />
+                              Locked (Not Today)
+                            </button>
+                          )}
                           <button
                             onClick={() => handleNoShowAppointment(appt._id)}
                             className="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer"
@@ -236,7 +266,7 @@ const DoctorDashboard = () => {
 
                     {/* Completion input wrapper */}
                     {isCompleting && (
-                      <div className="p-4 bg-teal-50/50 border border-teal-100 rounded-2xl space-y-3.5 animate-in slide-in-from-top-2 duration-200">
+                      <div className="p-4 bg-teal-50/50 border border-teal-100 rounded-2xl space-y-4 animate-in slide-in-from-top-2 duration-200">
                         <div className="space-y-1">
                           <label className="text-xs font-bold text-teal-950 flex items-center gap-1">
                             <FileText className="w-4 h-4" />
@@ -250,7 +280,58 @@ const DoctorDashboard = () => {
                             className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-teal-700"
                           />
                         </div>
-                        <div className="flex gap-2">
+
+                        {/* Vitals Form Section */}
+                        <div className="space-y-2.5 border-t border-teal-100/50 pt-3">
+                          <label className="text-xs font-bold text-teal-950 flex items-center gap-1">
+                            <Stethoscope className="w-4 h-4 text-teal-800" />
+                            Vitals Metrics (Patient Tracker Output)
+                          </label>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div className="space-y-1">
+                              <span className="text-[10px] text-slate-500 font-bold block">Heart Rate (bpm)</span>
+                              <input
+                                type="text"
+                                placeholder="e.g. 72"
+                                value={heartRate}
+                                onChange={(e) => setHeartRate(e.target.value)}
+                                className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-teal-700"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-[10px] text-slate-500 font-bold block">Blood Pressure</span>
+                              <input
+                                type="text"
+                                placeholder="e.g. 118/79"
+                                value={bloodPressure}
+                                onChange={(e) => setBloodPressure(e.target.value)}
+                                className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-teal-700"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-[10px] text-slate-500 font-bold block">Sleep Cycles (hrs)</span>
+                              <input
+                                type="text"
+                                placeholder="e.g. 7.5"
+                                value={sleepCycles}
+                                onChange={(e) => setSleepCycles(e.target.value)}
+                                className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-teal-700"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-[10px] text-slate-500 font-bold block">Blood Glucose</span>
+                              <input
+                                type="text"
+                                placeholder="e.g. 95"
+                                value={bloodGlucose}
+                                onChange={(e) => setBloodGlucose(e.target.value)}
+                                className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-teal-700"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 pt-1">
                           <button
                             onClick={() => handleSaveCompletion(appt._id)}
                             className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-teal-950 font-extrabold rounded-xl text-xs cursor-pointer"
@@ -259,7 +340,7 @@ const DoctorDashboard = () => {
                           </button>
                           <button
                             onClick={handleCancelCompletion}
-                            className="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs cursor-pointer"
+                            className="px-4 py-2 bg-white border border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl text-xs cursor-pointer font-bold"
                           >
                             Cancel
                           </button>

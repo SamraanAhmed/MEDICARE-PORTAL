@@ -165,6 +165,12 @@ const appointmentSchema = new mongoose.Schema({
     },
     proof: {
         type: String
+    },
+    vitals: {
+        heartRate: String,
+        bloodPressure: String,
+        sleepCycles: String,
+        bloodGlucose: String
     }
 }, { timestamps: true });
 

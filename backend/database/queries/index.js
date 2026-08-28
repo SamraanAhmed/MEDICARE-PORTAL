@@ -116,7 +116,7 @@ const getUserProfile = async (id, role) => {
 }
 const getAllAppointmentOfUser = async (user_id) => {
     try {
-        const result = await appointment.find({ patient: user_id }).populate('doctor', '_id name pillar');
+        const result = await appointment.find({ patient: user_id }).populate('doctor', '_id name pillar avatar').populate('service');
         return result;
     } catch (error) {
         throw error;
@@ -131,7 +131,6 @@ const getPillarByService = async (service_id) => {
     }
 }
 const getAllServices = async () => {
-    if (!isConnected()) return jsonDb.getAllServices();
     try {
         const result = await service.find({});
         return result;
@@ -306,27 +305,27 @@ const updateDoctorAvailability = async (doctorData) => {
         throw error;
     }
 }
-const markAppointmentAsCompleted = async (appointment_id, proof) => {
+const markAppointmentAsCompleted = async (appointment_id, proof, vitals) => {
     try {
-        const appointments = await appointment.findById(appointment_id)
-            .populate({ path: 'payment', select: 'paid' });
-        if (proof && appointments.payment.paid) {
-            const result = await appointment.findByIdAndUpdate(appointment_id, { proof: proof, status: 'completed'}, { new: true });
-            return result;
-        } else {
-            if(!appointments) throw new Error('No appointment Founded');
-            else if(!appointments.payment) throw new Error('No payment Founded');
-            else if (!proof) throw new Error('No Proof Founded');
+        if (!proof) throw new Error('Clinical notes/proof is required');
+        const existingAppt = await appointment.findById(appointment_id);
+        if (!existingAppt) throw new Error('Appointment not found');
+        const updateFields = { proof: proof, status: 'completed' };
+        if (vitals) {
+            updateFields.vitals = vitals;
         }
+        const result = await appointment.findByIdAndUpdate(appointment_id, updateFields, { new: true });
+        return result;
     } catch (error) {
         throw error;
     }
 }
 const payBill = async (payment_id, transcation_id, user_id) => {
     try {
-        const user = await appointment.findOne({payment: payment_id}).select('patient');
-        if (user_id === user.patient) {
-            const result = await payment.findByIdAndUpdate(payment_id, { paid: true, transcation: transcation_id }, { new: true });
+        const apptRecord = await appointment.findOne({payment: payment_id}).select('patient');
+        if (!apptRecord) throw new Error('Appointment not found for this payment');
+        if (user_id.toString() === apptRecord.patient.toString()) {
+            const result = await payment.findByIdAndUpdate(payment_id, { paid: true, transcation: transcation_id, paid_at: new Date() }, { new: true });
             return result;
         } else {
             throw new Error('You can not pay this bill');

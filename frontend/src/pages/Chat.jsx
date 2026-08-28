@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { Send, Bot, User, ShieldAlert, Sparkles, MessageSquare, RefreshCw } from 'lucide-react';
 
@@ -63,7 +64,7 @@ const Chat = () => {
       } else {
         // Mock response if guest access
         await new Promise((resolve) => setTimeout(resolve, 1500));
-        const botMock = "I am a medical assistant bot. Please Sign In to verify credentials and access the full Gemini-powered diagnostic assistant.";
+        const botMock = "I am a medical assistant bot. Please Sign In to verify credentials and access the full AI-powered diagnostic assistant.";
         setMessages((prev) => [
           ...prev,
           { sender: 'bot', content: botMock, created_at: new Date() }
@@ -102,7 +103,7 @@ const Chat = () => {
         </div>
         <h2 className="text-3xl font-black text-teal-950 font-heading">AI Medical Consultation</h2>
         <p className="text-slate-500 text-sm max-w-sm mx-auto leading-relaxed">
-          Access to our Gemini-powered telehealth advisor is restricted to registered patients. Please sign in to establish a session.
+          Access to our AI-powered telehealth advisor is restricted to registered patients. Please sign in to establish a session.
         </p>
         <div className="pt-2">
           <Link
@@ -128,10 +129,6 @@ const Chat = () => {
           <div className="text-left">
             <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-1.5 font-heading">
               MediCare AI Advisor
-              <span className="inline-flex items-center gap-1 text-[9px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded-full uppercase">
-                <Sparkles className="w-2.5 h-2.5" />
-                Gemini
-              </span>
             </h3>
             <p className="text-[10px] text-slate-400">Virtual Screening desk • HIPAA Compliant</p>
           </div>

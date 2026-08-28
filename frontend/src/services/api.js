@@ -249,15 +249,15 @@ export const api = {
     }
   },
 
-  completeAppointment: async (appointment_id, proof) => {
+  completeAppointment: async (appointment_id, proof, vitals) => {
     try {
-      const response = await apiClient.post('/database/appointment/mark/complete', { appointment_id, proof });
+      const response = await apiClient.post('/database/appointment/mark/complete', { appointment_id, proof, vitals });
       return response.data;
     } catch (e) {
       console.warn("completeAppointment failed:", e.message);
       const appointments = JSON.parse(localStorage.getItem('medicare_appointments') || '[]');
       const updated = appointments.map(app => 
-        app._id === appointment_id ? { ...app, status: 'completed', proof } : app
+        app._id === appointment_id ? { ...app, status: 'completed', proof, vitals } : app
       );
       localStorage.setItem('medicare_appointments', JSON.stringify(updated));
       return updated;

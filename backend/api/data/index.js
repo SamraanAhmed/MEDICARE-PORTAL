@@ -261,7 +261,7 @@ router.post('/appointment/mark/cancel', authenticate, async (req, res) => {
             return res.status(403).json({ message: 'Forbidden: You are not an user' });
         }
         const appointmentPatient = await getUserFromAppointment(req.body.appointment_id);
-        if (appointmentPatient._id === req.user._id) {
+        if (appointmentPatient._id.toString() === req.user._id.toString()) {
             const result = await updateAppointment({
                 appointment_id: req.body.appointment_id,
                 status: 'cancelled'
@@ -311,8 +311,8 @@ router.post('/appointment/mark/complete', authenticate, async (req, res) => {
             return res.status(403).json({ message: 'Forbidden: You are not an Doctor' });
         }
         const appointmentDoctor = await getDoctorFromAppointment(req.body.appointment_id);
-        if (appointmentDoctor._id === req.user._id) {
-            const result = await markAppointmentAsCompleted(req.body.appointment_id, req.body.proof);
+        if (appointmentDoctor._id.toString() === req.user._id.toString()) {
+            const result = await markAppointmentAsCompleted(req.body.appointment_id, req.body.proof, req.body.vitals);
             res.status(200).json(result);
         } else {
             throw new Error('You cannt mark this appointment');
