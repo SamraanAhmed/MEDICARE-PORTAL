@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShieldCheck, Award, Users, ArrowRight, Activity, Smile, PhoneCall, Sparkles, MessageSquare } from 'lucide-react';
+import { Heart, ShieldCheck, Award, Users, ArrowRight, Activity, Smile, PhoneCall, Sparkles, MessageSquare, CalendarCheck, Bot } from 'lucide-react';
 import DnaModel from '../components/DnaModel';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Home = () => {
+  const servicesTrackRef = useRef(null);
+  const servicesSectionRef = useRef(null);
+  const bannerRef = useRef(null);
+  const testimonialsRef = useRef(null);
+
   const departments = [
     {
       id: 'cardiology',
@@ -11,7 +21,7 @@ const Home = () => {
       description: 'Comprehensive coronary care, diagnostic mapping, and rhythm control monitored by seasoned cardiologists.',
       icon: Heart,
       color: 'text-rose-500 bg-rose-50 border-rose-100',
-      image: 'https://images.unsplash.com/photo-1579684389782-64d84b5e905d?auto=format&fit=crop&q=80&w=400',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYgYBIlm5witDE7hCW56t0r3TAUC_dAj__12fCxjPrhw&s=10',
     },
     {
       id: 'dermatology',
@@ -19,7 +29,7 @@ const Home = () => {
       description: 'Advanced clinical treatments for complex skin disorders, oncology checks, and aesthetics.',
       icon: Sparkles,
       color: 'text-amber-500 bg-amber-50 border-amber-100',
-      image: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?auto=format&fit=crop&q=80&w=400',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcO7DshGSpIzLSxbucc8XAWugxCP76IIOGh2XRlrv-iA&s',
     },
     {
       id: 'orthopedics',
@@ -27,7 +37,7 @@ const Home = () => {
       description: 'Restoring joint motility and skeletal strength through non-invasive therapies and robotic surgeries.',
       icon: Activity,
       color: 'text-indigo-500 bg-indigo-50 border-indigo-100',
-      image: 'https://images.unsplash.com/photo-1530026405186-ed1ea0ac7a63?auto=format&fit=crop&q=80&w=400',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsOS8SngKLoulKiz5ZNrc7ZKtOG-dvVMf7AYIFup7lsw&s=10',
     },
     {
       id: 'diagnostics',
@@ -35,7 +45,7 @@ const Home = () => {
       description: 'Precision pathology reports, high-resolution radiology scans, and molecular profiling.',
       icon: ShieldCheck,
       color: 'text-teal-500 bg-teal-50 border-teal-100',
-      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTp_sk6IYUurZTuKa4lUV8AyV2Ql4gzF2v47xS3GGlc-g&s=10',
     },
   ];
 
@@ -46,8 +56,76 @@ const Home = () => {
     { value: '24/7', label: 'Telemedicine Desk', icon: PhoneCall },
   ];
 
+  // GSAP ScrollTrigger for horizontal scroll of Clinical Services
+  useGSAP(() => {
+    const track = servicesTrackRef.current;
+    const section = servicesSectionRef.current;
+    if (!track || !section) return;
+
+    // Calculate how far to scroll: track width minus viewport
+    const getScrollAmount = () => {
+      const trackWidth = track.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      return -(trackWidth - viewportWidth);
+    };
+
+    const tween = gsap.to(track, {
+      x: getScrollAmount,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: () => `+=${Math.abs(getScrollAmount())}`,
+        pin: true,
+        scrub: 1,
+        invalidateOnRefresh: true,
+        anticipatePin: 1,
+      },
+    });
+
+    return () => {
+      tween.scrollTrigger?.kill();
+      tween.kill();
+    };
+  }, { scope: servicesSectionRef });
+
+  // GSAP float animation for the Chatbot Banner
+  useGSAP(() => {
+    if (!bannerRef.current) return;
+    
+    gsap.from(bannerRef.current, {
+      y: 100,
+      opacity: 0,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: bannerRef.current,
+        start: 'top 85%',
+        toggleActions: 'play none none reverse'
+      }
+    });
+  });
+
+  // GSAP staggered animation for Testimonial Cards
+  useGSAP(() => {
+    if (!testimonialsRef.current) return;
+    
+    gsap.from('.testimonial-card', {
+      y: 50,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.2,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: testimonialsRef.current,
+        start: 'top 80%',
+        toggleActions: 'play none none reverse'
+      }
+    });
+  });
+
   return (
-    <div className="space-y-24 pb-20">
+    <div className="pb-20">
       {/* 1. Hero Section */}
       <section className="relative h-[calc(100vh-80px)] min-h-[550px] md:min-h-[750px] flex items-center bg-[#fafffd]">
         
@@ -57,19 +135,38 @@ const Home = () => {
         </div>
 
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-30">
-          {/* Left Content */}
-          <div className="space-y-6 text-left max-w-xl mt-10 md:mt-0">
-            <h1 className="text-6xl sm:text-7xl md:text-8xl font-black text-slate-900 leading-none tracking-tighter uppercase">
-              MediCare
+          {/* Left Content — shifted slightly upward */}
+          <div className="space-y-6 text-left max-w-xl -mt-8 md:-mt-16">
+            <h1 className="font-black text-slate-900 leading-[0.85] tracking-tighter uppercase">
+              <span className="block text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] text-black">Medi</span>
+              <span className="block text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] text-black">Care</span>
             </h1>
             <p className="text-base sm:text-lg text-slate-600 max-w-md font-body leading-relaxed">
               Your trusted partner in health. We provide advanced clinical services, diagnostics, and 24/7 virtual care to ensure your well-being.
             </p>
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-4 pt-2">
+              <Link
+                to="/book"
+                className="inline-flex items-center gap-2.5 px-8 py-4 bg-teal-850 hover:bg-teal-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm group"
+              >
+                <CalendarCheck className="w-5 h-5" />
+                Book Consultant
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-chatbot'))}
+                className="inline-flex items-center gap-2.5 px-8 py-4 bg-white border-2 border-teal-850 text-teal-850 hover:bg-teal-50 font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-sm cursor-pointer group"
+              >
+                <Bot className="w-5 h-5" />
+                MediCare Assistant
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-
+      <div className="space-y-24">
 
       {/* 2. Statistics Section */}
       <section className="bg-black py-16 text-white relative overflow-hidden">
@@ -92,33 +189,43 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 3. Department Highlights */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center max-w-2xl mx-auto space-y-4">
-          <h2 className="text-3xl sm:text-4xl font-black text-teal-950 font-heading">
-            Our Dedicated Clinical Services
-          </h2>
-          <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
-            MediCare houses state-of-the-art departments engineered to cater to all aspects of clinical science, offering virtual scheduling and AI support.
-          </p>
+      {/* 3. Department Highlights — Horizontal Scroll with ScrollTrigger */}
+      <section ref={servicesSectionRef} className="services-scroll-section relative overflow-hidden">
+        {/* Section Header (pinned overlay) */}
+        <div className="absolute top-8 left-0 right-0 z-10 px-4 sm:px-6 lg:px-8">
+          <div className="section-header-anim max-w-7xl mx-auto text-center flex flex-col items-center space-y-3">
+            <h2 className="text-3xl sm:text-4xl font-black text-teal-950 font-heading">
+              Our Dedicated Clinical Services
+            </h2>
+            <p className="text-slate-500 text-sm sm:text-base leading-relaxed max-w-xl">
+              MediCare houses state-of-the-art departments engineered to cater to all aspects of clinical science, offering virtual scheduling and AI support.
+            </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {departments.map((dept) => {
+        {/* Horizontal Scroll Track */}
+        <div
+          ref={servicesTrackRef}
+          className="services-scroll-track flex items-center gap-8 pt-36 pb-12 pl-8 pr-[30vw]"
+          style={{ width: 'max-content' }}
+        >
+          {departments.map((dept, index) => {
             const Icon = dept.icon;
+            const isOffset = index % 2 === 1; // 2nd and 4th cards are offset down
             return (
               <div
                 key={dept.id}
-                className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col group"
+                className={`services-card bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md transition-all duration-500 flex flex-col group hover:shadow-2xl ${isOffset ? 'mt-16' : 'mt-0'}`}
+                style={{ width: '340px', minWidth: '340px', flexShrink: 0 }}
               >
-                <div className="h-44 overflow-hidden relative">
+                <div className="h-48 overflow-hidden relative">
                   <img
                     src={dept.image}
                     alt={dept.name}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
+                    className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
-                  <div className={`absolute bottom-3 left-3 p-2.5 rounded-2xl border ${dept.color} shadow-md`}>
+                  <div className={`absolute bottom-3 left-3 p-2.5 rounded-2xl border ${dept.color} shadow-md backdrop-blur-sm`}>
                     <Icon className="w-5 h-5" />
                   </div>
                 </div>
@@ -142,7 +249,7 @@ const Home = () => {
       </section>
 
       {/* 4. Telehealth Promo / AI Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section ref={bannerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-gradient-to-br from-black to-slate-950 rounded-3xl p-8 sm:p-12 lg:p-16 text-white relative overflow-hidden shadow-xl border border-slate-800">
           <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full filter blur-3xl -z-10 translate-x-12 -translate-y-12"></div>
           
@@ -192,8 +299,8 @@ const Home = () => {
       </section>
 
       {/* 5. Interactive Testimonial Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center max-w-xl mx-auto space-y-4">
+      <section ref={testimonialsRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        <div className="section-header-anim text-center max-w-xl mx-auto space-y-4">
           <h2 className="text-3xl font-black text-teal-950 font-heading">What Our Patients Say</h2>
           <p className="text-slate-500 text-xs sm:text-sm">
             Read stories of recovery and clinical satisfaction from patients registered in our databases.
@@ -201,7 +308,7 @@ const Home = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xs relative text-left">
+          <div className="testimonial-card bg-white p-8 rounded-3xl border border-slate-100 shadow-xs relative text-left">
             <p className="text-sm text-slate-600 leading-relaxed font-body italic">
               "Booking a cardiologist was incredibly fast. I selected Cardiology, and within seconds the portal scheduled me with Dr. Sarah Jenkins on my chosen date. Fully digital!"
             </p>
@@ -214,7 +321,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xs relative text-left">
+          <div className="testimonial-card bg-white p-8 rounded-3xl border border-slate-100 shadow-xs relative text-left">
             <p className="text-sm text-slate-600 leading-relaxed font-body italic">
               "The AI chatbot analyzed my minor rash and suggested dermatologist checking. The booking engine assigned me to Dr. Chen, who resolved my condition. Simply excellent experience!"
             </p>
@@ -227,7 +334,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xs relative text-left">
+          <div className="testimonial-card bg-white p-8 rounded-3xl border border-slate-100 shadow-xs relative text-left">
             <p className="text-sm text-slate-600 leading-relaxed font-body italic">
               "As an administrator, registering new diagnostic services and tracking active hospital pillars is unified. The dashboard layouts are neat, reactive, and responsive."
             </p>
@@ -242,6 +349,7 @@ const Home = () => {
         </div>
       </section>
 
+      </div>
     </div>
   );
 };

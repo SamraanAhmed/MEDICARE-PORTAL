@@ -69,8 +69,8 @@ const Feedback = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 space-y-8 text-left">
-      <div className="space-y-2">
+    <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
+      <div className="section-header-anim space-y-2 text-center">
         <h1 className="text-3xl sm:text-4xl font-black text-teal-950 font-heading">Empower Our Care</h1>
         <p className="text-sm text-slate-500 font-body">Your reviews and ratings directly improve our clinical operations and patient support experience.</p>
       </div>

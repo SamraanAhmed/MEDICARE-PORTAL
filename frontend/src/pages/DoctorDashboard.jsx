@@ -100,6 +100,10 @@ const DoctorDashboard = () => {
     try {
       // Call doctor appointment completion logic with vitals
       await api.completeAppointment(apptId, proofText, vitalsObj);
+      
+      const appt = pendingList.find(a => a._id === apptId);
+      const svc = typeof appt?.service === 'object' ? appt.service : (services.find(s => s._id === appt?.service) || {});
+      
       setActiveProofInput(null);
       setProofText('');
       setHeartRate('');
@@ -136,8 +140,8 @@ const DoctorDashboard = () => {
   return (
     <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       
-      {/* 1. Header Profile Box */}
-      <div className="doctor-header bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden">
+      {/* 1. Profile Header & Active Control */}
+      <div className="doctor-header bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-md flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-44 h-44 bg-teal-50/30 rounded-bl-full -z-10"></div>
         <div className="flex items-center gap-5">
           <img
@@ -355,7 +359,7 @@ const DoctorDashboard = () => {
           )}
         </div>
 
-        {/* Side Panel Guide */}
+        {/* Sidebar widgets */}
         <div className="doctor-sidebar-widget lg:col-span-4 space-y-6 text-left">
           <div className="bg-slate-900 text-white rounded-3xl p-6 relative overflow-hidden border border-slate-800 shadow-md">
             <h4 className="text-xs font-bold text-teal-300 uppercase tracking-wider mb-2">Physician Guidelines</h4>

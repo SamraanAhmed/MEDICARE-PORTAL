@@ -225,7 +225,10 @@ export const api = {
     localAppointments.push(newAppointment);
     localStorage.setItem('medicare_appointments', JSON.stringify(localAppointments));
 
-    return response.data || newAppointment;
+    // Attach the backend-assigned doctor ID so the caller can fetch real doctor details
+    const result = response.data || newAppointment;
+    result._backendDoctorId = response.data?.doctor || null;
+    return result;
   },
 
   getPatientAppointments: async (patientId) => {
@@ -313,6 +316,17 @@ export const api = {
 
   getDoctors: () => {
     return JSON.parse(localStorage.getItem('medicare_doctors') || '[]');
+  },
+
+  getDoctorById: async (doctorId) => {
+    try {
+      const response = await apiClient.get(`/database/get/doctor/${doctorId}`);
+      return response.data;
+    } catch (e) {
+      console.warn('getDoctorById failed, using local fallback:', e.message);
+      const doctors = JSON.parse(localStorage.getItem('medicare_doctors') || '[]');
+      return doctors.find(d => d._id === doctorId) || null;
+    }
   },
 
   // --- NEW PAYMENT & BILLING ENDPOINTS ---

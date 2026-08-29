@@ -34,10 +34,10 @@ const BookAppointment = () => {
   useGSAP(() => {
     if (successAppt) return; // Skip entry animations if confirmed screen is active
 
-    // Header Animation
+    // Booking Header
     gsap.from('.booking-header', {
       opacity: 0,
-      y: -20,
+      y: -30,
       duration: 0.8,
       ease: 'power3.out'
     });
@@ -55,7 +55,7 @@ const BookAppointment = () => {
       opacity: 0,
       y: 15,
       stagger: 0.1,
-      duration: 0.5,
+      duration: 0.6,
       ease: 'power3.out',
       delay: 0.2
     });
@@ -90,16 +90,29 @@ const BookAppointment = () => {
       // 1. Book appointment (which calls real backend database POST create/appointment endpoint)
       const res = await api.createAppointment(data.service, data.date, data.note);
       
-      // 2. Fetch full lists to extract doctor details for success display
-      const localDocs = api.getDoctors();
+      // 2. Fetch the real assigned doctor from the backend using the doctor ID
       const selectedService = services.find(s => s._id === data.service);
-      const assignedDoctor = localDocs.find(d => d.pillar === selectedService?.pillar) || localDocs[0];
+      let doctorName = 'Dr. Assigned Consultant';
+      let doctorAvatar = null;
 
+      const backendDoctorId = res._backendDoctorId || res.doctor;
+      if (backendDoctorId) {
+        try {
+          const realDoctor = await api.getDoctorById(backendDoctorId);
+          if (realDoctor) {
+            doctorName = realDoctor.name || doctorName;
+            doctorAvatar = realDoctor.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(realDoctor.name)}&background=115E59&color=fff`;
+          }
+        } catch (fetchErr) {
+          console.warn('Could not fetch assigned doctor details:', fetchErr);
+        }
+      }
+      
       setSuccessAppt({
         date: data.date,
         service: selectedService?.service_name || 'Medical Care',
-        doctor: assignedDoctor?.name || 'Dr. Assigned Consultant',
-        avatar: assignedDoctor?.avatar,
+        doctor: doctorName,
+        avatar: doctorAvatar,
       });
     } catch (err) {
       setSubmitError(err.message || 'Unable to book appointment. Ensure a doctor is available on the chosen date.');

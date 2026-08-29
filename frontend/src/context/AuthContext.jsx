@@ -3,9 +3,19 @@ import api from '../services/api';
 
 const AuthContext = createContext(null);
 
+// Helper: restore user/role from localStorage synchronously on first load
+const getStoredUser = () => {
+  try {
+    const stored = localStorage.getItem('medicare_user');
+    return stored ? JSON.parse(stored) : null;
+  } catch { return null; }
+};
+const getStoredRole = () => localStorage.getItem('medicare_role') || null;
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null); // 'user', 'doctor', or 'admin'
+  // Initialize from localStorage immediately so user stays logged in across reloads
+  const [user, setUser] = useState(getStoredUser);
+  const [role, setRole] = useState(getStoredRole);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -14,13 +24,15 @@ export const AuthProvider = ({ children }) => {
       try {
         const profile = await api.getCurrentUser();
         if (profile) {
+          // Merge: prefer server data, but keep localStorage name if server doesn't have one
+          const existingUser = getStoredUser();
           const userProfile = {
             _id: profile._id,
             email: profile.email,
-            name: profile.name || (profile.role === 'doctor' ? 'Dr. Sarah Jenkins' : profile.role === 'admin' ? 'System Administrator' : 'Jane Doe'),
-            gender: profile.gender || 'not-specified',
-            avatar: profile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'User')}&background=115E59&color=fff`,
-            pillar: profile.pillar || null,
+            name: profile.name || existingUser?.name || 'User',
+            gender: profile.gender || existingUser?.gender || 'not-specified',
+            avatar: profile.avatar || existingUser?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || existingUser?.name || 'User')}&background=115E59&color=fff`,
+            pillar: profile.pillar || existingUser?.pillar || null,
           };
           setUser(userProfile);
           setRole(profile.role);
@@ -28,21 +40,9 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('medicare_role', profile.role);
         }
       } catch (err) {
-        // Fallback to local storage if server is unreachable (offline mode)
-        if (err.message.includes('offline') || err.message.includes('unreachable')) {
-          const storedUser = localStorage.getItem('medicare_user');
-          const storedRole = localStorage.getItem('medicare_role');
-          if (storedUser && storedRole) {
-            setUser(JSON.parse(storedUser));
-            setRole(storedRole);
-          }
-        } else {
-          // Clear stale local session if server actively rejected
-          setUser(null);
-          setRole(null);
-          localStorage.removeItem('medicare_user');
-          localStorage.removeItem('medicare_role');
-        }
+        // Server failed or rejected — keep localStorage session intact
+        // User will only be logged out when they explicitly click logout
+        console.info('Session check failed, keeping local session:', err.message);
       } finally {
         setLoading(false);
       }
@@ -65,14 +65,12 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Invalid login role specified');
       }
 
-      // If user details (like name) are missing from backend login response due to query selections,
-      // fallback to assigning a sensible mock profile matching the role.
       const userProfile = {
         _id: responseData._id,
         email: responseData.email || email,
-        name: responseData.name || (selectedRole === 'doctor' ? 'Dr. Consultant' : selectedRole === 'admin' ? 'System Administrator' : 'Patient Member'),
+        name: responseData.name || email.split('@')[0],
         gender: responseData.gender || 'not-specified',
-        avatar: responseData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(responseData.name || 'User')}&background=115E59&color=fff`,
+        avatar: responseData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(responseData.name || email.split('@')[0])}&background=115E59&color=fff`,
         pillar: responseData.pillar || null,
       };
 

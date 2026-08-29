@@ -23,6 +23,12 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close drawer and dropdown on route change
+  useEffect(() => {
+    setDrawerOpen(false);
+    setDropdownOpen(false);
+  }, [location.pathname]);
+
   const handleLogout = async () => {
     await logout();
     setDropdownOpen(false);
@@ -50,6 +56,16 @@ const Navbar = () => {
     if (role === 'admin') return '/dashboard/admin';
     if (role === 'doctor') return '/dashboard/doctor';
     return '/dashboard/patient';
+  };
+
+  const getInitials = (name, role) => {
+    if (role === 'admin') return 'AD';
+    if (!name) return 'U';
+    const words = name.trim().split(/\s+/);
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
   };
 
   return (
@@ -93,11 +109,9 @@ const Navbar = () => {
                     onBlur={() => setTimeout(() => setDropdownOpen(false), 205)}
                     className="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-slate-205 bg-slate-50/50 hover:bg-slate-100 transition-all cursor-pointer focus:outline-hidden"
                   >
-                    <img
-                      src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=115E59&color=fff`}
-                      alt={user.name}
-                      className="w-8 h-8 rounded-full border border-teal-500 object-cover shrink-0"
-                    />
+                    <div className="w-8 h-8 rounded-full border border-teal-500 bg-teal-850 text-white flex items-center justify-center font-bold text-[10px] shrink-0 shadow-xs">
+                      {getInitials(user.name, role)}
+                    </div>
                     <div className="text-left hidden sm:block">
                       <p className="text-xs font-bold text-slate-800 leading-3">{user.name}</p>
                       <span className="text-[9px] text-teal-700 capitalize font-bold">{role}</span>
@@ -162,11 +176,11 @@ const Navbar = () => {
                     <div className="absolute right-0 mt-2.5 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 p-2.5 animate-in fade-in slide-in-from-top-3 duration-205 z-50">
                       <p className="text-[11px] text-slate-450 px-2 py-1 mb-2 text-left font-medium">Welcome, Guest</p>
                       <Link
-                        to="/auth"
+                        to="/"
                         className="w-full py-2 bg-teal-800 hover:bg-teal-900 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-1.5 text-xs shadow-xs"
                       >
                         <User className="w-3.5 h-3.5" />
-                        Sign In
+                        Go to Portal
                       </Link>
                     </div>
                   )}
@@ -243,11 +257,9 @@ const Navbar = () => {
         <div className="p-5 border-t border-slate-100 bg-slate-50/50">
           {user ? (
             <div className="flex items-center gap-3">
-              <img
-                src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=115E59&color=fff`}
-                alt={user.name}
-                className="w-10 h-10 rounded-full border border-teal-500 object-cover"
-              />
+              <div className="w-10 h-10 rounded-full border border-teal-500 bg-teal-850 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
+                {getInitials(user.name, role)}
+              </div>
               <div className="text-left">
                 <p className="text-sm font-bold text-slate-800 leading-tight">{user.name}</p>
                 <p className="text-xs text-teal-600 capitalize font-semibold">{role}</p>

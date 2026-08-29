@@ -271,12 +271,12 @@ const PatientDashboard = () => {
 
       {/* Health Vitals Summary Row */}
       <div className="space-y-4">
-        <h3 className="text-lg font-bold text-teal-950 font-heading text-left pl-1">Vitals Tracker</h3>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <h3 className="text-lg font-bold text-teal-950 font-heading text-left pl-1">Vitals Summary Row</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {healthMetrics.map((metric, i) => (
             <div
               key={i}
-              className="vitals-card bg-white p-5 rounded-2xl border border-slate-100 shadow-xs hover:shadow-md transition-shadow text-left space-y-3"
+              className="vitals-card bg-white p-6 rounded-3xl border border-slate-100 shadow-xs flex flex-col gap-2 text-left"
             >
               <div className="flex justify-between items-center">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{metric.label}</span>
@@ -293,11 +293,8 @@ const PatientDashboard = () => {
         </div>
       </div>
 
-      {/* Bottom Grid: Appointments History & Directives */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* Appointments List Column */}
-        <div className="appt-register lg:col-span-8 space-y-6 text-left">
+      {/* Bottom: Appointments History */}
+      <div className="appt-register bg-white rounded-3xl border border-slate-100 shadow-sm p-6 sm:p-8 text-left min-h-[500px]">
           
           {/* Tabs header */}
           <div className="flex gap-4 border-b border-slate-100 pb-2">
@@ -468,30 +465,6 @@ const PatientDashboard = () => {
           )}
         </div>
 
-        {/* Informative Side Card */}
-        <div className="telehealth-reminders lg:col-span-4 space-y-6 text-left">
-          <div className="bg-black text-white rounded-3xl p-6 relative overflow-hidden border border-slate-800 shadow-xl z-0">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-teal-800/10 rounded-full blur-2xl -z-10"></div>
-            <div className="absolute -bottom-5 -left-5 w-32 h-32 bg-teal-950/20 rounded-full blur-2xl -z-10"></div>
-            <h4 className="text-xs font-bold text-teal-400 uppercase tracking-wider mb-2">Telehealth Reminders</h4>
-            <ul className="space-y-4 text-xs text-slate-400 mt-4 leading-relaxed font-body">
-              <li className="flex gap-2">
-                <Clock className="w-4 h-4 text-teal-400 shrink-0" />
-                <span>Join virtual desk consults 5 minutes prior to scheduled slots.</span>
-              </li>
-              <li className="flex gap-2">
-                <ShieldCheck className="w-4 h-4 text-teal-400 shrink-0" />
-                <span>Keep medical record files ready. You can query clinical details with the AI bot.</span>
-              </li>
-              <li className="flex gap-2">
-                <UserCheck className="w-4 h-4 text-teal-400 shrink-0" />
-                <span>Proof documents (prescriptions/notes) will show directly on booking cards post completion.</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-      </div>
 
       {/* Payment Modal Overlay */}
       {payingAppointment && (

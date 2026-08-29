@@ -80,3 +80,24 @@ img[src*="medicarelogo"] {
 .text-white {
   color: #f0fdfa !important;
 }
+
+/* Horizontal scroll services section */
+.services-scroll-section {
+  height: 100vh;
+  width: 100%;
+}
+
+.services-scroll-track {
+  will-change: transform;
+}
+
+.services-card {
+  will-change: transform;
+  transition: box-shadow 0.5s ease, transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;
+}
+
+/* Dim other cards only when a specific card is hovered */
+.services-scroll-track:has(.services-card:hover) .services-card:not(:hover) {
+  opacity: 0.4;
+  filter: grayscale(100%);
+}

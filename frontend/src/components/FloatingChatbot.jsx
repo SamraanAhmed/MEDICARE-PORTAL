@@ -120,8 +120,6 @@ const FloatingChatbot = () => {
             alt="AI Assistant" 
             className="w-full h-full object-contain"
           />
-          <span className="absolute top-2 right-2 w-3.5 h-3.5 bg-teal-500 rounded-full border border-white animate-ping" />
-          <span className="absolute top-2 right-2 w-3.5 h-3.5 bg-teal-500 rounded-full border border-white" />
         </button>
       )}
 
@@ -137,7 +135,6 @@ const FloatingChatbot = () => {
                   alt="AI Assistant Logo" 
                   className="w-full h-full object-contain"
                 />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-teal-500 rounded-full" />
               </div>
               <div className="text-left font-sans">
                 <h3 className="text-sm font-extrabold flex items-center gap-1 font-heading text-white">

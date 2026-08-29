@@ -453,6 +453,28 @@ router.get('/get/doctor/all', authenticate, async (req, res) => {
         });
     }
 });
+router.get('/get/doctor/:id', authenticate, async (req, res) => {
+    try {
+        const result = await getdoctor(req.params.id);
+        if (!result) {
+            return res.status(404).json({ message: 'Doctor not found' });
+        }
+        // Return only public fields (no password)
+        res.status(200).json({
+            _id: result._id,
+            name: result.name,
+            email: result.email,
+            pillar: result.pillar,
+            gender: result.gender,
+            avatar: result.avatar,
+            available: result.available
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
 router.get('/get/appointment/all', authenticate, async (req, res) => {
     try {
         if (req.user.role !== 'admin') {

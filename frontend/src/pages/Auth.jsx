@@ -74,7 +74,7 @@ const Auth = () => {
   const onLoginSubmit = async (data) => {
     setSubmitError(null);
     try {
-      await login(data.email, data.password, 'user');
+      const res = await login(data.email, data.password, 'user');
       navigate('/dashboard/patient');
     } catch (err) {
       setSubmitError(err.message || 'Login failed. Please check your credentials.');
@@ -98,7 +98,7 @@ const Auth = () => {
   };
 
   return (
-    <div ref={containerRef} className="min-h-[calc(100vh-80px)] flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50/50">
+    <div ref={containerRef} className="min-h-[calc(100vh-80px)] flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-[#fafffd]">
       <div className="auth-card max-w-md w-full bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden text-left relative">
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-850 to-teal-600"></div>
 

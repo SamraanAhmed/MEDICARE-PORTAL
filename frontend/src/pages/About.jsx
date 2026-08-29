@@ -125,7 +125,7 @@ const About = () => {
             </ul>
           </div>
 
-          {/* Card 2: AI Diagnostic Engine */}
+          {/* Card 2: AI Tech Integration */}
           <div className="about-section-card bg-white rounded-3xl border border-slate-100 p-8 shadow-xs hover:shadow-md transition-shadow text-left space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-800 flex items-center justify-center">
               <Activity className="w-6 h-6" />
@@ -147,7 +147,7 @@ const About = () => {
             </ul>
           </div>
 
-          {/* Card 3: Secure Auditing */}
+          {/* Card 3: Research Driven Excellence */}
           <div className="about-section-card bg-white rounded-3xl border border-slate-100 p-8 shadow-xs hover:shadow-md transition-shadow text-left space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-800 flex items-center justify-center">
               <ShieldCheck className="w-6 h-6" />
@@ -174,7 +174,7 @@ const About = () => {
 
       {/* 3. Academic Affiliation & Facilities Details */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center text-left py-6">
-        <div className="lg:col-span-6 space-y-6">
+        <div className="slide-in-left lg:col-span-6 section-header-anim space-y-6">
           <h2 className="text-3xl font-black text-teal-950 font-heading leading-tight">
             Ibadat International University Affiliated Healthcare
           </h2>
@@ -195,9 +195,9 @@ const About = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-6 relative">
+        <div className="slide-in-right lg:col-span-6 relative">
           {/* Visual card mockup demonstrating high aesthetics */}
-          <div className="bg-black text-white p-8 sm:p-12 rounded-3xl border border-slate-800 shadow-xl overflow-hidden relative z-0">
+          <div className="fade-up-anim bg-black text-white rounded-3xl border border-slate-800 p-8 sm:p-16 text-center space-y-8 relative overflow-hidden shadow-2xl z-0">
             <div className="absolute top-0 right-0 w-48 h-48 bg-teal-800/10 rounded-full blur-3xl -z-10"></div>
             <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-teal-950/20 rounded-full blur-3xl -z-10"></div>
             <div className="space-y-4">

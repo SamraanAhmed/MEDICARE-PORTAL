@@ -263,20 +263,20 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       
-      {/* 1. Header Admin Profile */}
-      <div className="admin-header bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden">
+      {/* 1. Header Profile Box */}
+      <div className="admin-header bg-black text-white rounded-3xl border border-slate-800 p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 text-left relative overflow-hidden">
         <div className="absolute top-0 right-0 w-44 h-44 bg-teal-50/30 rounded-bl-full -z-10"></div>
         <div className="flex items-center gap-5">
           <div className="w-16 h-16 rounded-2xl bg-teal-850 text-white flex items-center justify-center font-bold text-xl shadow-md">
             AD
           </div>
           <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-black text-teal-950 font-heading">Control Panel: {user.name}</h1>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
+            <h1 className="text-2xl sm:text-3xl font-black text-white font-heading">Control Panel: {user.name}</h1>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-300">
               <span className="flex items-center gap-1">
-                <User className="w-4 h-4 text-teal-850" />
+                <User className="w-4 h-4 text-teal-400" />
                 Staff Rank: System Administrator
               </span>
               <span>•</span>
@@ -288,12 +288,12 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Dashboard toggles */}
-        <div className="admin-tabs flex flex-wrap gap-1.5 bg-slate-100 p-1.5 rounded-2xl">
+        {/* 2. Top Navigation Tabs */}
+        <div className="admin-tabs flex flex-wrap gap-2 justify-start lg:justify-center border-b border-slate-700/50 pb-4">
           <button
             onClick={() => handleTabChange('services')}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeForm === 'services' ? 'bg-white text-teal-850 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+            className={`px-3.5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeForm === 'services' ? 'text-[#00d5be]' : 'text-[#fafffd] hover:text-[#00d5be]/80'
             }`}
           >
             <List className="w-4 h-4" />
@@ -301,8 +301,8 @@ const AdminDashboard = () => {
           </button>
           <button
             onClick={() => handleTabChange('patients')}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeForm === 'patients' ? 'bg-white text-teal-850 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+            className={`px-3.5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeForm === 'patients' ? 'text-[#00d5be]' : 'text-[#fafffd] hover:text-[#00d5be]/80'
             }`}
           >
             <User className="w-4 h-4" />
@@ -310,8 +310,8 @@ const AdminDashboard = () => {
           </button>
           <button
             onClick={() => handleTabChange('doctors')}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeForm === 'doctors' ? 'bg-white text-teal-850 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+            className={`px-3.5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeForm === 'doctors' ? 'text-[#00d5be]' : 'text-[#fafffd] hover:text-[#00d5be]/80'
             }`}
           >
             <Stethoscope className="w-4 h-4" />
@@ -319,8 +319,8 @@ const AdminDashboard = () => {
           </button>
           <button
             onClick={() => handleTabChange('appointments')}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeForm === 'appointments' ? 'bg-white text-teal-850 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+            className={`px-3.5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeForm === 'appointments' ? 'text-[#00d5be]' : 'text-[#fafffd] hover:text-[#00d5be]/80'
             }`}
           >
             <Calendar className="w-4 h-4" />
@@ -328,8 +328,8 @@ const AdminDashboard = () => {
           </button>
           <button
             onClick={() => handleTabChange('add-doctor')}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeForm === 'add-doctor' ? 'bg-white text-teal-850 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+            className={`px-3.5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeForm === 'add-doctor' ? 'text-[#00d5be]' : 'text-[#fafffd] hover:text-[#00d5be]/80'
             }`}
           >
             <Plus className="w-4 h-4" />
@@ -337,8 +337,8 @@ const AdminDashboard = () => {
           </button>
           <button
             onClick={() => handleTabChange('add-admin')}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeForm === 'add-admin' ? 'bg-white text-teal-850 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+            className={`px-3.5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeForm === 'add-admin' ? 'text-[#00d5be]' : 'text-[#fafffd] hover:text-[#00d5be]/80'
             }`}
           >
             <UserCheck className="w-4 h-4" />
@@ -346,8 +346,8 @@ const AdminDashboard = () => {
           </button>
           <button
             onClick={() => handleTabChange('inquiries')}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 relative ${
-              activeForm === 'inquiries' ? 'bg-white text-teal-850 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+            className={`px-3.5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 relative ${
+              activeForm === 'inquiries' ? 'text-[#00d5be]' : 'text-[#fafffd] hover:text-[#00d5be]/80'
             }`}
           >
             <Mail className="w-4 h-4" />
@@ -379,8 +379,8 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* 3. Main Content Section */}
-      <div className="admin-content-section">
+      {/* 3. Main Content Panel */}
+      <div className="admin-content-section min-h-[400px]">
         {loadingData ? (
           <div className="text-center py-12">
             <Clock className="w-8 h-8 text-slate-300 animate-spin mx-auto" />
@@ -390,8 +390,7 @@ const AdminDashboard = () => {
         /* Split view dashboard layout for creation states */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in fade-in duration-200">
           
-          {/* Left Hand: Services catalog table */}
-          <div className="lg:col-span-7 space-y-4 text-left">
+          <div className="slide-in-left lg:col-span-8 bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs text-left">
             <h3 className="text-lg font-bold text-teal-950 font-heading pl-1">Available Medical Services</h3>
             
             <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-xs">
@@ -438,7 +437,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Right Hand Form Column */}
-          <div className="lg:col-span-5 text-left animate-in fade-in duration-350">
+          <div className="lg:col-span-4 text-left animate-in fade-in duration-350">
             
             {activeForm === 'services' && (
               /* CREATE SERVICE FORM */
@@ -891,8 +890,8 @@ const AdminDashboard = () => {
           {activeForm === 'inquiries' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in fade-in duration-200">
               
-              {/* Left Column: Inquiry list */}
-              <div className="lg:col-span-6 space-y-4 text-left">
+              {/* Left side: Services List */}
+              <div className="lg:col-span-8 bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs text-left">
                 <h3 className="text-lg font-bold text-teal-950 font-heading pl-1">Patient Inquiries</h3>
                 <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-xs">
                   {inquiriesList.length === 0 ? (

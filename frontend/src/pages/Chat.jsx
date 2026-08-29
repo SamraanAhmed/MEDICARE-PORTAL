@@ -98,10 +98,12 @@ const Chat = () => {
   if (!user) {
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-6">
-        <div className="w-16 h-16 rounded-full bg-teal-50 text-teal-800 flex items-center justify-center mx-auto border border-teal-100">
-          <Bot className="w-8 h-8" />
+        <div className="section-header-anim text-center space-y-2 shrink-0">
+          <div className="w-16 h-16 rounded-full bg-teal-50 text-teal-800 flex items-center justify-center mx-auto border border-teal-100">
+            <Bot className="w-8 h-8" />
+          </div>
+          <h2 className="text-3xl font-black text-teal-950 font-heading">AI Medical Consultation</h2>
         </div>
-        <h2 className="text-3xl font-black text-teal-950 font-heading">AI Medical Consultation</h2>
         <p className="text-slate-500 text-sm max-w-sm mx-auto leading-relaxed">
           Access to our AI-powered telehealth advisor is restricted to registered patients. Please sign in to establish a session.
         </p>
