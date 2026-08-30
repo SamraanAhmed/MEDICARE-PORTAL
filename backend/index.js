@@ -32,22 +32,17 @@ app.get("/", (req, res) => {
   });
 });
 
-connectDB()
-  .then(() => {
+const startApp = async () => {
+  try {
+    await connectDB();
     console.log("Database connected successfully");
-  })
-  .catch((error) => {
-    console.warn("WARNING: MongoDB failed to connect. Mongoose operations will timeout. Error:", error.message);
-  });
+    app.listen(process.env.PORT || 5000, () => {
+      console.log(`Server is running on port ${process.env.PORT || 5000}`);
+    });
+  } catch (error) {
+    console.error("CRITICAL: Server initialization failed:", error.message);
+    process.exit(1);
+  }
+};
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log(`Server is running on port ${process.env.PORT || 5000}`);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.warn('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
-process.on('uncaughtException', (error) => {
-  console.warn('Uncaught Exception thrown:', error.message);
-});
+startApp();
