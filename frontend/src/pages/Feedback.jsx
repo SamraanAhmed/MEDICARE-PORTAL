@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { Star, Send, ShieldAlert, Sparkles, HeartHandshake, CheckCircle2, MessageSquare, AlertCircle } from 'lucide-react';
 
 const Feedback = () => {
   const { user } = useAuth();
+  const { showNotification } = useNotification();
   const [category, setCategory] = useState('General');
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
@@ -36,6 +38,7 @@ const Feedback = () => {
     
     try {
       await api.createContactForm(user.name, user.email, subject, message);
+      showNotification('Thanks for your feedback');
       setSuccess(true);
       setMessage('');
     } catch (err) {

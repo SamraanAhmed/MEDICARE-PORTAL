@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import { LogIn, UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -24,6 +25,7 @@ const registerSchema = z.object({
 const Auth = () => {
   const navigate = useNavigate();
   const { login, register: signUp, error: authError } = useAuth();
+  const { showNotification } = useNotification();
   
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
   const [showPassword, setShowPassword] = useState(false);
@@ -75,7 +77,8 @@ const Auth = () => {
     setSubmitError(null);
     try {
       const res = await login(data.email, data.password, 'user');
-      navigate('/dashboard/patient');
+      showNotification(`Welcome Back ! ${res?.name || 'Patient'}`);
+      window.dispatchEvent(new CustomEvent('page-transition', { detail: { to: '/dashboard/patient' } }));
     } catch (err) {
       setSubmitError(err.message || 'Login failed. Please check your credentials.');
     }
@@ -91,7 +94,8 @@ const Auth = () => {
         data.gender, 
         'user'
       );
-      navigate('/dashboard/patient');
+      showNotification(`Welcome! ${data.name}`);
+      window.dispatchEvent(new CustomEvent('page-transition', { detail: { to: '/dashboard/patient' } }));
     } catch (err) {
       setSubmitError(err.message || 'Registration failed. Email might already be taken.');
     }

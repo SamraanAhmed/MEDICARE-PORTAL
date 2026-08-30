@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import api from '../services/api';
 import { Calendar, Clock, AlertCircle, FileText, CheckCircle2, ChevronRight, Activity, ShieldCheck } from 'lucide-react';
 import { useGSAP } from '@gsap/react';
@@ -19,6 +20,7 @@ const appointmentSchema = z.object({
 
 const BookAppointment = () => {
   const { user } = useAuth();
+  const { showNotification } = useNotification();
   const navigate = useNavigate();
   const [services, setServices] = useState([]);
   const [successAppt, setSuccessAppt] = useState(null);
@@ -114,6 +116,8 @@ const BookAppointment = () => {
         doctor: doctorName,
         avatar: doctorAvatar,
       });
+
+      showNotification(`Appoinment for ${selectedService?.service_name || 'Medical Care'} Booked sucessfully`);
     } catch (err) {
       setSubmitError(err.message || 'Unable to book appointment. Ensure a doctor is available on the chosen date.');
     }

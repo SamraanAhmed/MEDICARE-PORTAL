@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { Calendar, Heart, ShieldCheck, Activity, Trash2, Clock, CheckCircle2, User, UserCheck, Eye, CreditCard, AlertCircle, X, Download, Printer } from 'lucide-react';
@@ -8,6 +9,7 @@ import gsap from 'gsap';
 
 const PatientDashboard = () => {
   const { user } = useAuth();
+  const { showNotification } = useNotification();
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -109,6 +111,7 @@ const PatientDashboard = () => {
     try {
       await api.payAppointment(paymentId, transactionId.trim());
       setPaymentSuccess('Payment completed successfully! Transaction logged.');
+      showNotification('Payement sucessfull');
       
       // Refresh after a brief delay
       setTimeout(async () => {

@@ -1,6 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
+import NotificationContainer from './components/NotificationContainer';
+import PageTransition from './components/PageTransition';
 import Layout from './components/Layout';
 import SmoothScroll from './components/SmoothScroll';
 
@@ -21,41 +24,45 @@ import Feedback from './pages/Feedback';
 const App = () => {
   return (
     <AuthProvider>
-      <Router>
-        <SmoothScroll>
-          <Layout>
-            <Routes>
-            {/* Landing page */}
-            <Route path="/" element={<Welcome />} />
-            <Route path="/home" element={<Home />} />
-            
-            {/* Lead generation and Contact */}
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/about" element={<About />} />
-            
-            {/* Login & Register Tabbed Interface */}
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<StaffAuth />} />
-            
-            {/* Appointment Booking Flow */}
-            <Route path="/book" element={<BookAppointment />} />
-            
-            {/* AI Assistant Messaging Desk */}
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/feedback" element={<Feedback />} />
-            
-            {/* Dashboards */}
-            <Route path="/dashboard/patient" element={<PatientDashboard />} />
-            <Route path="/dashboard/doctor" element={<DoctorDashboard />} />
-            <Route path="/dashboard/admin" element={<AdminDashboard />} />
+      <NotificationProvider>
+        <NotificationContainer />
+        <Router>
+          <PageTransition />
+          <SmoothScroll>
+            <Layout>
+              <Routes>
+                {/* Landing page */}
+                <Route path="/" element={<Welcome />} />
+                <Route path="/home" element={<Home />} />
+                
+                {/* Lead generation and Contact */}
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/about" element={<About />} />
+                
+                {/* Login & Register Tabbed Interface */}
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/admin" element={<StaffAuth />} />
+                
+                {/* Appointment Booking Flow */}
+                <Route path="/book" element={<BookAppointment />} />
+                
+                {/* AI Assistant Messaging Desk */}
+                <Route path="/chat" element={<Chat />} />
+                <Route path="/feedback" element={<Feedback />} />
+                
+                {/* Dashboards */}
+                <Route path="/dashboard/patient" element={<PatientDashboard />} />
+                <Route path="/dashboard/doctor" element={<DoctorDashboard />} />
+                <Route path="/dashboard/admin" element={<AdminDashboard />} />
 
-            {/* Catch-all fallback redirect */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Layout>
-      </SmoothScroll>
-    </Router>
-  </AuthProvider>
+                {/* Catch-all fallback redirect */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Layout>
+          </SmoothScroll>
+        </Router>
+      </NotificationProvider>
+    </AuthProvider>
   );
 };
 

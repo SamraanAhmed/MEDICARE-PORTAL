@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import { LogIn, AlertCircle, Eye, EyeOff, Lock, Stethoscope } from 'lucide-react';
 
 const loginSchema = z.object({
@@ -14,6 +15,7 @@ const loginSchema = z.object({
 const StaffAuth = () => {
   const navigate = useNavigate();
   const { login, error: authError } = useAuth();
+  const { showNotification } = useNotification();
   
   const [selectedRole, setSelectedRole] = useState('doctor'); // 'doctor' or 'admin'
   const [showPassword, setShowPassword] = useState(false);
@@ -27,11 +29,12 @@ const StaffAuth = () => {
     setSubmitError(null);
     try {
       const res = await login(data.email, data.password, selectedRole);
+      showNotification(`Welcome Back ! ${res?.name || 'Staff'}`);
       
       if (selectedRole === 'admin') {
-        navigate('/dashboard/admin');
+        window.dispatchEvent(new CustomEvent('page-transition', { detail: { to: '/dashboard/admin' } }));
       } else {
-        navigate('/dashboard/doctor');
+        window.dispatchEvent(new CustomEvent('page-transition', { detail: { to: '/dashboard/doctor' } }));
       }
     } catch (err) {
       setSubmitError(err.message || 'Login failed. Please check your credentials.');

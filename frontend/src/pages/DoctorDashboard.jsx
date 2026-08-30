@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import api from '../services/api';
 import { Calendar, User, CheckCircle2, Clock, XCircle, FileText, Stethoscope, Mail, ShieldAlert, Award } from 'lucide-react';
 import { useGSAP } from '@gsap/react';
@@ -7,6 +8,7 @@ import gsap from 'gsap';
 
 const DoctorDashboard = () => {
   const { user } = useAuth();
+  const { showNotification } = useNotification();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAvailable, setIsAvailable] = useState(true);
@@ -111,6 +113,8 @@ const DoctorDashboard = () => {
       setSleepCycles('');
       setBloodGlucose('');
       
+      showNotification(`Appoinment for ${svc?.service_name || 'Medical Care'} Reported  sucessfully`);
+
       // Reload lists
       loadDoctorData();
     } catch (err) {
